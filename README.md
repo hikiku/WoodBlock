@@ -1,3 +1,3 @@
 # Wood Block
 
-A tiny implementation of IEC-61499.
+A tiny implementation of IEC-61499 on Arduino.
