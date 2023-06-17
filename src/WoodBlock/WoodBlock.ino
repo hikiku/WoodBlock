@@ -1,44 +1,97 @@
+#include "WoodData.h"
+#include "WoodEvent.h"
 #include "WoodBlock.h"
+#include "WoodBlockContainer.h"
 
-class WebPortal: public WoodBlock
+// For user extend data type
+extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType)
 {
-  // TODO:
+  return false;
+}
+
+class WebPortal : public WoodServiceInterfaceBlock
+{
+public:
+  WebPortal(const String &name) : WoodServiceInterfaceBlock(name) {}
+  ~WebPortal() {}
+  void executionInEvent(WoodInEvent &inEvent)
+  {
+    // ......
+  }
+  WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent()
+  {
+    // TODO: ......
+    return nullptr;
+  }
+  void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent)
+  {
+    // ......
+  }
 };
 
-class Relay: public WoodBlock
+class OccupySensor : public WoodServiceInterfaceBlock
 {
-  // TODO:
+public:
+  OccupySensor(const String &name) : WoodServiceInterfaceBlock(name) {}
+  ~OccupySensor() {}
+  void executionInEvent(WoodInEvent &inEvent)
+  {
+    // ......
+  }
+  WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent()
+  {
+    // TODO: ......
+    return nullptr;
+  }
+  void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent)
+  {
+    // ......
+  }
 };
 
-class OccupySensor: public WoodBlock
+class Relay : public WoodBlock
 {
-  // TODO:
+public:
+  Relay(const String &name) : WoodBlock(name) {}
+  ~Relay() {}
+  void executionInEvent(WoodInEvent &inEvent)
+  {
+    // ......
+  }
 };
 
-Relay relay;
-OccupySensor occupySensor;
-WebPortal webPortal;
+Relay relay("relay");
+OccupySensor occupySensor("occupySensor");
+WebPortal webPortal("webPortal");
 
-void setup() {
+WoodBlockContainer blockContainer;
+
+void setup()
+{
   // put your setup code here, to run once:
+
+  blockContainer.hostWoodBlock(relay);
+  blockContainer.hostWoodBlock(occupySensor);
+  blockContainer.hostWoodBlock(webPortal);
 
   // TODO: INIT!
   {
-    const char * outVariables[] = {"occupied"};
-    const char * inVariables[] = {"occupied"};
-    CONNECT(occupySensor, "status", outVariables, sizeof(outVariables)/sizeof(outVariables(0)),
-            webPortal, "occupyStatus", inVariables, sizeof(inVariables)/sizeof(inVariables(0)));
-  }
+    const char *outVariableNames[] = {"occupied"};
+    const char *inVariableNames[] = {"occupied"};
 
+    blockContainer.connect("occupySensor", "status", outVariableNames, sizeof(outVariableNames) / sizeof(outVariableNames[0]),
+                           "webPortal", "occupyStatus", inVariableNames, sizeof(inVariableNames) / sizeof(inVariableNames[0]));
+  }
   {
-    const char * outVariables[] = {"relayOnOff"};
-    const char * inVariables[] = {"onOff"};
-    CONNECT(webPortal, "relayControl", outVariables, sizeof(outVariables)/sizeof(outVariables(0)),
-            webPortal, "control", inVariables, sizeof(inVariables)/sizeof(inVariables(0)));
+    const char *outVariableNames[] = {"relayOnOff"};
+    const char *inVariableNames[] = {"onOff"};
+    blockContainer.connect("webPortal", "relayControl", outVariableNames, sizeof(outVariableNames) / sizeof(outVariableNames[0]),
+                           "webPortal", "control", inVariableNames, sizeof(inVariableNames) / sizeof(inVariableNames[0]));
   }
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
 
   occupySensor.fetchExternalEvents();

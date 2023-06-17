@@ -7,7 +7,7 @@
 
 #include <WString.h>
 
-#include "WBMacro.h"
+#include "WoodMacro.h"
 #include "WoodBlock.h"
 
 // class WoodBlock;

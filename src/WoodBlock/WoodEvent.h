@@ -1,5 +1,5 @@
-#ifndef WoodBlock_class_h
-#define WoodBlock_class_h
+#ifndef WoodEvent_class_h
+#define WoodEvent_class_h
 #ifdef __cplusplus
 
 #include <list>
@@ -7,15 +7,11 @@
 
 #include <WString.h>
 
-#include "WBMacro.h"
+#include "WoodMacro.h"
 #include "WoodData.h"
-// #include "WoodBlock.h"
 
-class WoodBlock;
 class WoodInEvent;
 class WoodOutEvent;
-// class WoodInData;
-// class WoodOutData;
 
 // Wood Event Type
 #define EVENT_ANY (0)

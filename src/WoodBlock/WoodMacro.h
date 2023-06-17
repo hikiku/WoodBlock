@@ -1,3 +1,6 @@
+#ifndef WoodMacro_h
+#define WoodMacro_h
+
 #ifndef NULL
     #define NULL (void*)0
 #endif
@@ -29,3 +32,5 @@
     {                                        \
         return (result);                     \
     }
+
+#endif // WoodMacro

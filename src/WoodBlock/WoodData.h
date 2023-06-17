@@ -1,3 +1,14 @@
+#ifndef WoodData_class_h
+#define WoodData_class_h
+#ifdef __cplusplus
+
+#include <list>
+#include <iterator> //
+
+#include <WString.h>
+
+#include "WoodMacro.h"
+
 class WoodInData;
 class WoodOutData;
 
@@ -37,7 +48,7 @@ public:
     WoodDataBox(unsigned int dataType, unsigned int dataSize, void *dataPoint)
         : dataType(dataType), dataSize(dataSize), dataPoint(dataPoint) {}
 
-    virtual ~WoodDataBox() {} // TODO: = 0
+    virtual ~WoodDataBox() {} // TODO: = 0;
 
     unsigned int getDataType() { return dataType; }
     unsigned int getDataSize() { return dataSize; }
@@ -102,10 +113,10 @@ public:
         {
             delete data;
         }
-        setDataPoint(nullptr); // TODO: remove ?
+        setDataPoint(nullptr);
     }
 
-    T *getData() // TODO: const ???
+    T *getData()
     {
         return (T *)dataPoint();
     }
@@ -125,7 +136,7 @@ public:
         T *data = getData();
         if (data && from.getData())
         {
-            *data = from.getData(); // TODO: copy assign value function !
+            *data = from.getData(); // TODO: copy assign value function!
             return true;
         }
         else
@@ -151,16 +162,8 @@ typedef WoodDataBoxImpl<LREAL, DT_LREAL> WoodLRealDataBox; // Long real numbers 
 class WoodData
 {
 public:
-    // TODO:
-    WoodData(const char *name) //, WoodDataType dataType
-        : name(name)           //, dataType(dataType)
-    {
-    }
-    WoodData(const String &name) //, WoodDataType dataType
-        : name(name)             //, dataType(dataType)
-    {
-    }
-    virtual ~WoodData() {}
+    WoodData(const char *name) : name(name) {}
+    virtual ~WoodData() {} // TODO: = 0;
 
     const String &getName() { return name; }
 
@@ -172,7 +175,7 @@ private:
     // WoodDataType dataType;
 };
 
-// TODO: .........................
+// For user extend data type
 extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType);
 
 class WoodInData : public WoodData
@@ -182,7 +185,7 @@ public:
         : WoodData(name), outData(nullptr) //, dataType
     {
     }
-    // virtual ~WoodInData() {} // TODO: ?
+    // virtual ~WoodInData() {}
 
     bool isAlreadyConnected()
     {
@@ -547,7 +550,7 @@ class WoodOutData : public WoodData
 {
 public:
     WoodOutData(const char *name) : WoodData(name) {}
-    // virtual ~WoodOutData() {} // TODO: ?
+    // virtual ~WoodOutData() {}
 
 private:
 };
@@ -564,3 +567,6 @@ public:
 private:
     TDataBox dataBox;
 };
+
+#endif // __cplusplus
+#endif // WoodData

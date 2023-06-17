@@ -3,26 +3,13 @@
 #ifdef __cplusplus
 
 #include <list>
-#include <iterator>  //
+#include <iterator> //
 
 #include <WString.h>
 
-#include "WBMacro.h"
+#include "WoodMacro.h"
 #include "WoodData.h"
 #include "WoodEvent.h"
-
-//class WoodBlock;
-//class WoodInEvent;
-//class WoodOutEvent;
-//class WoodInData;
-//class WoodOutData;
-//class WoodServiceInterfaceInEvent;
-
-// class WoodEventType
-// {
-// public:
-//     static const char *EVENT_ANY = "EVENT_ANY";
-// };
 
 class WoodBlock
 {
@@ -32,7 +19,7 @@ public:
     {
         //
     }
-    virtual ~WoodBlock()
+    virtual ~WoodBlock() // TODO: = 0;
     {
         // std::list<WoodOutEvent &> triggeredOutEvents;
         triggeredOutEvents.clear();
@@ -303,9 +290,9 @@ private:
             inEvent->disconnect();
         }
     }
-    void disconnectOutEvent(const char *outEventName)
+    void disconnectOutEvent(const String &outEventName)
     {
-        WoodOutEvent *outEvent = findInEventByName(outEventName);
+        WoodOutEvent *outEvent = findOutEventByName(outEventName);
         if (outEvent)
         {
             outEvent->disconnect();
@@ -326,22 +313,22 @@ private:
 class WoodServiceInterfaceBlock : public WoodBlock
 {
 public:
-    WoodServiceInterfaceBlock()
-    {
-        // TODO:
-    }
+    WoodServiceInterfaceBlock(const String &name) : WoodBlock(name), siiEvents() {}
     ~WoodServiceInterfaceBlock()
     {
-        // TODO: Move to class WoodServiceInterfaceBlock!
         // std::list<WoodServiceInterfaceInEvent&> siiEvents;
+        for (std::list<WoodServiceInterfaceInEvent &>::iterator it = siiEvents.begin(); it != siiEvents.end();)
+        {
+            delete &(*it);
+            it = siiEvents.erase(it); // it++;
+        }
+        // triggeredOutEvents.clear();
     }
 
-    // TODO: Move to class WoodServiceInterfaceBlock!
     bool fetchExternalEvents()
     {
         // Get extra/sifb event and/or timer event
         WoodServiceInterfaceInEvent *siiEvent = captureServiceInterfaceInEvent();
-
         // if no extra/sifb event, return false;
         if (!siiEvent)
         {
@@ -350,7 +337,6 @@ public:
         }
 
         executionServiceInterfaceInEvent(*siiEvent); // execution ecc
-
         // dispatch and execute all output events
         for (std::list<WoodServiceInterfaceInEvent &>::iterator it = siiEvents.begin(); it != siiEvents.end();)
         {
@@ -358,12 +344,10 @@ public:
             it = siiEvents.erase(it); // it++;
         }
         // triggeredOutEvents.clear();
-
         return true;
     }
 
 protected:
-    // TODO: Move to class WoodServiceInterfaceBlock!
     virtual WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent() = 0;
 
     virtual void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent) = 0;
@@ -376,7 +360,6 @@ protected:
     //}
 
 private:
-    // TODO: Move to class WoodServiceInterfaceBlock!
     std::list<WoodServiceInterfaceInEvent &> siiEvents;
 };
 
