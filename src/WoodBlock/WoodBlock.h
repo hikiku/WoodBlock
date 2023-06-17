@@ -21,35 +21,35 @@ public:
     }
     virtual ~WoodBlock() // TODO: = 0;
     {
-        // std::list<WoodOutEvent &> triggeredOutEvents;
+        // std::list<WoodOutEvent*> triggeredOutEvents;
         triggeredOutEvents.clear();
 
         // clear some connects of inEvents & outEvents, inVariables & outVariables
         disconnect();
 
         // remove member variables
-        // std::list<WoodInEvent&> inEvents;
-        for (std::list<WoodInEvent &>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
+        // std::list<WoodInEvent*> inEvents;
+        for (std::list<WoodInEvent *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
         {
-            delete &(*it);
+            delete *it;
         }
         inEvents.clear();
-        // std::list<WoodOutEvent&> outEvents;
-        for (std::list<WoodOutEvent &>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
+        // std::list<WoodOutEvent*> outEvents;
+        for (std::list<WoodOutEvent *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
         {
-            delete &(*it);
+            delete *it;
         }
         outEvents.clear();
-        // std::list<WoodInData&> inVariables;
-        for (std::list<WoodInData &>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        // std::list<WoodInData*> inVariables;
+        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
-            delete &(*it);
+            delete *it;
         }
         inVariables.clear();
-        // std::list<WoodOutData&> outVariables;
-        for (std::list<WoodOutData &>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        // std::list<WoodOutData*> outVariables;
+        for (std::list<WoodOutData *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
-            delete &(*it);
+            delete *it;
         }
         outVariables.clear();
     }
@@ -61,12 +61,12 @@ public:
 
     WoodInEvent *findInEventByName(const String &inEventName)
     {
-        // std::list<WoodInEvent&> inEvents;
-        for (std::list<WoodInEvent &>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
+        // std::list<WoodInEvent*> inEvents;
+        for (std::list<WoodInEvent *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
         {
-            if (it->getName().equals(inEventName))
+            if ((*it)->getName().equals(inEventName))
             {
-                return &(*it);
+                return *it;
             }
         }
 
@@ -74,12 +74,12 @@ public:
     }
     WoodOutEvent *findOutEventByName(const String &outEventName)
     {
-        // std::list<WoodOutEvent&> outEvents;
-        for (std::list<WoodOutEvent &>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
+        // std::list<WoodOutEvent*> outEvents;
+        for (std::list<WoodOutEvent *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
         {
-            if (it->getName().equals(outEventName))
+            if ((*it)->getName().equals(outEventName))
             {
-                return &(*it);
+                return *it;
             }
         }
 
@@ -87,12 +87,12 @@ public:
     }
     WoodInData *findInVariableByName(const String &inVariableName)
     {
-        // std::list<WoodInData&> inVariables;
-        for (std::list<WoodInData &>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        // std::list<WoodInData*> inVariables;
+        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
-            if (it->getName().equals(inVariableName))
+            if ((*it)->getName().equals(inVariableName))
             {
-                return &(*it);
+                return *it;
             }
         }
 
@@ -100,12 +100,12 @@ public:
     }
     WoodOutData *findOutVariableByName(const String &outVariableName)
     {
-        // std::list<WoodOutData&> outVariables;
-        for (std::list<WoodOutData &>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        // std::list<WoodOutData*> outVariables;
+        for (std::list<WoodOutData *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
-            if (it->getName().equals(outVariableName))
+            if ((*it)->getName().equals(outVariableName))
             {
-                return &(*it);
+                return *it;
             }
         }
 
@@ -118,12 +118,11 @@ public:
     template <class TDataBox>
     bool addInVariable(const char *name)
     {
-        // push a inVariable to std::list<WoodInData&> inVariables!
+        // push a inVariable to std::list<WoodInData*> inVariables!
         WoodInData *inVariable = new WoodInDataImpl<TDataBox>(name);
         if (inVariable)
         {
-            WoodInData &in = *inVariable;
-            inVariables.push_back(in);
+            inVariables.push_back(inVariable);
             return true;
         }
         return false;
@@ -132,12 +131,11 @@ public:
     template <class TDataBox>
     bool addOutVariable(const char *name)
     {
-        // push a outVariable to std::list<WoodOutData&> outVariables!
+        // push a outVariable to std::list<WoodOutData*> outVariables!
         WoodOutData *outVariable = new WoodOutDataImpl<TDataBox>(name);
         if (outVariable)
         {
-            WoodOutData &out = *outVariable;
-            outVariables.push_back(out);
+            outVariables.push_back(outVariable);
             return true;
         }
         return false;
@@ -151,11 +149,10 @@ public:
         if (inEvent)
         {
             bool result = inEvent->addInVariablesByNames(inVariableNames, sizeofInVariables);
-            // add inEvents ot std::list<WoodInEvent&> inEvents;
+            // add inEvents ot std::list<WoodInEvent*> inEvents;
             if (result)
             {
-                WoodInEvent &in = *inEvent;
-                inEvents.push_back(in);
+                inEvents.push_back(inEvent);
                 return true;
             }
             else
@@ -180,11 +177,10 @@ public:
         if (outEvent)
         {
             bool result = outEvent->addOutVariablesByNames(outVariableNames, sizeofOutVariables);
-            // add outEvent to std::list<WoodOutEvent&> outEvents;
+            // add outEvent to std::list<WoodOutEvent*> outEvents;
             if (result)
             {
-                WoodOutEvent &out = *outEvent;
-                outEvents.push_back(out);
+                outEvents.push_back(outEvent);
                 return true;
             }
             else
@@ -229,36 +225,28 @@ public:
     // ====================== Normal: running =========================
     void processInEvent(WoodInEvent &inEvent)
     {
-        inEvent.sample(); // sample input variables
-
-        executionInEvent(inEvent); // execution ecc
-
-        // dispatch and execute all output events
-        for (std::list<WoodOutEvent &>::iterator it = triggeredOutEvents.begin(); it != triggeredOutEvents.end();)
-        {
-            it->dispatchAndExecute();
-            it = triggeredOutEvents.erase(it); // it++;
-        }
-        // triggeredOutEvents.clear();
+        inEvent.sample();                 // sample input variables
+        executionInEvent(inEvent);        // execution ecc
+        dispatchAndExecuteAllOutEvents(); // dispatch and execute all output events
     }
 
     // ====================== Deconstructor: disconnecting =========================
     void disconnect()
     {
 
-        // std::list<WoodOutEvent &> triggeredOutEvents;
+        // std::list<WoodOutEvent*> triggeredOutEvents;
         triggeredOutEvents.clear();
 
-        // std::list<WoodInEvent&> inEvents;
-        for (std::list<WoodInEvent &>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
+        // std::list<WoodInEvent*> inEvents;
+        for (std::list<WoodInEvent *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
         {
-            it->disconnect();
+            (*it)->disconnect();
         }
 
-        // std::list<WoodOutEvent&> outEvents;
-        for (std::list<WoodOutEvent &>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
+        // std::list<WoodOutEvent*> outEvents;
+        for (std::list<WoodOutEvent *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
         {
-            it->disconnect();
+            (*it)->disconnect();
         }
     }
 
@@ -278,7 +266,18 @@ protected:
     void generateOutEvent(WoodOutEvent &outEvent)
     {
         outEvent.generate();
-        triggeredOutEvents.push_back(outEvent);
+        triggeredOutEvents.push_back(&outEvent);
+    }
+
+    // dispatch and execute all output events
+    void dispatchAndExecuteAllOutEvents()
+    {
+        for (std::list<WoodOutEvent *>::iterator it = triggeredOutEvents.begin(); it != triggeredOutEvents.end();)
+        {
+            (*it)->dispatchAndExecute();
+            it = triggeredOutEvents.erase(it); // it++;
+        }
+        // triggeredOutEvents.clear();
     }
 
 private:
@@ -301,28 +300,27 @@ private:
 
     String name;
 
-    std::list<WoodInEvent &> inEvents;
-    std::list<WoodOutEvent &> outEvents;
+    std::list<WoodInEvent *> inEvents;
+    std::list<WoodOutEvent *> outEvents;
 
-    std::list<WoodInData &> inVariables;
-    std::list<WoodOutData &> outVariables;
+    std::list<WoodInData *> inVariables;
+    std::list<WoodOutData *> outVariables;
 
-    std::list<WoodOutEvent &> triggeredOutEvents; // pop_front() & push_back(), erase()/clear()
+    std::list<WoodOutEvent *> triggeredOutEvents; // pop_front() & push_back(), erase()/clear()
 };
 
 class WoodServiceInterfaceBlock : public WoodBlock
 {
 public:
-    WoodServiceInterfaceBlock(const String &name) : WoodBlock(name), siiEvents() {}
+    WoodServiceInterfaceBlock(const String &name) : WoodBlock(name) {} //, siiEvents()
     ~WoodServiceInterfaceBlock()
     {
-        // std::list<WoodServiceInterfaceInEvent&> siiEvents;
-        for (std::list<WoodServiceInterfaceInEvent &>::iterator it = siiEvents.begin(); it != siiEvents.end();)
-        {
-            delete &(*it);
-            it = siiEvents.erase(it); // it++;
-        }
-        // triggeredOutEvents.clear();
+        // // std::list<WoodServiceInterfaceInEvent*> siiEvents;
+        // for (std::list<WoodServiceInterfaceInEvent*>::iterator it = siiEvents.begin(); it != siiEvents.end();)
+        // {
+        //     delete *it;
+        //     it = siiEvents.erase(it); // it++;
+        // }
     }
 
     bool fetchExternalEvents()
@@ -330,20 +328,14 @@ public:
         // Get extra/sifb event and/or timer event
         WoodServiceInterfaceInEvent *siiEvent = captureServiceInterfaceInEvent();
         // if no extra/sifb event, return false;
-        if (!siiEvent)
+        if ((siiEvent == nullptr) || (siiEvent == NULL))
         {
             //// printf (HINT, "It has no ServiceInterfaceInEvent to capture!\n"])
             return false;
         }
 
         executionServiceInterfaceInEvent(*siiEvent); // execution ecc
-        // dispatch and execute all output events
-        for (std::list<WoodServiceInterfaceInEvent &>::iterator it = siiEvents.begin(); it != siiEvents.end();)
-        {
-            it->dispatchAndExecute();
-            it = siiEvents.erase(it); // it++;
-        }
-        // triggeredOutEvents.clear();
+        dispatchAndExecuteAllOutEvents();            // dispatch and execute all output events
         return true;
     }
 
@@ -360,7 +352,7 @@ protected:
     //}
 
 private:
-    std::list<WoodServiceInterfaceInEvent &> siiEvents;
+    // std::list<WoodServiceInterfaceInEvent*> siiEvents;
 };
 
 #endif // __cplusplus

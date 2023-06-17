@@ -89,9 +89,9 @@ protected:
     void setDataPoint(void *dataPoint) { this->dataPoint = dataPoint; }
 
 private:
-    const unsigned int dataType; // DT_SINT, ...
-    const unsigned int dataSize; // bytes
-    void *dataPoint;             // data point
+    unsigned int dataType; // DT_SINT, ...
+    unsigned int dataSize; // bytes
+    void *dataPoint;       // data point
 };
 
 // eg: WoodDataBoxImpl<SINT, DT_SINT>
@@ -100,7 +100,7 @@ class WoodDataBoxImpl : public WoodDataBox
 {
 public:
     WoodDataBoxImpl()
-        : XxxxData(DT, sizeof(T))
+        : WoodDataBox(DT, sizeof(T))
     {
         T *dataPoint = new T();
         setDataPoint(dataPoint);
@@ -118,7 +118,7 @@ public:
 
     T *getData()
     {
-        return (T *)dataPoint();
+        return (T *)getDataPoint();
     }
     void setData(const T &value)
     {
@@ -168,6 +168,7 @@ public:
     const String &getName() { return name; }
 
     virtual unsigned int getDataType() = 0;
+
     // WoodDataType getType() { return dataType; }
 
 private:
@@ -192,27 +193,7 @@ public:
         return (outData == nullptr) ? false : true;
     }
     // check that outVariable and inVariable are match
-    bool checkForConnectFrom(WoodOutData &outData)
-    {
-        if (isAlreadyConnected())
-        {
-            // TODO: printf(WARN, "inData is alreay connected!\n");
-            return false;
-        }
-        // check data type
-        unsigned int outDataType = outData.getDataType();
-        unsigned int inDataType = getDataType();
-        bool result = WoodInData::check4ConnectDataType(outDataType, inDataType);
-        if (!result)
-        {
-            // TODO: printf(WARNING, "DataType of outDataType(%u) and inDataType(%u) do not match!\n", outDataTyp, inDataType)
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
+    bool checkForConnectFrom(WoodOutData &outData);
     bool connectFrom(WoodOutData &outData)
     {
         if (!checkForConnectFrom(outData))
@@ -264,6 +245,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_INT: // Integer                  16  -32768 to 32767
             switch (inDataType)
             {
@@ -290,6 +272,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_DINT: // Double integer           32  -2^(31) to 2^(31)-1
             switch (inDataType)
             {
@@ -316,6 +299,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_LINT: // Long integer             64  -2^(63) to 2^(63)-1
             switch (inDataType)
             {
@@ -340,8 +324,9 @@ public:
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
             default:
-                return;
+                break;
             }
+            break;
         case DT_USINT: // Unsigned short integer   8   0 to 255
             switch (inDataType)
             {
@@ -368,6 +353,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_UINT: // Unsigned integer         16  0 to 2^(16)-1
             switch (inDataType)
             {
@@ -394,6 +380,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_UDINT: // Unsigned double integer  32  0 to 2^(32)-1
             switch (inDataType)
             {
@@ -420,6 +407,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_ULINT: // Unsigned long integer    64  0 to 2^(64)-1
             switch (inDataType)
             {
@@ -446,6 +434,7 @@ public:
             default:
                 break;
             }
+            break;
         // Floating point (REAL)
         case DT_REAL: // Real numbers         32      +-10^(+-38)
             switch (inDataType)
@@ -473,6 +462,7 @@ public:
             default:
                 break;
             }
+            break;
         case DT_LREAL: // Long real numbers    64      +-10^(+-308)
             switch (inDataType)
             {
@@ -499,6 +489,7 @@ public:
             default:
                 break;
             }
+            break;
         default:
             break;
         }
@@ -507,13 +498,13 @@ public:
     }
 
 protected:
-    const WoodOutData *getWoodOutData()
+    WoodOutData *getWoodOutData()
     {
         return outData;
     }
 
 private:
-    const WoodOutData *outData = nullptr; // start of connection, Output data variable
+    WoodOutData *outData; // start of connection, Output data variable
 };
 
 // WoodInDataImpl<WoodSIntDataBox>;
@@ -526,20 +517,16 @@ public:
     {
     }
 
-    const TDataBox &getDataBox()
+    TDataBox &getDataBox()
     {
         return dataBox;
     }
 
-    bool sample() // clone data from 'fromData'
+    bool sample(); // clone data from 'fromData'
+
+    unsigned int getDataType()
     {
-        const WoodOutData *outData = getWoodOutData();
-        if (outData)
-        {
-            dataBox.copy(outData->getDataBox());
-            return true;
-        }
-        return false;
+        return dataBox.getDataType();
     }
 
 private:
@@ -562,7 +549,12 @@ class WoodOutDataImpl : public WoodOutData
 public:
     WoodOutDataImpl(const char *name) : WoodOutData(name), dataBox() {}
 
-    const TDataBox &getDataBox() { return dataBox; }
+    TDataBox &getDataBox() { return dataBox; }
+
+    unsigned int getDataType()
+    {
+        return dataBox.getDataType();
+    }
 
 private:
     TDataBox dataBox;

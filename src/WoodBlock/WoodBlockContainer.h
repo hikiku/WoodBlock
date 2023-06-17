@@ -18,23 +18,23 @@ public:
     WoodBlockContainer() : woodBlocks() {}
     ~WoodBlockContainer()
     {
-        std::list<WoodBlock &> woodBlocks;
-        for (std::list<WoodBlock &>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
+        std::list<WoodBlock*> woodBlocks;
+        for (std::list<WoodBlock*>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
         {
-            delete &(*it);
+            delete *it;
         }
         woodBlocks.clear();
     }
 
     WoodBlock *findWoodBlockByName(const String &woodBlockName)
     {
-        // std::list<WoodBlock &> woodBlocks;
-        for (std::list<WoodBlock &>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
+        // std::list<WoodBlock*> woodBlocks;
+        for (std::list<WoodBlock*>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
         {
 
-            if (it->getName().equals(woodBlockName))
+            if ((*it)->getName().equals(woodBlockName))
             {
-                return &(*it);
+                return *it;
             }
         }
 
@@ -44,17 +44,17 @@ public:
     // Don't delete a managed WoodBlock directly. Please call unhostAndDeleteWoodBlock()!
     bool hostWoodBlock(WoodBlock &woodBlock)
     {
-        woodBlocks.push_back(woodBlock);
+        woodBlocks.push_back(&woodBlock);
         return true;
     }
     bool unhostAndDeleteWoodBlock(const String &woodBlockName)
     {
-        // std::list<WoodBlock &> woodBlocks;
-        for (std::list<WoodBlock &>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
+        // std::list<WoodBlock *> woodBlocks;
+        for (std::list<WoodBlock *>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
         {
-            if (it->getName().equals(woodBlockName))
+            if ((*it)->getName().equals(woodBlockName))
             {
-                delete &(*it);
+                delete *it;
                 woodBlocks.erase(it);
                 return true;
             }
@@ -100,7 +100,7 @@ public:
     }
 
 private:
-    std::list<WoodBlock &> woodBlocks;
+    std::list<WoodBlock*> woodBlocks;
 };
 
 #endif // __cplusplus

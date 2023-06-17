@@ -14,9 +14,10 @@ class WebPortal : public WoodServiceInterfaceBlock
 public:
   WebPortal(const String &name) : WoodServiceInterfaceBlock(name) {}
   ~WebPortal() {}
+
   void executionInEvent(WoodInEvent &inEvent)
   {
-    // ......
+    // TODO: ......
   }
   WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent()
   {
@@ -25,7 +26,7 @@ public:
   }
   void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent)
   {
-    // ......
+    // TODO: ......
   }
 };
 
@@ -34,9 +35,10 @@ class OccupySensor : public WoodServiceInterfaceBlock
 public:
   OccupySensor(const String &name) : WoodServiceInterfaceBlock(name) {}
   ~OccupySensor() {}
+
   void executionInEvent(WoodInEvent &inEvent)
   {
-    // ......
+    // TODO: ......
   }
   WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent()
   {
@@ -45,7 +47,7 @@ public:
   }
   void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent)
   {
-    // ......
+    // TODO: ......
   }
 };
 
@@ -54,9 +56,10 @@ class Relay : public WoodBlock
 public:
   Relay(const String &name) : WoodBlock(name) {}
   ~Relay() {}
+
   void executionInEvent(WoodInEvent &inEvent)
   {
-    // ......
+    // TODO: ......
   }
 };
 

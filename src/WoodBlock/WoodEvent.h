@@ -10,6 +10,8 @@
 #include "WoodMacro.h"
 #include "WoodData.h"
 
+class WoodBlock;
+
 class WoodInEvent;
 class WoodOutEvent;
 
@@ -22,7 +24,7 @@ class WoodEvent
 public:
     WoodEvent(WoodBlock &owner, const String &name, unsigned int eventType = EVENT_ANY)
         : owner(owner), name(name), eventType(eventType) {}
-    virtual ~WoodEvent() = 0 {}
+    virtual ~WoodEvent() {} // TODO: = 0;
     const String &getName() { return name; }
     unsigned int getEventType() { return eventType; }
 
@@ -54,31 +56,18 @@ public:
         }
 
         String name(inVariableName);
-        for (std::list<WoodInData &>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        for (std::list<WoodInData*>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
-            if (it->getName().equals(name))
+            if ((*it)->getName().equals(name))
             {
-                return &(*it);
+                return *it;
             }
         }
 
         return nullptr;
     }
 
-    bool addInVariableByName(const char *inVariableName)
-    {
-        bool result = check4AddingInVariableByName(inVariableName);
-        if (!result)
-        {
-            return false;
-        }
-        else
-        {
-            WoodInData *inData = getOwner().findInVariableByName(inVariableName);
-            inVariables.push_back(*inData);
-            return true;
-        }
-    }
+    bool addInVariableByName(const char *inVariableName);
 
     bool addInVariablesByNames(const char *inVariableNames[], int sizeofInVariables)
     {
@@ -111,68 +100,27 @@ public:
         }
         return false;
     }
-    void disconnect()
-    {
-        if (this->outEvent == nullptr)
-        {
-            return;
-        }
-        // disconnect all of inVariables
-        for (std::list<WoodInData &>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
-        {
-            it->disconnect();
-        }
+    void disconnect();
 
-        this->outEvent->clearConnectDestination();
-        this->outEvent == nullptr;
-    }
-
-    bool trigger() // TODO: move outside????
-    {
-        getOwner().processInEvent(*this);
-    }
+    void trigger();
 
     void sample()
     {
         // sample all of inVariables
-        for (std::list<WoodInData &>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        for (std::list<WoodInData*>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
-            it->sample();
+            (*it)->sample();
         }
     }
 
 private:
-    bool check4AddingInVariableByName(const char *inVariableName)
+    bool check4AddingInVariableByName(const char *inVariableName);
+
+    bool check4AddingInVariablesByNames(const char *inVariableNames[], int sizeofInVariables)
     {
-        if (inVariableName == nullptr)
+        if (!inVariableNames)
         {
-            // TODO: printf (DEBUG, "inVariableName is NULL!");
-            return false;
-        }
-
-        if (findInVariableByName(inVariableName))
-        {
-            // TODO: printf (WARNING, "inVariableName is already in the inVariables list!");
-            return false;
-        }
-
-        WoodInData *inData = getOwner().findInVariableByName(inVariableName);
-        if (!inData)
-        {
-            // TODO: printf (WARNING, "Don't find InVariable by  inVariableName(%s)!", inVariableName);
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-    bool check4AddingInVariablesByNames(const char *inVariables[], int sizeofInVariables)
-    {
-        if (!inVariables)
-        {
-            // TODO: printf (ERROR, "inVariables is NULL!");
+            // TODO: printf (ERROR, "inVariableNames is NULL!");
             return false;
         }
         if (sizeofInVariables <= 0)
@@ -184,17 +132,17 @@ private:
         // check
         for (int i = 0; i < sizeofInVariables; i++)
         {
-            bool result = check4AddingInVariableByName(inVariables[i]);
+            bool result = check4AddingInVariableByName(inVariableNames[i]);
             if (!result)
             {
-                // TODO: printf (ERROR, "inVariables[%d] is error!", %d);
+                // TODO: printf (ERROR, "inVariableNames[%d] is error!", %d);
                 return false;
             }
         }
         return true;
     }
 
-    std::list<WoodInData &> inVariables;
+    std::list<WoodInData*> inVariables;
     WoodOutEvent *outEvent;
 };
 
@@ -205,24 +153,11 @@ public:
         : WoodEvent(owner, name), outVariables(), inEvent(nullptr) {}
     ~WoodOutEvent()
     {
-        // std::list<WoodOutData &> outVariables;
+        // std::list<WoodOutData*> outVariables;
         outVariables.clear();
     }
 
-    bool addOutVariableByName(const char *outVariableName)
-    {
-        bool result = check4AddingOutVariableByName(outVariableName);
-        if (!result)
-        {
-            return false;
-        }
-        else
-        {
-            WoodOutData *outData = getOwner().findOutVariableByName(outVariableName);
-            outVariables.push_back(*outData);
-            return true;
-        }
-    }
+    bool addOutVariableByName(const char *outVariableName);
 
     bool addOutVariablesByNames(const char *outVariableNames[], int sizeofOutVariables)
     {
@@ -254,11 +189,11 @@ public:
         }
 
         String name(outVariableName);
-        for (std::list<WoodOutData &>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        for (std::list<WoodOutData*>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
-            if (it->getName().equals(name))
+            if ((*it)->getName().equals(name))
             {
-                return &(*it);
+                return *it;
             }
         }
 
@@ -371,40 +306,17 @@ public:
         }
         inEvent->trigger();
         clear();
+        return true;
     }
 
 private:
-    bool check4AddingOutVariableByName(const char *outVariableName)
+    bool check4AddingOutVariableByName(const char *outVariableName);
+
+    bool check4AddingOutVariablesByNames(const char *outVariableNames[], int sizeofOutVariables)
     {
-        if (outVariableName == nullptr)
+        if (!outVariableNames)
         {
-            // TODO: printf (DEBUG, "outVariableName is NULL!");
-            return false;
-        }
-
-        if (findOutVariableByName(outVariableName))
-        {
-            // TODO: printf (WARNING, "outVariableName is already in the outVariables list!");
-            return false;
-        }
-
-        WoodOutData *outData = getOwner().findOutVariableByName(outVariableName);
-        if (!outData)
-        {
-            // TODO: printf (WARNING, "Don't find OutVariable by  outVariableName(%s)!", outVariableName);
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-    bool check4AddingOutVariablesByNames(const char *outVariables[], int sizeofOutVariables)
-    {
-        if (!outVariables)
-        {
-            // TODO: printf (ERROR, "outVariables is NULL!");
+            // TODO: printf (ERROR, "outVariableNames is NULL!");
             return false;
         }
         if (sizeofOutVariables <= 0)
@@ -416,10 +328,10 @@ private:
         // check
         for (int i = 0; i < sizeofOutVariables; i++)
         {
-            bool result = check4AddingOutVariableByName(outVariables[i]);
+            bool result = check4AddingOutVariableByName(outVariableNames[i]);
             if (!result)
             {
-                // TODO: printf (ERROR, "outVariables[%d] is error!", %d);
+                // TODO: printf (ERROR, "outVariableNames[%d] is error!", %d);
                 return false;
             }
         }
@@ -428,7 +340,7 @@ private:
 
     void clear() { generated = false; }
 
-    std::list<WoodOutData &> outVariables;
+    std::list<WoodOutData*> outVariables;
     WoodInEvent *inEvent; // event observer, to event, connect to
     bool generated;       // Has a out event been alreay generated?
 };
