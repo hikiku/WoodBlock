@@ -25,8 +25,8 @@ public:
     WoodEvent(WoodBlock &owner, const String &name, unsigned int eventType = EVENT_ANY)
         : owner(owner), name(name), eventType(eventType) {}
     virtual ~WoodEvent() {} // TODO: = 0;
-    const String &getName() { return name; }
-    unsigned int getEventType() { return eventType; }
+    const String &getName() const { return name; }
+    unsigned int getEventType() const { return eventType; }
 
 protected:
     WoodBlock &getOwner() { return owner; }
@@ -56,7 +56,7 @@ public:
         }
 
         String name(inVariableName);
-        for (std::list<WoodInData*>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
             if ((*it)->getName().equals(name))
             {
@@ -90,7 +90,7 @@ public:
         return true;
     }
 
-    bool isAlreadyConnected() { return (outEvent == nullptr) ? false : true; }
+    bool isAlreadyConnected() const { return (outEvent == nullptr) ? false : true; }
     bool setConnectSource(WoodOutEvent &outEvent) // friend class method
     {
         if (this->outEvent == nullptr)
@@ -107,7 +107,7 @@ public:
     void sample()
     {
         // sample all of inVariables
-        for (std::list<WoodInData*>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
             (*it)->sample();
         }
@@ -142,7 +142,7 @@ private:
         return true;
     }
 
-    std::list<WoodInData*> inVariables;
+    std::list<WoodInData *> inVariables;
     WoodOutEvent *outEvent;
 };
 
@@ -189,7 +189,7 @@ public:
         }
 
         String name(outVariableName);
-        for (std::list<WoodOutData*>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        for (std::list<WoodOutData *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
             if ((*it)->getName().equals(name))
             {
@@ -200,7 +200,7 @@ public:
         return nullptr;
     }
 
-    bool isAlreadyConnected() { return (inEvent == nullptr) ? false : true; }
+    bool isAlreadyConnected() const { return (inEvent == nullptr) ? false : true; }
     bool connectTo(const char *outVariableNames[],
                    WoodInEvent &inEvent, const char *inVariableNames[], int sizeofVariables)
     {
@@ -291,7 +291,7 @@ public:
     }
 
     void generate() { generated = true; }
-    bool isGenerated() { return generated; }
+    bool isGenerated() const { return generated; }
 
     bool dispatchAndExecute()
     {
@@ -340,7 +340,7 @@ private:
 
     void clear() { generated = false; }
 
-    std::list<WoodOutData*> outVariables;
+    std::list<WoodOutData *> outVariables;
     WoodInEvent *inEvent; // event observer, to event, connect to
     bool generated;       // Has a out event been alreay generated?
 };

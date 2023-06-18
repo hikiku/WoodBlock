@@ -44,16 +44,13 @@ class WoodDataBox
 public:
     WoodDataBox(unsigned int dataType, unsigned int dataSize)
         : dataType(dataType), dataSize(dataSize), dataPoint(nullptr) {}
-
     WoodDataBox(unsigned int dataType, unsigned int dataSize, void *dataPoint)
         : dataType(dataType), dataSize(dataSize), dataPoint(dataPoint) {}
-
     virtual ~WoodDataBox() {} // TODO: = 0;
 
-    unsigned int getDataType() { return dataType; }
-    unsigned int getDataSize() { return dataSize; }
+    unsigned int getDataType() const { return dataType; }
+    unsigned int getDataSize() const { return dataSize; }
     void *getDataPoint() { return dataPoint; }
-
     const char *getDataTypeDescription() const
     {
         switch (dataType)
@@ -105,7 +102,6 @@ public:
         T *dataPoint = new T();
         setDataPoint(dataPoint);
     }
-
     ~WoodDataBoxImpl()
     {
         T *data = getData();
@@ -116,10 +112,7 @@ public:
         setDataPoint(nullptr);
     }
 
-    T *getData()
-    {
-        return (T *)getDataPoint();
-    }
+    T *getData() { return (T *)getDataPoint(); }
     void setData(const T &value)
     {
         T *data = getData();
@@ -165,15 +158,12 @@ public:
     WoodData(const char *name) : name(name) {}
     virtual ~WoodData() {} // TODO: = 0;
 
-    const String &getName() { return name; }
-
-    virtual unsigned int getDataType() = 0;
-
-    // WoodDataType getType() { return dataType; }
+    const String &getName() const { return name; }
+    virtual unsigned int getDataType() const = 0;
+    virtual WoodDataBox &getDataBox() = 0;
 
 private:
     String name;
-    // WoodDataType dataType;
 };
 
 // For user extend data type
@@ -182,18 +172,12 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int 
 class WoodInData : public WoodData
 {
 public:
-    WoodInData(const char *name)           //, WoodDataType dataType
-        : WoodData(name), outData(nullptr) //, dataType
-    {
-    }
+    WoodInData(const char *name) : WoodData(name), outData(nullptr) {}
     // virtual ~WoodInData() {}
 
-    bool isAlreadyConnected()
-    {
-        return (outData == nullptr) ? false : true;
-    }
+    bool isAlreadyConnected() const { return (outData == nullptr) ? false : true; }
     // check that outVariable and inVariable are match
-    bool checkForConnectFrom(WoodOutData &outData);
+    bool checkForConnectFrom(WoodOutData &outData) const;
     bool connectFrom(WoodOutData &outData)
     {
         if (!checkForConnectFrom(outData))
@@ -213,7 +197,6 @@ public:
     }
 
     virtual bool sample() = 0; // clone data from 'outData'
-
     static bool check4ConnectDataType(unsigned int outDataType, unsigned int inDataType)
     {
         switch (outDataType)
@@ -498,10 +481,7 @@ public:
     }
 
 protected:
-    WoodOutData *getWoodOutData()
-    {
-        return outData;
-    }
+    WoodOutData *getWoodOutData() { return outData; }
 
 private:
     WoodOutData *outData; // start of connection, Output data variable
@@ -512,22 +492,11 @@ template <class TDataBox>
 class WoodInDataImpl : public WoodInData
 {
 public:
-    WoodInDataImpl(const char *name)  // WoodDataType dataType
-        : WoodInData(name), dataBox() //, dataType
-    {
-    }
+    WoodInDataImpl(const char *name) : WoodInData(name), dataBox() {}
 
-    TDataBox &getDataBox()
-    {
-        return dataBox;
-    }
-
+    unsigned int getDataType() const { return dataBox.getDataType(); }
+    TDataBox &getDataBox() { return dataBox; }
     bool sample(); // clone data from 'fromData'
-
-    unsigned int getDataType()
-    {
-        return dataBox.getDataType();
-    }
 
 private:
     TDataBox dataBox;
@@ -549,12 +518,8 @@ class WoodOutDataImpl : public WoodOutData
 public:
     WoodOutDataImpl(const char *name) : WoodOutData(name), dataBox() {}
 
+    unsigned int getDataType() const { return dataBox.getDataType(); }
     TDataBox &getDataBox() { return dataBox; }
-
-    unsigned int getDataType()
-    {
-        return dataBox.getDataType();
-    }
 
 private:
     TDataBox dataBox;

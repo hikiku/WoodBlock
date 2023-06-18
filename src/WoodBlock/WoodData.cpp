@@ -1,7 +1,7 @@
 #include "WoodData.h"
 
 // check that outVariable and inVariable are match
-bool WoodInData::checkForConnectFrom(WoodOutData &outData)
+bool WoodInData::checkForConnectFrom(WoodOutData &outData) const 
 {
     if (isAlreadyConnected())
     {

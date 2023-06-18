@@ -3,6 +3,8 @@
 #include "WoodBlock.h"
 #include "WoodBlockContainer.h"
 
+// TODO: Lookup Event / Feedback Event!
+
 // For user extend data type
 extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType)
 {
@@ -12,7 +14,10 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int 
 class WebPortal : public WoodServiceInterfaceBlock
 {
 public:
-  WebPortal(const String &name) : WoodServiceInterfaceBlock(name) {}
+  WebPortal(const String &name) : WoodServiceInterfaceBlock(name)
+  {
+    // TODO: ......
+  }
   ~WebPortal() {}
 
   void executionInEvent(WoodInEvent &inEvent)
@@ -33,7 +38,10 @@ public:
 class OccupySensor : public WoodServiceInterfaceBlock
 {
 public:
-  OccupySensor(const String &name) : WoodServiceInterfaceBlock(name) {}
+  OccupySensor(const String &name) : WoodServiceInterfaceBlock(name)
+  {
+    // TODO: ......
+  }
   ~OccupySensor() {}
 
   void executionInEvent(WoodInEvent &inEvent)
@@ -54,7 +62,10 @@ public:
 class Relay : public WoodBlock
 {
 public:
-  Relay(const String &name) : WoodBlock(name) {}
+  Relay(const String &name) : WoodBlock(name) 
+  {
+    // TODO: ......
+  }
   ~Relay() {}
 
   void executionInEvent(WoodInEvent &inEvent)

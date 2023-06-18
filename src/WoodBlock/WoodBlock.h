@@ -15,10 +15,7 @@ class WoodBlock
 {
 public:
     WoodBlock(const String &name)
-        : name(name), inEvents(), outEvents(), inVariables(), outVariables(), triggeredOutEvents()
-    {
-        //
-    }
+        : name(name), inEvents(), outEvents(), inVariables(), outVariables(), triggeredOutEvents() {}
     virtual ~WoodBlock() // TODO: = 0;
     {
         // std::list<WoodOutEvent*> triggeredOutEvents;
