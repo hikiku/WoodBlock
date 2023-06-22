@@ -2,6 +2,8 @@
 #define WoodEvent_class_h
 #ifdef __cplusplus
 
+#include <Arduino.h>
+
 #include <list>
 #include <iterator> //
 
@@ -233,16 +235,19 @@ public:
 
             if (!outVariable)
             {
-                //// printf(ERROR, "Check: It Can't find WoodOutData by name %s!\n", outVariableNames[i])
+                Serial.printf("ERROR: Check: It Can't find WoodOutData by name %s!\n", outVariableNames[i]);
                 result = false;
             }
             if (!inVariable)
             {
-                //// printf(ERROR, "Check: It Can't find WoodInData by name %s!\n", inVariableNames[i])
+                Serial.printf("ERROR: Check: It Can't find WoodInData by name %s!\n", inVariableNames[i]);
                 result = false;
             }
             // check that outVariable and inVariable are match
-            inVariable->checkForConnectFrom(*outVariable);
+            if (result)
+            {
+                inVariable->checkForConnectFrom(*outVariable);
+            }
         }
         if (!result)
         {

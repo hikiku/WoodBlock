@@ -14,7 +14,7 @@
 class WoodBlock
 {
 public:
-    WoodBlock(const String &name)
+    WoodBlock(const char *name)
         : name(name), inEvents(), outEvents(), inVariables(), outVariables(), triggeredOutEvents() {}
     virtual ~WoodBlock() // TODO: = 0;
     {
@@ -111,36 +111,35 @@ public:
 
     // ====================== Constructor: adding =========================
     // eg: WoodSIntDataBox
-    // WoodInDataImpl<WoodSIntDataBox>;
     template <class TDataBox>
-    bool addInVariable(const char *name)
+    WoodInDataImpl<TDataBox> *addInVariable(const char *name)
     {
         // push a inVariable to std::list<WoodInData*> inVariables!
-        WoodInData *inVariable = new WoodInDataImpl<TDataBox>(name);
+        WoodInDataImpl<TDataBox> *inVariable = new WoodInDataImpl<TDataBox>(name);
         if (inVariable)
         {
             inVariables.push_back(inVariable);
-            return true;
+            return inVariable;
         }
-        return false;
+        return nullptr;
     }
     // eg: WoodSIntDataBox
     template <class TDataBox>
-    bool addOutVariable(const char *name)
+    WoodOutDataImpl<TDataBox> *addOutVariable(const char *name)
     {
         // push a outVariable to std::list<WoodOutData*> outVariables!
-        WoodOutData *outVariable = new WoodOutDataImpl<TDataBox>(name);
+        WoodOutDataImpl<TDataBox> *outVariable = new WoodOutDataImpl<TDataBox>(name); // WoodOutData
         if (outVariable)
         {
             outVariables.push_back(outVariable);
-            return true;
+            return outVariable;
         }
-        return false;
+        return nullptr;
     }
 
     // eg: EVENT_ANY, ...
     // template <class TEventType>
-    bool addInEvent(const char *name, const char *inVariableNames[], int sizeofInVariables)
+    WoodInEvent *addInEvent(const char *name, const char *inVariableNames[], int sizeofInVariables)
     {
         WoodInEvent *inEvent = new WoodInEvent(*this, name);
         if (inEvent)
@@ -150,24 +149,24 @@ public:
             if (result)
             {
                 inEvents.push_back(inEvent);
-                return true;
+                return inEvent;
             }
             else
             {
                 // TODO: printf (ERROR, "It fail for calling addInVariablesByNames(WoodInEvent[%s])!", name);
                 delete inEvent;
-                return false;
+                return nullptr;
             }
         }
         else
         {
             // TODO: printf (ERROR, "It fail for adding WoodInEvent[%s]!", name);
-            return false;
+            return nullptr;
         }
     }
     // eg: EVENT_ANY, ...
     // template <class TEventType>
-    bool addOutEvent(const char *name, const char *outVariableNames[], int sizeofOutVariables)
+    WoodOutEvent *addOutEvent(const char *name, const char *outVariableNames[], int sizeofOutVariables)
     {
         // TODO: ...
         WoodOutEvent *outEvent = new WoodOutEvent(*this, name);
@@ -178,19 +177,19 @@ public:
             if (result)
             {
                 outEvents.push_back(outEvent);
-                return true;
+                return outEvent;
             }
             else
             {
                 // TODO: printf (ERROR, "It fail for calling addOutVariablesByNames(WoodInEvent[%s])!", name);
                 delete outEvent;
-                return false;
+                return nullptr;
             }
         }
         else
         {
             // TODO: printf (ERROR, "It fail for adding addOutEvent[%s]!", name);
-            return false;
+            return nullptr;
         }
     }
 
@@ -223,7 +222,7 @@ public:
     void processInEvent(WoodInEvent &inEvent)
     {
         inEvent.sample();                 // sample input variables
-        executionInEvent(inEvent);        // execution ecc
+        executeInEvent(inEvent);          // execution ecc
         dispatchAndExecuteAllOutEvents(); // dispatch and execute all output events
     }
 
@@ -251,7 +250,7 @@ public:
     // Some private functions in ~WoodBlock()
 
 protected:
-    virtual void executionInEvent(WoodInEvent &inEvent) = 0;
+    virtual void executeInEvent(WoodInEvent &inEvent) = 0;
     //{
     // TODO: ......
     // if inEvent.is("INIT") { ... }
@@ -309,7 +308,7 @@ private:
 class WoodServiceInterfaceBlock : public WoodBlock
 {
 public:
-    WoodServiceInterfaceBlock(const String &name) : WoodBlock(name) {} //, siiEvents()
+    WoodServiceInterfaceBlock(const char *name) : WoodBlock(name) {} //, siiEvents()
     ~WoodServiceInterfaceBlock()
     {
         // // std::list<WoodServiceInterfaceInEvent*> siiEvents;
@@ -322,31 +321,37 @@ public:
 
     bool fetchExternalEvents()
     {
-        // Get extra/sifb event and/or timer event
-        WoodServiceInterfaceInEvent *siiEvent = captureServiceInterfaceInEvent();
-        // if no extra/sifb event, return false;
-        if ((siiEvent == nullptr) || (siiEvent == NULL))
+        bool result = captureAndExecuteServiceInterfaceInEvent(); // execution ecc
+        if (result)
         {
-            //// printf (HINT, "It has no ServiceInterfaceInEvent to capture!\n"])
-            return false;
+            dispatchAndExecuteAllOutEvents(); // dispatch and execute all output events
         }
-
-        executionServiceInterfaceInEvent(*siiEvent); // execution ecc
-        dispatchAndExecuteAllOutEvents();            // dispatch and execute all output events
         return true;
     }
 
 protected:
-    virtual WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent() = 0;
-
-    virtual void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent) = 0;
-    //{
-    // TODO: ......
-    // if siiEvent.is("AAA") { ... }
-    // else if siiEvent.is("BBB") { ... }
-    // ...... woodOutData.set(xyz)......
-    // ...... generateOutEvent(WoodOutEvent &outEvent)......
-    //}
+    virtual bool captureAndExecuteServiceInterfaceInEvent() = 0;
+    // {
+    //     // Get extra/sifb event and/or timer event
+    //     WoodServiceInterfaceInEvent *siiEvent = captureServiceInterfaceInEvent();
+    //     // if no extra/sifb event, return false;
+    //     if ((siiEvent == nullptr) || (siiEvent == NULL))
+    //     {
+    //         //// printf (HINT, "It has no ServiceInterfaceInEvent to capture!\n"])
+    //         return false;
+    //     }
+    //     // virtual WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent() = 0;
+    //     executionServiceInterfaceInEvent(*siiEvent);
+    //     // virtual void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent) = 0;
+    //     // {
+    //     //   TODO: ......
+    //     //   if siiEvent.is("AAA") { ... }
+    //     //   else if siiEvent.is("BBB") { ... }
+    //     //   ...... woodOutData.set(xyz)......
+    //     //   ...... generateOutEvent(WoodOutEvent &outEvent)......
+    //     //  }
+    //     return true;
+    // }
 
 private:
     // std::list<WoodServiceInterfaceInEvent*> siiEvents;

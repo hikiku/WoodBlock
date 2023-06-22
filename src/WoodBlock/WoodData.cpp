@@ -22,16 +22,3 @@ bool WoodInData::checkForConnectFrom(WoodOutData &outData) const
         return true;
     }
 }
-
-// WoodInDataImpl<WoodSIntDataBox>;
-template <class TDataBox>
-bool WoodInDataImpl<TDataBox>::sample() // clone data from 'fromData'
-{
-    WoodOutData *outData = getWoodOutData();
-    if (outData)
-    {
-        dataBox.copy(outData->getDataBox()); // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
-        return true;
-    }
-    return false;
-}

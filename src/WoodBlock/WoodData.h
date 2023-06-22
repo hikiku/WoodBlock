@@ -25,6 +25,8 @@ typedef uint64_t ULINT; // Unsigned long integer    64  0 to 2^(64)-1
 typedef float REAL;   // Real numbers         32      +-10^(+-38)
 typedef double LREAL; // Long real numbers    64      +-10^(+-308)
 
+typedef bool BOOL; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+
 // Wood Data Type // enum class WoodDataType
 // Integer
 #define DT_SINT (1)  // Short integer            8   -128 to þ127
@@ -38,6 +40,8 @@ typedef double LREAL; // Long real numbers    64      +-10^(+-308)
 // Floating point (REAL)
 #define DT_REAL (9)   // Real numbers         32      +-10^(+-38)
 #define DT_LREAL (10) // Long real numbers    64      +-10^(+-308)
+
+#define DT_BOOL (30) // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
 class WoodDataBox
 {
@@ -77,6 +81,8 @@ public:
             return "REAL";
         case DT_LREAL: // Long real numbers    64      +-10^(+-308)
             return "LREAL";
+        case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+            return "BOOL";
         default:
             return "Unkown";
         }
@@ -124,12 +130,12 @@ public:
 
     // FROM: eg: WoodSIntDataBox or WoodDataBoxImpl<SINT, DT_SINT>
     template <class FROM>
-    bool copy(const FROM &from)
+    bool copy(FROM &from) // const
     {
         T *data = getData();
         if (data && from.getData())
         {
-            *data = from.getData(); // TODO: copy assign value function!
+            *data = *from.getData(); // TODO: copy assign value function!
             return true;
         }
         else
@@ -151,6 +157,8 @@ typedef WoodDataBoxImpl<ULINT, DT_ULINT> WoodULIntDataBox; // Unsigned long inte
 // Floating point (REAL)
 typedef WoodDataBoxImpl<REAL, DT_REAL> WoodRealDataBox;    // Real numbers         32      +-10^(+-38)
 typedef WoodDataBoxImpl<LREAL, DT_LREAL> WoodLRealDataBox; // Long real numbers    64      +-10^(+-308)
+// BOOL
+typedef WoodDataBoxImpl<BOOL, DT_BOOL> WoodBoolDataBox; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
 class WoodData
 {
@@ -164,6 +172,29 @@ public:
 
 private:
     String name;
+};
+
+class WoodOutData : public WoodData
+{
+public:
+    WoodOutData(const char *name) : WoodData(name) {}
+    // virtual ~WoodOutData() {}
+
+private:
+};
+
+// WoodOutDataImpl<WoodSIntDataBox>;
+template <class TDataBox>
+class WoodOutDataImpl : public WoodOutData
+{
+public:
+    WoodOutDataImpl(const char *name) : WoodOutData(name), dataBox() {}
+
+    unsigned int getDataType() const { return dataBox.getDataType(); }
+    TDataBox &getDataBox() { return dataBox; }
+
+private:
+    TDataBox dataBox;
 };
 
 // For user extend data type
@@ -225,6 +256,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -252,6 +285,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -279,6 +314,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -306,6 +343,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -333,6 +372,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -360,6 +401,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -387,6 +430,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -414,6 +459,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -442,6 +489,8 @@ public:
                 return true;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
                 return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
             default:
                 break;
             }
@@ -468,6 +517,37 @@ public:
             case DT_REAL: // Real numbers         32      +-10^(+-38)
                 return false;
             case DT_LREAL: // Long real numbers    64      +-10^(+-308)
+                return true;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+                return false;
+            default:
+                break;
+            }
+            break;
+        case DT_BOOL: // Long real numbers    64      +-10^(+-308)
+            switch (inDataType)
+            {
+            case DT_SINT: // Short integer            8   -128 to þ127
+                return false;
+            case DT_INT: // Integer                  16  -32768 to 32767
+                return false;
+            case DT_DINT: // Double integer           32  -2^(31) to 2^(31)-1
+                return false;
+            case DT_LINT: // Long integer             64  -2^(63) to 2^(63)-1
+                return false;
+            case DT_USINT: // Unsigned short integer   8   0 to 255
+                return false;
+            case DT_UINT: // Unsigned integer         16  0 to 2^(16)-1
+                return false;
+            case DT_UDINT: // Unsigned double integer  32  0 to 2^(32)-1
+                return false;
+            case DT_ULINT: // Unsigned long integer    64  0 to 2^(64)-1
+                return false;
+            case DT_REAL: // Real numbers         32      +-10^(+-38)
+                return false;
+            case DT_LREAL: // Long real numbers    64      +-10^(+-308)
+                return false;
+            case DT_BOOL: // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
                 return true;
             default:
                 break;
@@ -496,34 +576,46 @@ public:
 
     unsigned int getDataType() const { return dataBox.getDataType(); }
     TDataBox &getDataBox() { return dataBox; }
-    bool sample(); // clone data from 'fromData'
+
+    // WoodInDataImpl<WoodSIntDataBox>;
+    // template <class TDataBox>
+    bool sample() // clone data from 'fromData'
+    {
+        // WoodOutData *outData = getWoodOutData();
+        // if (outData)
+        // {
+        //     dataBox.copy((TDataBox&)outData->getDataBox()); // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
+        //     return true;
+        // }
+
+        // TODO: only same data type fields may be converted!
+        WoodOutDataImpl<TDataBox> *outData = (WoodOutDataImpl<TDataBox> *)getWoodOutData();
+        if (outData)
+        {
+            dataBox.copy(outData->getDataBox()); // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
+            return true;
+        }
+        return false;
+    }
 
 private:
     TDataBox dataBox;
 };
 
-class WoodOutData : public WoodData
-{
-public:
-    WoodOutData(const char *name) : WoodData(name) {}
-    // virtual ~WoodOutData() {}
-
-private:
-};
-
-// WoodOutDataImpl<WoodSIntDataBox>;
-template <class TDataBox>
-class WoodOutDataImpl : public WoodOutData
-{
-public:
-    WoodOutDataImpl(const char *name) : WoodOutData(name), dataBox() {}
-
-    unsigned int getDataType() const { return dataBox.getDataType(); }
-    TDataBox &getDataBox() { return dataBox; }
-
-private:
-    TDataBox dataBox;
-};
+// Integer
+typedef WoodInDataImpl<WoodSIntDataBox> WoodSIntInData; // Short integer            8   -128 to þ127
+// typedef WoodDataBoxImpl<INT, DT_INT> WoodIntDataBox;       // Integer                  16  -32768 to 32767
+// typedef WoodDataBoxImpl<DINT, DT_DINT> WoodDIntDataBox;    // Double integer           32  -2^(31) to 2^(31)-1
+// typedef WoodDataBoxImpl<LINT, DT_LINT> WoodLIntDataBox;    // Long integer             64  -2^(63) to 2^(63)-1
+// typedef WoodDataBoxImpl<USINT, DT_USINT> WoodUSIntDataBox; // Unsigned short integer   8   0 to 255
+// typedef WoodDataBoxImpl<UINT, DT_UINT> WoodUIntDataBox;    // Unsigned integer         16  0 to 2^(16)-1
+// typedef WoodDataBoxImpl<UDINT, DT_UDINT> WoodUDIntDataBox; // Unsigned double integer  32  0 to 2^(32)-1
+// typedef WoodDataBoxImpl<ULINT, DT_ULINT> WoodULIntDataBox; // Unsigned long integer    64  0 to 2^(64)-1
+// // Floating point (REAL)
+// typedef WoodDataBoxImpl<REAL, DT_REAL> WoodRealDataBox;    // Real numbers         32      +-10^(+-38)
+// typedef WoodDataBoxImpl<LREAL, DT_LREAL> WoodLRealDataBox; // Long real numbers    64      +-10^(+-308)
+// BOOL
+typedef WoodInDataImpl<WoodBoolDataBox> WoodBoolInData; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
 #endif // __cplusplus
 #endif // WoodData

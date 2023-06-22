@@ -5,6 +5,8 @@
 
 // TODO: Lookup Event / Feedback Event!
 
+#define ARRAY_SIZE(array) sizeof(array) / sizeof(array[0])
+
 // For user extend data type
 extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType)
 {
@@ -14,93 +16,202 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int 
 class WebPortal : public WoodServiceInterfaceBlock
 {
 public:
-  WebPortal(const String &name) : WoodServiceInterfaceBlock(name)
+  WebPortal(const char *name)
+      : WoodServiceInterfaceBlock(name),
+        ivStatus(nullptr), ieOccupy(nullptr),
+        ovOnOff(nullptr), oeControl(nullptr), onOff(nullptr)
   {
-    // TODO: ......
+    ivStatus = addInVariable<WoodBoolDataBox>("Status");
+    {
+      const char *outVariableNames[] = {"Status"};
+      ieOccupy = addInEvent("Occupy", outVariableNames, ARRAY_SIZE(outVariableNames));
+    }
+
+    ovOnOff = addOutVariable<WoodBoolDataBox>("OnOff");
+    {
+      const char *outVariableNames[] = {"OnOff"};
+      oeControl = addOutEvent("Control", outVariableNames, ARRAY_SIZE(outVariableNames));
+    }
   }
   ~WebPortal() {}
 
-  void executionInEvent(WoodInEvent &inEvent)
+  void executeInEvent(WoodInEvent &inEvent)
   {
-    // TODO: ......
+    if (inEvent.getName().equals("Occupy"))
+    {
+      if (ivStatus)
+      {
+        BOOL *status = ivStatus->getDataBox().getData();
+        if (status)
+        {
+          Serial.printf("%s \tProcess: \tEVENT_INPUT \t%s \t\tWITH \tStatus \t(* %s, \tline:%d *) \n",
+                        getName().c_str(), inEvent.getName().c_str(), (*status) ? "true" : "false", __LINE__);
+        }
+      }
+    }
+    else
+    {
+      Serial.printf("TODO: Don't deal event(%s), line:%d !!!!!!!!\n", inEvent.getName().c_str(), __LINE__);
+    }
   }
-  WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent()
+  bool captureAndExecuteServiceInterfaceInEvent()
   {
-    // TODO: ......
-    return nullptr;
+    static long unsigned int lasttime = 0; // time stamp, millisecond  //Fixed bug: std::time(0) is changed with SNTP response!
+    long unsigned int time = millis();     //(uint32_t)std::time(0); //Fixed bug: std::time(0) is changed with SNTP response!
+
+    if (lasttime == 0)
+    {
+      lasttime = time + 5 * 1000;
+    }
+
+    if (time - lasttime > 10 * 1000)
+    {
+      if (ovOnOff)
+      {
+        onOff = !onOff;
+        ovOnOff->getDataBox().setData(onOff);
+      }
+      if (oeControl)
+      {
+        Serial.printf("%s \tGenerate: \tEVENT_OUTPUT \t%s \tWITH \tOnOff \t(* %s, \tline:%d *)\n",
+                      getName().c_str(), oeControl->getName().c_str(), onOff ? "true" : "false", __LINE__);
+        generateOutEvent(*oeControl);
+      }
+      lasttime = time;
+      return true;
+    }
+    return false;
   }
-  void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent)
-  {
-    // TODO: ......
-  }
+
+private:
+  WoodInDataImpl<WoodBoolDataBox> *ivStatus;
+  WoodInEvent *ieOccupy;
+
+  WoodOutDataImpl<WoodBoolDataBox> *ovOnOff;
+  WoodOutEvent *oeControl;
+  bool onOff;
 };
 
 class OccupySensor : public WoodServiceInterfaceBlock
 {
 public:
-  OccupySensor(const String &name) : WoodServiceInterfaceBlock(name)
+  OccupySensor(const char *name)
+      : WoodServiceInterfaceBlock(name), ovStatus(nullptr), oeOccupy(nullptr), status(false)
   {
-    // TODO: ......
+    ovStatus = addOutVariable<WoodBoolDataBox>("Status");
+    {
+      const char *outVariableNames[] = {"Status"};
+      oeOccupy = addOutEvent("Occupy", outVariableNames, ARRAY_SIZE(outVariableNames));
+    }
   }
   ~OccupySensor() {}
 
-  void executionInEvent(WoodInEvent &inEvent)
+  void executeInEvent(WoodInEvent &inEvent)
   {
-    // TODO: ......
+    Serial.printf("TODO: Don't deal event(%s), line:%d\n", inEvent.getName().c_str(), __LINE__);
   }
-  WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent()
+  bool captureAndExecuteServiceInterfaceInEvent()
   {
-    // TODO: ......
-    return nullptr;
+    static long unsigned int lasttime = 0; // time stamp, millisecond  //Fixed bug: std::time(0) is changed with SNTP response!
+    long unsigned int time = millis();     //(uint32_t)std::time(0); //Fixed bug: std::time(0) is changed with SNTP response!
+
+    if (lasttime == 0)
+    {
+      lasttime = time;
+    }
+
+    if (time - lasttime > 10 * 1000)
+    {
+      if (ovStatus)
+      {
+        status = !status;
+        ovStatus->getDataBox().setData(status);
+      }
+      if (oeOccupy)
+      {
+        Serial.printf("%s \tGenerate: \tEVENT_OUTPUT \t%s \t\tWITH \tStatus \t(* %s, \tline:%d *)\n",
+                      getName().c_str(), oeOccupy->getName().c_str(), status ? "true" : "false", __LINE__);
+        generateOutEvent(*oeOccupy);
+      }
+      lasttime = time;
+      return true;
+    }
+    return false;
   }
-  void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent)
-  {
-    // TODO: ......
-  }
+
+private:
+  WoodOutDataImpl<WoodBoolDataBox> *ovStatus;
+  WoodOutEvent *oeOccupy;
+  bool status;
 };
 
 class Relay : public WoodBlock
 {
 public:
-  Relay(const String &name) : WoodBlock(name) 
+  Relay(const char *name) : WoodBlock(name)
   {
-    // TODO: ......
+    ivOnOff = addInVariable<WoodBoolDataBox>("OnOff");
+    {
+      const char *inVariableNames[] = {"OnOff"};
+      ieControl = addInEvent("Control", inVariableNames, ARRAY_SIZE(inVariableNames));
+    }
   }
   ~Relay() {}
 
-  void executionInEvent(WoodInEvent &inEvent)
+  void executeInEvent(WoodInEvent &inEvent)
   {
-    // TODO: ......
+    if (inEvent.getName().equals("Control"))
+    {
+      if (ivOnOff)
+      {
+        BOOL *onOff = ivOnOff->getDataBox().getData();
+        if (onOff)
+        {
+          Serial.printf("%s \t\tProcess: \tEVENT_INPUT \t%s \tWITH \tOnOff \t(* %s, \tline:%d *) \n",
+                        getName().c_str(), inEvent.getName().c_str(), (*onOff) ? "true" : "false", __LINE__);
+        }
+      }
+    }
+    else
+    {
+      Serial.printf("TODO: Don't deal event(%s), line:%d !!!!!!!!\n", inEvent.getName().c_str(), __LINE__);
+    }
   }
+
+private:
+  WoodInDataImpl<WoodBoolDataBox> *ivOnOff;
+  WoodInEvent *ieControl;
 };
 
-Relay relay("relay");
-OccupySensor occupySensor("occupySensor");
-WebPortal webPortal("webPortal");
+WoodInDataImpl<WoodBoolDataBox> inVariable("Test");
+
+Relay relay("Relay");
+OccupySensor occupySensor("OccupySensor");
+WebPortal webPortal("WebPortal");
 
 WoodBlockContainer blockContainer;
 
 void setup()
 {
   // put your setup code here, to run once:
+  Serial.begin(115200);
 
   blockContainer.hostWoodBlock(relay);
   blockContainer.hostWoodBlock(occupySensor);
   blockContainer.hostWoodBlock(webPortal);
 
-  // TODO: INIT!
   {
-    const char *outVariableNames[] = {"occupied"};
-    const char *inVariableNames[] = {"occupied"};
+    const char *outVariableNames[] = {"Status"};
+    const char *inVariableNames[] = {"Status"};
 
-    blockContainer.connect("occupySensor", "status", outVariableNames, sizeof(outVariableNames) / sizeof(outVariableNames[0]),
-                           "webPortal", "occupyStatus", inVariableNames, sizeof(inVariableNames) / sizeof(inVariableNames[0]));
+    blockContainer.connect("OccupySensor", "Occupy", outVariableNames, ARRAY_SIZE(outVariableNames),
+                           "WebPortal", "Occupy", inVariableNames, ARRAY_SIZE(inVariableNames));
   }
   {
-    const char *outVariableNames[] = {"relayOnOff"};
-    const char *inVariableNames[] = {"onOff"};
-    blockContainer.connect("webPortal", "relayControl", outVariableNames, sizeof(outVariableNames) / sizeof(outVariableNames[0]),
-                           "webPortal", "control", inVariableNames, sizeof(inVariableNames) / sizeof(inVariableNames[0]));
+    const char *outVariableNames[] = {"OnOff"};
+    const char *inVariableNames[] = {"OnOff"};
+    blockContainer.connect("WebPortal", "Control", outVariableNames, ARRAY_SIZE(outVariableNames),
+                           "Relay", "Control", inVariableNames, ARRAY_SIZE(inVariableNames));
   }
 }
 
@@ -110,4 +221,6 @@ void loop()
 
   occupySensor.fetchExternalEvents();
   webPortal.fetchExternalEvents();
+
+  delay(1000);
 }
