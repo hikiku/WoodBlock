@@ -1,0 +1,25 @@
+{
+  "name": "WoodBlock",
+  "keywords": "IEC-61499, iot, c-plus-plus, arduino",
+  "description": "A tiny implementation of IEC-61499 for Arduino and embedded C++. Simple and efficient. The library serves component consumers and component producers nicely. For component consumers, they can quickly realize product prototypes. For component producers, they can quickly package their own hardware, algorithms, or communication protocols into components.",
+  "homepage": "https://hikiku.io/en/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hikiku/WoodBlock.git"
+  },
+  "version": "0.1",
+  "authors": {
+    "name": "HiKiku",
+    "url": "https://www.hikiku.io"
+  },
+  "exclude": [
+    ".devcontainer",
+    ".github",
+    "extras"
+  ],
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "libArchive": false
+  }
+}

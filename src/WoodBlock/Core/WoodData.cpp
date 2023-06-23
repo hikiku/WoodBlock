@@ -1,3 +1,7 @@
+// WoodBlock - https://hikiku.io
+// Copyright © 2023, HiKiku
+// MIT License
+
 #include "WoodData.h"
 
 // check that outVariable and inVariable are match

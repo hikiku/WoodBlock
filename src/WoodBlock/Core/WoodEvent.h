@@ -1,3 +1,7 @@
+// WoodBlock - https://hikiku.io
+// Copyright © 2023, HiKiku
+// MIT License
+
 #ifndef WoodEvent_class_h
 #define WoodEvent_class_h
 #ifdef __cplusplus

@@ -1,3 +1,7 @@
+// WoodBlock - https://hikiku.io
+// Copyright © 2023, HiKiku
+// MIT License
+
 #include "WoodEvent.h"
 #include "WoodBlock.h"
 
