@@ -1,3 +1,3 @@
 # Wood Block
 
-A tiny implementation of IEC-61499 on Arduino.
+It is a tiny C++ IEC-61499 library for Arduino and IoT (Internet Of Things).
