@@ -2,8 +2,8 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef WoodEvent_class_h
-#define WoodEvent_class_h
+#ifndef Event_class_h
+#define Event_class_h
 #ifdef __cplusplus
 
 #include <Arduino.h>
@@ -13,47 +13,47 @@
 
 #include <WString.h>
 
-#include "WoodMacro.h"
-#include "WoodData.h"
+#include "Macro.h"
+#include "Variable.h"
 
-class WoodBlock;
+class FunctionBlock;
 
-class WoodInEvent;
-class WoodOutEvent;
+class EventInput;
+class EventOutput;
 
-// Wood Event Type
+// Event Type
 #define EVENT_ANY (0)
 #define EVENT_USER_EXTENDED_BASE (10000)
 
-class WoodEvent
+class Event
 {
 public:
-    WoodEvent(WoodBlock &owner, const String &name, unsigned int eventType = EVENT_ANY)
+    Event(FunctionBlock &owner, const String &name, unsigned int eventType = EVENT_ANY)
         : owner(owner), name(name), eventType(eventType) {}
-    virtual ~WoodEvent() {} // TODO: = 0;
+    virtual ~Event() {} // TODO: = 0;
     const String &getName() const { return name; }
     unsigned int getEventType() const { return eventType; }
 
 protected:
-    WoodBlock &getOwner() { return owner; }
+    FunctionBlock &getOwner() { return owner; }
 
 private:
-    WoodBlock &owner; // belongs to
+    FunctionBlock &owner; // belongs to
     String name;
     unsigned int eventType;
 };
 
-class WoodInEvent : public WoodEvent
+class EventInput : public Event
 {
 public:
-    WoodInEvent(WoodBlock &owner, const char *name)
-        : WoodEvent(owner, name), inVariables(), outEvent(nullptr)
+    EventInput(FunctionBlock &owner, const char *name)
+        : Event(owner, name), inVariables(), outEvent(nullptr)
     {
         //
     }
-    ~WoodInEvent() {}
+    ~EventInput() {}
 
-    WoodInData *findInVariableByName(const char *inVariableName)
+    VariableInput *findInVariableByName(const char *inVariableName)
     {
         if (inVariableName == nullptr)
         {
@@ -62,7 +62,7 @@ public:
         }
 
         String name(inVariableName);
-        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        for (std::list<VariableInput *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
             if ((*it)->getName().equals(name))
             {
@@ -97,7 +97,7 @@ public:
     }
 
     bool isAlreadyConnected() const { return (outEvent == nullptr) ? false : true; }
-    bool setConnectSource(WoodOutEvent &outEvent) // friend class method
+    bool setConnectSource(EventOutput &outEvent) // friend class method
     {
         if (this->outEvent == nullptr)
         {
@@ -113,7 +113,7 @@ public:
     void sample()
     {
         // sample all of inVariables
-        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        for (std::list<VariableInput *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
             (*it)->sample();
         }
@@ -148,18 +148,18 @@ private:
         return true;
     }
 
-    std::list<WoodInData *> inVariables;
-    WoodOutEvent *outEvent;
+    std::list<VariableInput *> inVariables;
+    EventOutput *outEvent;
 };
 
-class WoodOutEvent : public WoodEvent
+class EventOutput : public Event
 {
 public:
-    WoodOutEvent(WoodBlock &owner, const char *name)
-        : WoodEvent(owner, name), outVariables(), inEvent(nullptr) {}
-    ~WoodOutEvent()
+    EventOutput(FunctionBlock &owner, const char *name)
+        : Event(owner, name), outVariables(), inEvent(nullptr) {}
+    ~EventOutput()
     {
-        // std::list<WoodOutData*> outVariables;
+        // std::list<VariableOutput*> outVariables;
         outVariables.clear();
     }
 
@@ -186,7 +186,7 @@ public:
         return true;
     }
 
-    WoodOutData *findOutVariableByName(const char *outVariableName)
+    VariableOutput *findOutVariableByName(const char *outVariableName)
     {
         if (outVariableName == nullptr)
         {
@@ -195,7 +195,7 @@ public:
         }
 
         String name(outVariableName);
-        for (std::list<WoodOutData *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        for (std::list<VariableOutput *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
             if ((*it)->getName().equals(name))
             {
@@ -208,7 +208,7 @@ public:
 
     bool isAlreadyConnected() const { return (inEvent == nullptr) ? false : true; }
     bool connectTo(const char *outVariableNames[],
-                   WoodInEvent &inEvent, const char *inVariableNames[], int sizeofVariables)
+                   EventInput &inEvent, const char *inVariableNames[], int sizeofVariables)
     {
         bool result = true;
 
@@ -234,17 +234,17 @@ public:
         // check that each of outVariableNames and each of inVariableNames are match
         for (int i = 0; i < sizeofVariables; i++)
         {
-            WoodOutData *outVariable = findOutVariableByName(outVariableNames[i]);
-            WoodInData *inVariable = inEvent.findInVariableByName(inVariableNames[i]);
+            VariableOutput *outVariable = findOutVariableByName(outVariableNames[i]);
+            VariableInput *inVariable = inEvent.findInVariableByName(inVariableNames[i]);
 
             if (!outVariable)
             {
-                Serial.printf("ERROR: Check: It Can't find WoodOutData by name %s!\n", outVariableNames[i]);
+                Serial.printf("ERROR: Check: It Can't find VariableOutput by name %s!\n", outVariableNames[i]);
                 result = false;
             }
             if (!inVariable)
             {
-                Serial.printf("ERROR: Check: It Can't find WoodInData by name %s!\n", inVariableNames[i]);
+                Serial.printf("ERROR: Check: It Can't find VariableInput by name %s!\n", inVariableNames[i]);
                 result = false;
             }
             // check that outVariable and inVariable are match
@@ -262,17 +262,17 @@ public:
         // connect inVariables from outVariables
         for (int i = 0; i < sizeofVariables; i++)
         {
-            WoodOutData *outVariable = findOutVariableByName(outVariableNames[i]);
-            WoodInData *inVariable = inEvent.findInVariableByName(inVariableNames[i]);
+            VariableOutput *outVariable = findOutVariableByName(outVariableNames[i]);
+            VariableInput *inVariable = inEvent.findInVariableByName(inVariableNames[i]);
 
             if (!outVariable)
             {
-                //// printf(ERROR, "Connect: It Can't find WoodOutData by name %s!\n", outVariableNames[i])
+                //// printf(ERROR, "Connect: It Can't find VariableOutput by name %s!\n", outVariableNames[i])
                 continue; // result = false;
             }
             if (!inVariable)
             {
-                //// printf(ERROR, "Connect: It Can't find WoodInData by name %s!\n", inVariableNames[i])
+                //// printf(ERROR, "Connect: It Can't find VariableInput by name %s!\n", inVariableNames[i])
                 continue; // result = false;
             }
             inVariable->connectFrom(*outVariable);
@@ -349,15 +349,15 @@ private:
 
     void clear() { generated = false; }
 
-    std::list<WoodOutData *> outVariables;
-    WoodInEvent *inEvent; // event observer, to event, connect to
+    std::list<VariableOutput *> outVariables;
+    EventInput *inEvent; // event observer, to event, connect to
     bool generated;       // Has a out event been alreay generated?
 };
 
-class WoodServiceInterfaceInEvent : public WoodInEvent
+class ServiceInterfaceInEvent : public EventInput
 {
     //
 };
 
 #endif // __cplusplus
-#endif // WoodEvent
+#endif // Event_class_h

@@ -12,14 +12,14 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int 
   return false;
 }
 
-class WebPortal : public WoodServiceInterfaceBlock
+class WebPortal : public ServiceInterfaceBlock
 {
 public:
   WebPortal(const char *name)
-      : WoodServiceInterfaceBlock(name),
+      : ServiceInterfaceBlock(name),
         ovOnOff(nullptr), oeControl(nullptr), onOff(nullptr)
   {
-    ovOnOff = addOutVariable<WoodBoolDataBox>("OnOff");
+    ovOnOff = addOutVariable<DataBoxBool>("OnOff");
     {
       const char *outVariableNames[] = {"OnOff"};
       oeControl = addOutEvent("Control", outVariableNames, ARRAY_SIZE(outVariableNames));
@@ -27,7 +27,7 @@ public:
   }
   ~WebPortal() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
       Serial.printf("TODO: Don't deal event(%s), line:%d !!!!!!!!\n", inEvent.getName().c_str(), __LINE__);
   }
@@ -61,17 +61,17 @@ public:
   }
 
 private:
-  WoodOutDataImpl<WoodBoolDataBox> *ovOnOff;
-  WoodOutEvent *oeControl;
+  VariableOutputImpl<DataBoxBool> *ovOnOff;
+  EventOutput *oeControl;
   bool onOff;
 };
 
-class Relay : public WoodBlock
+class Relay : public FunctionBlock
 {
 public:
-  Relay(const char *name) : WoodBlock(name)
+  Relay(const char *name) : FunctionBlock(name)
   {
-    ivOnOff = addInVariable<WoodBoolDataBox>("OnOff");
+    ivOnOff = addInVariable<DataBoxBool>("OnOff");
     {
       const char *inVariableNames[] = {"OnOff"};
       ieControl = addInEvent("Control", inVariableNames, ARRAY_SIZE(inVariableNames));
@@ -79,7 +79,7 @@ public:
   }
   ~Relay() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
     if (inEvent.getName().equals("Control"))
     {
@@ -100,22 +100,22 @@ public:
   }
 
 private:
-  WoodInDataImpl<WoodBoolDataBox> *ivOnOff;
-  WoodInEvent *ieControl;
+  VariableInputImpl<DataBoxBool> *ivOnOff;
+  EventInput *ieControl;
 };
 
 Relay relay("Relay");
 WebPortal webPortal("WebPortal");
 
-WoodBlockContainer blockContainer;
+FunctionBlockContainer blockContainer;
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  blockContainer.hostWoodBlock(relay);
-  blockContainer.hostWoodBlock(webPortal);
+  blockContainer.hostFunctionBlock(relay);
+  blockContainer.hostFunctionBlock(webPortal);
 
   {
     const char *outVariableNames[] = {"OnOff"};

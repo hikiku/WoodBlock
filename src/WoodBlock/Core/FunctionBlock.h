@@ -2,8 +2,8 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef WoodBlock_class_h
-#define WoodBlock_class_h
+#ifndef FunctionBlock_class_h
+#define FunctionBlock_class_h
 #ifdef __cplusplus
 
 #include <list>
@@ -11,44 +11,44 @@
 
 #include <WString.h>
 
-#include "WoodMacro.h"
-#include "WoodData.h"
-#include "WoodEvent.h"
+#include "Macro.h"
+#include "Variable.h"
+#include "Event.h"
 
-class WoodBlock
+class FunctionBlock
 {
 public:
-    WoodBlock(const char *name)
+    FunctionBlock(const char *name)
         : name(name), inEvents(), outEvents(), inVariables(), outVariables(), triggeredOutEvents() {}
-    virtual ~WoodBlock() // TODO: = 0;
+    virtual ~FunctionBlock() // TODO: = 0;
     {
-        // std::list<WoodOutEvent*> triggeredOutEvents;
+        // std::list<EventOutput*> triggeredOutEvents;
         triggeredOutEvents.clear();
 
         // clear some connects of inEvents & outEvents, inVariables & outVariables
         disconnect();
 
         // remove member variables
-        // std::list<WoodInEvent*> inEvents;
-        for (std::list<WoodInEvent *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
+        // std::list<EventInput*> inEvents;
+        for (std::list<EventInput *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
         {
             delete *it;
         }
         inEvents.clear();
-        // std::list<WoodOutEvent*> outEvents;
-        for (std::list<WoodOutEvent *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
+        // std::list<EventOutput*> outEvents;
+        for (std::list<EventOutput *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
         {
             delete *it;
         }
         outEvents.clear();
-        // std::list<WoodInData*> inVariables;
-        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        // std::list<VariableInput*> inVariables;
+        for (std::list<VariableInput *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
             delete *it;
         }
         inVariables.clear();
-        // std::list<WoodOutData*> outVariables;
-        for (std::list<WoodOutData *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        // std::list<VariableOutput*> outVariables;
+        for (std::list<VariableOutput *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
             delete *it;
         }
@@ -60,10 +60,10 @@ public:
         return name;
     }
 
-    WoodInEvent *findInEventByName(const String &inEventName)
+    EventInput *findInEventByName(const String &inEventName)
     {
-        // std::list<WoodInEvent*> inEvents;
-        for (std::list<WoodInEvent *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
+        // std::list<EventInput*> inEvents;
+        for (std::list<EventInput *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
         {
             if ((*it)->getName().equals(inEventName))
             {
@@ -73,10 +73,10 @@ public:
 
         return nullptr;
     }
-    WoodOutEvent *findOutEventByName(const String &outEventName)
+    EventOutput *findOutEventByName(const String &outEventName)
     {
-        // std::list<WoodOutEvent*> outEvents;
-        for (std::list<WoodOutEvent *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
+        // std::list<EventOutput*> outEvents;
+        for (std::list<EventOutput *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
         {
             if ((*it)->getName().equals(outEventName))
             {
@@ -86,10 +86,10 @@ public:
 
         return nullptr;
     }
-    WoodInData *findInVariableByName(const String &inVariableName)
+    VariableInput *findInVariableByName(const String &inVariableName)
     {
-        // std::list<WoodInData*> inVariables;
-        for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+        // std::list<VariableInput*> inVariables;
+        for (std::list<VariableInput *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
         {
             if ((*it)->getName().equals(inVariableName))
             {
@@ -99,10 +99,10 @@ public:
 
         return nullptr;
     }
-    WoodOutData *findOutVariableByName(const String &outVariableName)
+    VariableOutput *findOutVariableByName(const String &outVariableName)
     {
-        // std::list<WoodOutData*> outVariables;
-        for (std::list<WoodOutData *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
+        // std::list<VariableOutput*> outVariables;
+        for (std::list<VariableOutput *>::iterator it = outVariables.begin(); it != outVariables.end(); ++it)
         {
             if ((*it)->getName().equals(outVariableName))
             {
@@ -114,12 +114,12 @@ public:
     }
 
     // ====================== Constructor: adding =========================
-    // eg: WoodSIntDataBox
+    // eg: DataBoxSInt
     template <class TDataBox>
-    WoodInDataImpl<TDataBox> *addInVariable(const char *name)
+    VariableInputImpl<TDataBox> *addInVariable(const char *name)
     {
-        // push a inVariable to std::list<WoodInData*> inVariables!
-        WoodInDataImpl<TDataBox> *inVariable = new WoodInDataImpl<TDataBox>(name);
+        // push a inVariable to std::list<VariableInput*> inVariables!
+        VariableInputImpl<TDataBox> *inVariable = new VariableInputImpl<TDataBox>(name);
         if (inVariable)
         {
             inVariables.push_back(inVariable);
@@ -127,12 +127,12 @@ public:
         }
         return nullptr;
     }
-    // eg: WoodSIntDataBox
+    // eg: DataBoxSInt
     template <class TDataBox>
-    WoodOutDataImpl<TDataBox> *addOutVariable(const char *name)
+    VariableOutputImpl<TDataBox> *addOutVariable(const char *name)
     {
-        // push a outVariable to std::list<WoodOutData*> outVariables!
-        WoodOutDataImpl<TDataBox> *outVariable = new WoodOutDataImpl<TDataBox>(name); // WoodOutData
+        // push a outVariable to std::list<VariableOutput*> outVariables!
+        VariableOutputImpl<TDataBox> *outVariable = new VariableOutputImpl<TDataBox>(name); // VariableOutput
         if (outVariable)
         {
             outVariables.push_back(outVariable);
@@ -143,13 +143,13 @@ public:
 
     // eg: EVENT_ANY, ...
     // template <class TEventType>
-    WoodInEvent *addInEvent(const char *name, const char *inVariableNames[], int sizeofInVariables)
+    EventInput *addInEvent(const char *name, const char *inVariableNames[], int sizeofInVariables)
     {
-        WoodInEvent *inEvent = new WoodInEvent(*this, name);
+        EventInput *inEvent = new EventInput(*this, name);
         if (inEvent)
         {
             bool result = inEvent->addInVariablesByNames(inVariableNames, sizeofInVariables);
-            // add inEvents ot std::list<WoodInEvent*> inEvents;
+            // add inEvents ot std::list<EventInput*> inEvents;
             if (result)
             {
                 inEvents.push_back(inEvent);
@@ -157,27 +157,27 @@ public:
             }
             else
             {
-                // TODO: printf (ERROR, "It fail for calling addInVariablesByNames(WoodInEvent[%s])!", name);
+                // TODO: printf (ERROR, "It fail for calling addInVariablesByNames(EventInput[%s])!", name);
                 delete inEvent;
                 return nullptr;
             }
         }
         else
         {
-            // TODO: printf (ERROR, "It fail for adding WoodInEvent[%s]!", name);
+            // TODO: printf (ERROR, "It fail for adding EventInput[%s]!", name);
             return nullptr;
         }
     }
     // eg: EVENT_ANY, ...
     // template <class TEventType>
-    WoodOutEvent *addOutEvent(const char *name, const char *outVariableNames[], int sizeofOutVariables)
+    EventOutput *addOutEvent(const char *name, const char *outVariableNames[], int sizeofOutVariables)
     {
         // TODO: ...
-        WoodOutEvent *outEvent = new WoodOutEvent(*this, name);
+        EventOutput *outEvent = new EventOutput(*this, name);
         if (outEvent)
         {
             bool result = outEvent->addOutVariablesByNames(outVariableNames, sizeofOutVariables);
-            // add outEvent to std::list<WoodOutEvent*> outEvents;
+            // add outEvent to std::list<EventOutput*> outEvents;
             if (result)
             {
                 outEvents.push_back(outEvent);
@@ -185,7 +185,7 @@ public:
             }
             else
             {
-                // TODO: printf (ERROR, "It fail for calling addOutVariablesByNames(WoodInEvent[%s])!", name);
+                // TODO: printf (ERROR, "It fail for calling addOutVariablesByNames(EventInput[%s])!", name);
                 delete outEvent;
                 return nullptr;
             }
@@ -199,19 +199,19 @@ public:
 
     // ====================== Constructor: connecting =========================
     bool connectTo(const char *outEventName, const char *outVariableNames[],
-                   WoodBlock &destWoodBlock, const char *inEventName, const char *inVariableNames[], int sizeofVariables)
+                   FunctionBlock &destFunctionBlock, const char *inEventName, const char *inVariableNames[], int sizeofVariables)
     {
         bool result = true;
-        WoodOutEvent *outEvent = findOutEventByName(outEventName);
-        WoodInEvent *inEvent = destWoodBlock.findInEventByName(inEventName);
+        EventOutput *outEvent = findOutEventByName(outEventName);
+        EventInput *inEvent = destFunctionBlock.findInEventByName(inEventName);
         if (!outEvent)
         {
-            //// printf(ERROR, "It Can't find WoodOutEvent by name %s!\n", outEventName)
+            //// printf(ERROR, "It Can't find EventOutput by name %s!\n", outEventName)
             result = false;
         }
         if (!inEvent)
         {
-            //// printf(ERROR, "It Can't find WoodInEvent by name %s!\n", inEventName)
+            //// printf(ERROR, "It Can't find EventInput by name %s!\n", inEventName)
             result = false;
         }
         if (!result)
@@ -223,7 +223,7 @@ public:
     }
 
     // ====================== Normal: running =========================
-    void processInEvent(WoodInEvent &inEvent)
+    void processInEvent(EventInput &inEvent)
     {
         inEvent.sample();                 // sample input variables
         executeInEvent(inEvent);          // execution ecc
@@ -234,36 +234,36 @@ public:
     void disconnect()
     {
 
-        // std::list<WoodOutEvent*> triggeredOutEvents;
+        // std::list<EventOutput*> triggeredOutEvents;
         triggeredOutEvents.clear();
 
-        // std::list<WoodInEvent*> inEvents;
-        for (std::list<WoodInEvent *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
+        // std::list<EventInput*> inEvents;
+        for (std::list<EventInput *>::iterator it = inEvents.begin(); it != inEvents.end(); ++it)
         {
             (*it)->disconnect();
         }
 
-        // std::list<WoodOutEvent*> outEvents;
-        for (std::list<WoodOutEvent *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
+        // std::list<EventOutput*> outEvents;
+        for (std::list<EventOutput *>::iterator it = outEvents.begin(); it != outEvents.end(); ++it)
         {
             (*it)->disconnect();
         }
     }
 
     // ====================== Deconstructor: removing =========================
-    // Some private functions in ~WoodBlock()
+    // Some private functions in ~FunctionBlock()
 
 protected:
-    virtual void executeInEvent(WoodInEvent &inEvent) = 0;
+    virtual void executeInEvent(EventInput &inEvent) = 0;
     //{
     // TODO: ......
     // if inEvent.is("INIT") { ... }
     // else if inEvent.is("RESET") { ... }
-    // ...... woodOutData.set(xyz)......
-    // ...... generateOutEvent(WoodOutEvent &outEvent)......
+    // ...... OutData.set(xyz)......
+    // ...... generateOutEvent(EventOutput &outEvent)......
     //}
 
-    void generateOutEvent(WoodOutEvent &outEvent)
+    void generateOutEvent(EventOutput &outEvent)
     {
         outEvent.generate();
         triggeredOutEvents.push_back(&outEvent);
@@ -272,7 +272,7 @@ protected:
     // dispatch and execute all output events
     void dispatchAndExecuteAllOutEvents()
     {
-        for (std::list<WoodOutEvent *>::iterator it = triggeredOutEvents.begin(); it != triggeredOutEvents.end();)
+        for (std::list<EventOutput *>::iterator it = triggeredOutEvents.begin(); it != triggeredOutEvents.end();)
         {
             (*it)->dispatchAndExecute();
             it = triggeredOutEvents.erase(it); // it++;
@@ -283,7 +283,7 @@ protected:
 private:
     void disconnectInEvent(const String &inEventName)
     {
-        WoodInEvent *inEvent = findInEventByName(inEventName);
+        EventInput *inEvent = findInEventByName(inEventName);
         if (inEvent)
         {
             inEvent->disconnect();
@@ -291,7 +291,7 @@ private:
     }
     void disconnectOutEvent(const String &outEventName)
     {
-        WoodOutEvent *outEvent = findOutEventByName(outEventName);
+        EventOutput *outEvent = findOutEventByName(outEventName);
         if (outEvent)
         {
             outEvent->disconnect();
@@ -300,23 +300,23 @@ private:
 
     String name;
 
-    std::list<WoodInEvent *> inEvents;
-    std::list<WoodOutEvent *> outEvents;
+    std::list<EventInput *> inEvents;
+    std::list<EventOutput *> outEvents;
 
-    std::list<WoodInData *> inVariables;
-    std::list<WoodOutData *> outVariables;
+    std::list<VariableInput *> inVariables;
+    std::list<VariableOutput *> outVariables;
 
-    std::list<WoodOutEvent *> triggeredOutEvents; // pop_front() & push_back(), erase()/clear()
+    std::list<EventOutput *> triggeredOutEvents; // pop_front() & push_back(), erase()/clear()
 };
 
-class WoodServiceInterfaceBlock : public WoodBlock
+class ServiceInterfaceBlock : public FunctionBlock
 {
 public:
-    WoodServiceInterfaceBlock(const char *name) : WoodBlock(name) {} //, siiEvents()
-    ~WoodServiceInterfaceBlock()
+    ServiceInterfaceBlock(const char *name) : FunctionBlock(name) {} //, siiEvents()
+    ~ServiceInterfaceBlock()
     {
-        // // std::list<WoodServiceInterfaceInEvent*> siiEvents;
-        // for (std::list<WoodServiceInterfaceInEvent*>::iterator it = siiEvents.begin(); it != siiEvents.end();)
+        // // std::list<ServiceInterfaceInEvent*> siiEvents;
+        // for (std::list<ServiceInterfaceInEvent*>::iterator it = siiEvents.begin(); it != siiEvents.end();)
         // {
         //     delete *it;
         //     it = siiEvents.erase(it); // it++;
@@ -337,29 +337,29 @@ protected:
     virtual bool captureAndExecuteServiceInterfaceInEvent() = 0;
     // {
     //     // Get extra/sifb event and/or timer event
-    //     WoodServiceInterfaceInEvent *siiEvent = captureServiceInterfaceInEvent();
+    //     ServiceInterfaceInEvent *siiEvent = captureServiceInterfaceInEvent();
     //     // if no extra/sifb event, return false;
     //     if ((siiEvent == nullptr) || (siiEvent == NULL))
     //     {
     //         //// printf (HINT, "It has no ServiceInterfaceInEvent to capture!\n"])
     //         return false;
     //     }
-    //     // virtual WoodServiceInterfaceInEvent *captureServiceInterfaceInEvent() = 0;
+    //     // virtual ServiceInterfaceInEvent *captureServiceInterfaceInEvent() = 0;
     //     executionServiceInterfaceInEvent(*siiEvent);
-    //     // virtual void executionServiceInterfaceInEvent(WoodServiceInterfaceInEvent &siiEvent) = 0;
+    //     // virtual void executionServiceInterfaceInEvent(ServiceInterfaceInEvent &siiEvent) = 0;
     //     // {
     //     //   TODO: ......
     //     //   if siiEvent.is("AAA") { ... }
     //     //   else if siiEvent.is("BBB") { ... }
-    //     //   ...... woodOutData.set(xyz)......
-    //     //   ...... generateOutEvent(WoodOutEvent &outEvent)......
+    //     //   ...... OutData.set(xyz)......
+    //     //   ...... generateOutEvent(EventOutput &outEvent)......
     //     //  }
     //     return true;
     // }
 
 private:
-    // std::list<WoodServiceInterfaceInEvent*> siiEvents;
+    // std::list<ServiceInterfaceInEvent*> siiEvents;
 };
 
 #endif // __cplusplus
-#endif // WoodBlock
+#endif // FunctionBlock_class_h

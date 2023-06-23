@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "WoodBlock/Core/WoodMacro.h"
-#include "WoodBlock/Core/WoodData.h"
-#include "WoodBlock/Core/WoodEvent.h"
-#include "WoodBlock/Core/WoodBlock.h"
-#include "WoodBlock/Core/WoodBlockContainer.h "
+#include "WoodBlock/Core/Macro.h"
+#include "WoodBlock/Core/Variable.h"
+#include "WoodBlock/Core/Event.h"
+#include "WoodBlock/Core/FunctionBlock.h"
+#include "WoodBlock/Core/FunctionBlockContainer.h "
 

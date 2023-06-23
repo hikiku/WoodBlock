@@ -6,10 +6,10 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-WoodBlock		KEYWORD1	WoodBlock
-WoodBlockContainer	KEYWORD1	WoodBlockContainer
-WoodInData		KEYWORD1	WoodInData
-WoodEvent		KEYWORD1	WoodEvent
+FunctionBlock		    KEYWORD1	FunctionBlock
+FunctionBlockContainer	KEYWORD1	FunctionBlockContainer
+VariableInput		    KEYWORD1	VariableInput
+Event		        KEYWORD1	Event
 
 #######################################
 # Methods and Functions (KEYWORD2)

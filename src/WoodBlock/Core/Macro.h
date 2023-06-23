@@ -2,8 +2,8 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef WoodMacro_h
-#define WoodMacro_h
+#ifndef __Macro_h_
+#define __Macro_h_
 
 #ifndef NULL
     #define NULL (void*)0
@@ -37,4 +37,4 @@
         return (result);                     \
     }
 
-#endif // WoodMacro
+#endif // __Macro_h_

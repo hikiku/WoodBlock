@@ -2,8 +2,8 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef WoodData_class_h
-#define WoodData_class_h
+#ifndef Variable_class_h
+#define Variable_class_h
 #ifdef __cplusplus
 
 #include <list>
@@ -11,10 +11,10 @@
 
 #include <WString.h>
 
-#include "WoodMacro.h"
+#include "Macro.h"
 
-class WoodInData;
-class WoodOutData;
+class VariableInput;
+class VariableOutput;
 
 // Integer
 typedef int8_t SINT;    // Short integer            8   -128 to þ127
@@ -31,7 +31,7 @@ typedef double LREAL; // Long real numbers    64      +-10^(+-308)
 
 typedef bool BOOL; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
-// Wood Data Type // enum class WoodDataType
+// Data Type // enum class VariableType
 // Integer
 #define DT_SINT (1)  // Short integer            8   -128 to þ127
 #define DT_INT (2)   // Integer                  16  -32768 to 32767
@@ -47,14 +47,14 @@ typedef bool BOOL; // Has two states FALSE, equivalent to 0, and TRUE equivalent
 
 #define DT_BOOL (30) // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
-class WoodDataBox
+class DataBox
 {
 public:
-    WoodDataBox(unsigned int dataType, unsigned int dataSize)
+    DataBox(unsigned int dataType, unsigned int dataSize)
         : dataType(dataType), dataSize(dataSize), dataPoint(nullptr) {}
-    WoodDataBox(unsigned int dataType, unsigned int dataSize, void *dataPoint)
+    DataBox(unsigned int dataType, unsigned int dataSize, void *dataPoint)
         : dataType(dataType), dataSize(dataSize), dataPoint(dataPoint) {}
-    virtual ~WoodDataBox() {} // TODO: = 0;
+    virtual ~DataBox() {} // TODO: = 0;
 
     unsigned int getDataType() const { return dataType; }
     unsigned int getDataSize() const { return dataSize; }
@@ -101,18 +101,18 @@ private:
     void *dataPoint;       // data point
 };
 
-// eg: WoodDataBoxImpl<SINT, DT_SINT>
+// eg: DataBoxImpl<SINT, DT_SINT>
 template <class T, unsigned int DT>
-class WoodDataBoxImpl : public WoodDataBox
+class DataBoxImpl : public DataBox
 {
 public:
-    WoodDataBoxImpl()
-        : WoodDataBox(DT, sizeof(T))
+    DataBoxImpl()
+        : DataBox(DT, sizeof(T))
     {
         T *dataPoint = new T();
         setDataPoint(dataPoint);
     }
-    ~WoodDataBoxImpl()
+    ~DataBoxImpl()
     {
         T *data = getData();
         if (data)
@@ -132,7 +132,7 @@ public:
         }
     }
 
-    // FROM: eg: WoodSIntDataBox or WoodDataBoxImpl<SINT, DT_SINT>
+    // FROM: eg: DataBoxSInt or DataBoxImpl<SINT, DT_SINT>
     template <class FROM>
     bool copy(FROM &from) // const
     {
@@ -150,49 +150,49 @@ public:
 };
 
 // Integer
-typedef WoodDataBoxImpl<SINT, DT_SINT> WoodSIntDataBox;    // Short integer            8   -128 to þ127
-typedef WoodDataBoxImpl<INT, DT_INT> WoodIntDataBox;       // Integer                  16  -32768 to 32767
-typedef WoodDataBoxImpl<DINT, DT_DINT> WoodDIntDataBox;    // Double integer           32  -2^(31) to 2^(31)-1
-typedef WoodDataBoxImpl<LINT, DT_LINT> WoodLIntDataBox;    // Long integer             64  -2^(63) to 2^(63)-1
-typedef WoodDataBoxImpl<USINT, DT_USINT> WoodUSIntDataBox; // Unsigned short integer   8   0 to 255
-typedef WoodDataBoxImpl<UINT, DT_UINT> WoodUIntDataBox;    // Unsigned integer         16  0 to 2^(16)-1
-typedef WoodDataBoxImpl<UDINT, DT_UDINT> WoodUDIntDataBox; // Unsigned double integer  32  0 to 2^(32)-1
-typedef WoodDataBoxImpl<ULINT, DT_ULINT> WoodULIntDataBox; // Unsigned long integer    64  0 to 2^(64)-1
+typedef DataBoxImpl<SINT, DT_SINT> DataBoxSInt;    // Short integer            8   -128 to þ127
+typedef DataBoxImpl<INT, DT_INT> DataBoxInt;       // Integer                  16  -32768 to 32767
+typedef DataBoxImpl<DINT, DT_DINT> DataBoxDInt;    // Double integer           32  -2^(31) to 2^(31)-1
+typedef DataBoxImpl<LINT, DT_LINT> DataBoxLInt;    // Long integer             64  -2^(63) to 2^(63)-1
+typedef DataBoxImpl<USINT, DT_USINT> DataBoxUSInt; // Unsigned short integer   8   0 to 255
+typedef DataBoxImpl<UINT, DT_UINT> DataBoxUInt;    // Unsigned integer         16  0 to 2^(16)-1
+typedef DataBoxImpl<UDINT, DT_UDINT> DataBoxUDInt; // Unsigned double integer  32  0 to 2^(32)-1
+typedef DataBoxImpl<ULINT, DT_ULINT> DataBoxULInt; // Unsigned long integer    64  0 to 2^(64)-1
 // Floating point (REAL)
-typedef WoodDataBoxImpl<REAL, DT_REAL> WoodRealDataBox;    // Real numbers         32      +-10^(+-38)
-typedef WoodDataBoxImpl<LREAL, DT_LREAL> WoodLRealDataBox; // Long real numbers    64      +-10^(+-308)
+typedef DataBoxImpl<REAL, DT_REAL> DataBoxReal;    // Real numbers         32      +-10^(+-38)
+typedef DataBoxImpl<LREAL, DT_LREAL> DataBoxLReal; // Long real numbers    64      +-10^(+-308)
 // BOOL
-typedef WoodDataBoxImpl<BOOL, DT_BOOL> WoodBoolDataBox; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+typedef DataBoxImpl<BOOL, DT_BOOL> DataBoxBool; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
-class WoodData
+class Variable
 {
 public:
-    WoodData(const char *name) : name(name) {}
-    virtual ~WoodData() {} // TODO: = 0;
+    Variable(const char *name) : name(name) {}
+    virtual ~Variable() {} // TODO: = 0;
 
     const String &getName() const { return name; }
     virtual unsigned int getDataType() const = 0;
-    virtual WoodDataBox &getDataBox() = 0;
+    virtual DataBox &getDataBox() = 0;
 
 private:
     String name;
 };
 
-class WoodOutData : public WoodData
+class VariableOutput : public Variable
 {
 public:
-    WoodOutData(const char *name) : WoodData(name) {}
-    // virtual ~WoodOutData() {}
+    VariableOutput(const char *name) : Variable(name) {}
+    // virtual ~VariableOutput() {}
 
 private:
 };
 
-// WoodOutDataImpl<WoodSIntDataBox>;
+// VariableOutputImpl<DataBoxSInt>;
 template <class TDataBox>
-class WoodOutDataImpl : public WoodOutData
+class VariableOutputImpl : public VariableOutput
 {
 public:
-    WoodOutDataImpl(const char *name) : WoodOutData(name), dataBox() {}
+    VariableOutputImpl(const char *name) : VariableOutput(name), dataBox() {}
 
     unsigned int getDataType() const { return dataBox.getDataType(); }
     TDataBox &getDataBox() { return dataBox; }
@@ -204,22 +204,22 @@ private:
 // For user extend data type
 extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType);
 
-class WoodInData : public WoodData
+class VariableInput : public Variable
 {
 public:
-    WoodInData(const char *name) : WoodData(name), outData(nullptr) {}
-    // virtual ~WoodInData() {}
+    VariableInput(const char *name) : Variable(name), outData(nullptr) {}
+    // virtual ~VariableInput() {}
 
     bool isAlreadyConnected() const { return (outData == nullptr) ? false : true; }
     // check that outVariable and inVariable are match
-    bool checkForConnectFrom(WoodOutData &outData) const;
-    bool connectFrom(WoodOutData &outData)
+    bool checkForConnectFrom(VariableOutput &outData) const;
+    bool connectFrom(VariableOutput &outData)
     {
         if (!checkForConnectFrom(outData))
         {
             return false;
         }
-        // connect WoodInData from WoodOutData
+        // connect VariableInput from VariableOutput
         this->outData = &outData;
         return true;
     }
@@ -565,27 +565,27 @@ public:
     }
 
 protected:
-    WoodOutData *getWoodOutData() { return outData; }
+    VariableOutput *getVariableOutput() { return outData; }
 
 private:
-    WoodOutData *outData; // start of connection, Output data variable
+    VariableOutput *outData; // start of connection, Output data variable
 };
 
-// WoodInDataImpl<WoodSIntDataBox>;
+// VariableInputImpl<DataBoxSInt>;
 template <class TDataBox>
-class WoodInDataImpl : public WoodInData
+class VariableInputImpl : public VariableInput
 {
 public:
-    WoodInDataImpl(const char *name) : WoodInData(name), dataBox() {}
+    VariableInputImpl(const char *name) : VariableInput(name), dataBox() {}
 
     unsigned int getDataType() const { return dataBox.getDataType(); }
     TDataBox &getDataBox() { return dataBox; }
 
-    // WoodInDataImpl<WoodSIntDataBox>;
+    // VariableInputImpl<DataBoxSInt>;
     // template <class TDataBox>
     bool sample() // clone data from 'fromData'
     {
-        // WoodOutData *outData = getWoodOutData();
+        // VariableOutput *outData = getVariableOutput();
         // if (outData)
         // {
         //     dataBox.copy((TDataBox&)outData->getDataBox()); // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -593,7 +593,7 @@ public:
         // }
 
         // TODO: only same data type fields may be converted!
-        WoodOutDataImpl<TDataBox> *outData = (WoodOutDataImpl<TDataBox> *)getWoodOutData();
+        VariableOutputImpl<TDataBox> *outData = (VariableOutputImpl<TDataBox> *)getVariableOutput();
         if (outData)
         {
             dataBox.copy(outData->getDataBox()); // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -607,19 +607,19 @@ private:
 };
 
 // Integer
-typedef WoodInDataImpl<WoodSIntDataBox> WoodSIntInData; // Short integer            8   -128 to þ127
-// typedef WoodDataBoxImpl<INT, DT_INT> WoodIntDataBox;       // Integer                  16  -32768 to 32767
-// typedef WoodDataBoxImpl<DINT, DT_DINT> WoodDIntDataBox;    // Double integer           32  -2^(31) to 2^(31)-1
-// typedef WoodDataBoxImpl<LINT, DT_LINT> WoodLIntDataBox;    // Long integer             64  -2^(63) to 2^(63)-1
-// typedef WoodDataBoxImpl<USINT, DT_USINT> WoodUSIntDataBox; // Unsigned short integer   8   0 to 255
-// typedef WoodDataBoxImpl<UINT, DT_UINT> WoodUIntDataBox;    // Unsigned integer         16  0 to 2^(16)-1
-// typedef WoodDataBoxImpl<UDINT, DT_UDINT> WoodUDIntDataBox; // Unsigned double integer  32  0 to 2^(32)-1
-// typedef WoodDataBoxImpl<ULINT, DT_ULINT> WoodULIntDataBox; // Unsigned long integer    64  0 to 2^(64)-1
+// typedef VariableInputImpl<DataBoxSInt> VarInSInt; // Short integer            8   -128 to þ127
+// typedef DataBoxImpl<INT, DT_INT> DataBoxInt;       // Integer                  16  -32768 to 32767
+// typedef DataBoxImpl<DINT, DT_DINT> DataBoxDInt;    // Double integer           32  -2^(31) to 2^(31)-1
+// typedef DataBoxImpl<LINT, DT_LINT> DataBoxLInt;    // Long integer             64  -2^(63) to 2^(63)-1
+// typedef DataBoxImpl<USINT, DT_USINT> DataBoxUSInt; // Unsigned short integer   8   0 to 255
+// typedef DataBoxImpl<UINT, DT_UINT> DataBoxUInt;    // Unsigned integer         16  0 to 2^(16)-1
+// typedef DataBoxImpl<UDINT, DT_UDINT> DataBoxUDInt; // Unsigned double integer  32  0 to 2^(32)-1
+// typedef DataBoxImpl<ULINT, DT_ULINT> DataBoxULInt; // Unsigned long integer    64  0 to 2^(64)-1
 // // Floating point (REAL)
-// typedef WoodDataBoxImpl<REAL, DT_REAL> WoodRealDataBox;    // Real numbers         32      +-10^(+-38)
-// typedef WoodDataBoxImpl<LREAL, DT_LREAL> WoodLRealDataBox; // Long real numbers    64      +-10^(+-308)
+// typedef DataBoxImpl<REAL, DT_REAL> DataBoxReal;    // Real numbers         32      +-10^(+-38)
+// typedef DataBoxImpl<LREAL, DT_LREAL> DataBoxLReal; // Long real numbers    64      +-10^(+-308)
 // BOOL
-typedef WoodInDataImpl<WoodBoolDataBox> WoodBoolInData; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
+// typedef VariableInputImpl<DataBoxBool> VarInBool; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
 #endif // __cplusplus
-#endif // WoodData
+#endif // Variable_class_h

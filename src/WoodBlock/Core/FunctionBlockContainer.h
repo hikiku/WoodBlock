@@ -1,9 +1,9 @@
-// WoodBlock - https://hikiku.io
+// FunctionBlock - https://hikiku.io
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef WoodBlockContainer_class_h
-#define WoodBlockContainer_class_h
+#ifndef FunctionBlockContainer_class_h
+#define FunctionBlockContainer_class_h
 #ifdef __cplusplus
 
 #include <list>
@@ -11,32 +11,32 @@
 
 #include <WString.h>
 
-#include "WoodMacro.h"
-#include "WoodBlock.h"
+#include "Macro.h"
+#include "FunctionBlock.h"
 
-// class WoodBlock;
+// class FunctionBlock;
 
-class WoodBlockContainer
+class FunctionBlockContainer
 {
 public:
-    WoodBlockContainer() : woodBlocks() {}
-    ~WoodBlockContainer()
+    FunctionBlockContainer() : functionBlocks() {}
+    ~FunctionBlockContainer()
     {
-        std::list<WoodBlock*> woodBlocks;
-        for (std::list<WoodBlock*>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
+        std::list<FunctionBlock*> functionBlocks;
+        for (std::list<FunctionBlock*>::iterator it = functionBlocks.begin(); it != functionBlocks.end(); ++it)
         {
             delete *it;
         }
-        woodBlocks.clear();
+        functionBlocks.clear();
     }
 
-    WoodBlock *findWoodBlockByName(const String &woodBlockName)
+    FunctionBlock *findFunctionBlockByName(const String &functionBlockName)
     {
-        // std::list<WoodBlock*> woodBlocks;
-        for (std::list<WoodBlock*>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
+        // std::list<FunctionBlock*> functionBlocks;
+        for (std::list<FunctionBlock*>::iterator it = functionBlocks.begin(); it != functionBlocks.end(); ++it)
         {
 
-            if ((*it)->getName().equals(woodBlockName))
+            if ((*it)->getName().equals(functionBlockName))
             {
                 return *it;
             }
@@ -45,21 +45,21 @@ public:
         return nullptr;
     }
 
-    // Don't delete a managed WoodBlock directly. Please call unhostAndDeleteWoodBlock()!
-    bool hostWoodBlock(WoodBlock &woodBlock)
+    // Don't delete a managed FunctionBlock directly. Please call unhostAndDeleteFunctionBlock()!
+    bool hostFunctionBlock(FunctionBlock &functionBlock)
     {
-        woodBlocks.push_back(&woodBlock);
+        functionBlocks.push_back(&functionBlock);
         return true;
     }
-    bool unhostAndDeleteWoodBlock(const String &woodBlockName)
+    bool unhostAndDeleteFunctionBlock(const String &functionBlockName)
     {
-        // std::list<WoodBlock *> woodBlocks;
-        for (std::list<WoodBlock *>::iterator it = woodBlocks.begin(); it != woodBlocks.end(); ++it)
+        // std::list<FunctionBlock *> functionBlocks;
+        for (std::list<FunctionBlock *>::iterator it = functionBlocks.begin(); it != functionBlocks.end(); ++it)
         {
-            if ((*it)->getName().equals(woodBlockName))
+            if ((*it)->getName().equals(functionBlockName))
             {
                 delete *it;
-                woodBlocks.erase(it);
+                functionBlocks.erase(it);
                 return true;
             }
         }
@@ -81,8 +81,8 @@ public:
         WB_CHECK_EXP_RETURN_VALUE((sizeofInVariables <= 0), false);
         WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables != sizeofInVariables), false);
 
-        WoodBlock *srcBlock = findWoodBlockByName(srcBlockName);
-        WoodBlock *dstBlock = findWoodBlockByName(destBlockName);
+        FunctionBlock *srcBlock = findFunctionBlockByName(srcBlockName);
+        FunctionBlock *dstBlock = findFunctionBlockByName(destBlockName);
         if (srcBlock == nullptr)
         {
             // TODO: printf(WARNING, "srcBlock is nullptr!");
@@ -104,8 +104,8 @@ public:
     }
 
 private:
-    std::list<WoodBlock*> woodBlocks;
+    std::list<FunctionBlock*> functionBlocks;
 };
 
 #endif // __cplusplus
-#endif // WoodBlockContainer
+#endif // FunctionBlockContainer_class_h

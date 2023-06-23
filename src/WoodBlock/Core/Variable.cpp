@@ -2,10 +2,10 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#include "WoodData.h"
+#include "Variable.h"
 
 // check that outVariable and inVariable are match
-bool WoodInData::checkForConnectFrom(WoodOutData &outData) const 
+bool VariableInput::checkForConnectFrom(VariableOutput &outData) const 
 {
     if (isAlreadyConnected())
     {

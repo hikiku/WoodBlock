@@ -2,10 +2,10 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#include "WoodEvent.h"
-#include "WoodBlock.h"
+#include "Event.h"
+#include "FunctionBlock.h"
 
-bool WoodInEvent::addInVariableByName(const char *inVariableName)
+bool EventInput::addInVariableByName(const char *inVariableName)
 {
     bool result = check4AddingInVariableByName(inVariableName);
     if (!result)
@@ -14,13 +14,13 @@ bool WoodInEvent::addInVariableByName(const char *inVariableName)
     }
     else
     {
-        WoodInData *inData = getOwner().findInVariableByName(inVariableName);
+        VariableInput *inData = getOwner().findInVariableByName(inVariableName);
         inVariables.push_back(inData);
         return true;
     }
 }
 
-bool WoodInEvent::check4AddingInVariableByName(const char *inVariableName)
+bool EventInput::check4AddingInVariableByName(const char *inVariableName)
 {
     if (inVariableName == nullptr)
     {
@@ -34,7 +34,7 @@ bool WoodInEvent::check4AddingInVariableByName(const char *inVariableName)
         return false;
     }
 
-    WoodInData *inData = getOwner().findInVariableByName(inVariableName);
+    VariableInput *inData = getOwner().findInVariableByName(inVariableName);
     if (!inData)
     {
         // TODO: printf (WARNING, "Don't find InVariable by  inVariableName(%s)!", inVariableName);
@@ -46,14 +46,14 @@ bool WoodInEvent::check4AddingInVariableByName(const char *inVariableName)
     }
 }
 
-void WoodInEvent::disconnect()
+void EventInput::disconnect()
 {
     if (this->outEvent == nullptr)
     {
         return;
     }
     // disconnect all of inVariables
-    for (std::list<WoodInData *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
+    for (std::list<VariableInput *>::iterator it = inVariables.begin(); it != inVariables.end(); ++it)
     {
         (*it)->disconnect();
     }
@@ -62,12 +62,12 @@ void WoodInEvent::disconnect()
     this->outEvent = nullptr;
 }
 
-void WoodInEvent::trigger()
+void EventInput::trigger()
 {
     getOwner().processInEvent(*this);
 }
 
-bool WoodOutEvent::addOutVariableByName(const char *outVariableName)
+bool EventOutput::addOutVariableByName(const char *outVariableName)
 {
     bool result = check4AddingOutVariableByName(outVariableName);
     if (!result)
@@ -76,13 +76,13 @@ bool WoodOutEvent::addOutVariableByName(const char *outVariableName)
     }
     else
     {
-        WoodOutData *outData = getOwner().findOutVariableByName(outVariableName);
+        VariableOutput *outData = getOwner().findOutVariableByName(outVariableName);
         outVariables.push_back(outData);
         return true;
     }
 }
 
-bool WoodOutEvent::check4AddingOutVariableByName(const char *outVariableName)
+bool EventOutput::check4AddingOutVariableByName(const char *outVariableName)
 {
     if (outVariableName == nullptr)
     {
@@ -96,7 +96,7 @@ bool WoodOutEvent::check4AddingOutVariableByName(const char *outVariableName)
         return false;
     }
 
-    WoodOutData *outData = getOwner().findOutVariableByName(outVariableName);
+    VariableOutput *outData = getOwner().findOutVariableByName(outVariableName);
     if (!outData)
     {
         // TODO: printf (WARNING, "Don't find OutVariable by  outVariableName(%s)!", outVariableName);

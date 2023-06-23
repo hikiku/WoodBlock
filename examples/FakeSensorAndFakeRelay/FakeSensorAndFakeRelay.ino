@@ -12,21 +12,21 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int 
   return false;
 }
 
-class WebPortal : public WoodServiceInterfaceBlock
+class WebPortal : public ServiceInterfaceBlock
 {
 public:
   WebPortal(const char *name)
-      : WoodServiceInterfaceBlock(name),
+      : ServiceInterfaceBlock(name),
         ivStatus(nullptr), ieOccupy(nullptr),
         ovOnOff(nullptr), oeControl(nullptr), onOff(nullptr)
   {
-    ivStatus = addInVariable<WoodBoolDataBox>("Status");
+    ivStatus = addInVariable<DataBoxBool>("Status");
     {
       const char *outVariableNames[] = {"Status"};
       ieOccupy = addInEvent("Occupy", outVariableNames, ARRAY_SIZE(outVariableNames));
     }
 
-    ovOnOff = addOutVariable<WoodBoolDataBox>("OnOff");
+    ovOnOff = addOutVariable<DataBoxBool>("OnOff");
     {
       const char *outVariableNames[] = {"OnOff"};
       oeControl = addOutEvent("Control", outVariableNames, ARRAY_SIZE(outVariableNames));
@@ -34,7 +34,7 @@ public:
   }
   ~WebPortal() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
     if (inEvent.getName().equals("Occupy"))
     {
@@ -83,21 +83,21 @@ public:
   }
 
 private:
-  WoodInDataImpl<WoodBoolDataBox> *ivStatus;
-  WoodInEvent *ieOccupy;
+  VariableInputImpl<DataBoxBool> *ivStatus;
+  EventInput *ieOccupy;
 
-  WoodOutDataImpl<WoodBoolDataBox> *ovOnOff;
-  WoodOutEvent *oeControl;
+  VariableOutputImpl<DataBoxBool> *ovOnOff;
+  EventOutput *oeControl;
   bool onOff;
 };
 
-class OccupySensor : public WoodServiceInterfaceBlock
+class OccupySensor : public ServiceInterfaceBlock
 {
 public:
   OccupySensor(const char *name)
-      : WoodServiceInterfaceBlock(name), ovStatus(nullptr), oeOccupy(nullptr), status(false)
+      : ServiceInterfaceBlock(name), ovStatus(nullptr), oeOccupy(nullptr), status(false)
   {
-    ovStatus = addOutVariable<WoodBoolDataBox>("Status");
+    ovStatus = addOutVariable<DataBoxBool>("Status");
     {
       const char *outVariableNames[] = {"Status"};
       oeOccupy = addOutEvent("Occupy", outVariableNames, ARRAY_SIZE(outVariableNames));
@@ -105,7 +105,7 @@ public:
   }
   ~OccupySensor() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
     Serial.printf("TODO: Don't deal event(%s), line:%d\n", inEvent.getName().c_str(), __LINE__);
   }
@@ -139,17 +139,17 @@ public:
   }
 
 private:
-  WoodOutDataImpl<WoodBoolDataBox> *ovStatus;
-  WoodOutEvent *oeOccupy;
+  VariableOutputImpl<DataBoxBool> *ovStatus;
+  EventOutput *oeOccupy;
   bool status;
 };
 
-class Relay : public WoodBlock
+class Relay : public FunctionBlock
 {
 public:
-  Relay(const char *name) : WoodBlock(name)
+  Relay(const char *name) : FunctionBlock(name)
   {
-    ivOnOff = addInVariable<WoodBoolDataBox>("OnOff");
+    ivOnOff = addInVariable<DataBoxBool>("OnOff");
     {
       const char *inVariableNames[] = {"OnOff"};
       ieControl = addInEvent("Control", inVariableNames, ARRAY_SIZE(inVariableNames));
@@ -157,7 +157,7 @@ public:
   }
   ~Relay() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
     if (inEvent.getName().equals("Control"))
     {
@@ -178,24 +178,24 @@ public:
   }
 
 private:
-  WoodInDataImpl<WoodBoolDataBox> *ivOnOff;
-  WoodInEvent *ieControl;
+  VariableInputImpl<DataBoxBool> *ivOnOff;
+  EventInput *ieControl;
 };
 
 Relay relay("Relay");
 OccupySensor occupySensor("OccupySensor");
 WebPortal webPortal("WebPortal");
 
-WoodBlockContainer blockContainer;
+FunctionBlockContainer blockContainer;
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  blockContainer.hostWoodBlock(relay);
-  blockContainer.hostWoodBlock(occupySensor);
-  blockContainer.hostWoodBlock(webPortal);
+  blockContainer.hostFunctionBlock(relay);
+  blockContainer.hostFunctionBlock(occupySensor);
+  blockContainer.hostFunctionBlock(webPortal);
 
   {
     const char *outVariableNames[] = {"Status"};

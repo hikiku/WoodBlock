@@ -12,14 +12,14 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int 
   return false;
 }
 
-class WebPortal : public WoodServiceInterfaceBlock
+class WebPortal : public ServiceInterfaceBlock
 {
 public:
   WebPortal(const char *name)
-      : WoodServiceInterfaceBlock(name),
+      : ServiceInterfaceBlock(name),
         ivStatus(nullptr), ieOccupy(nullptr)
   {
-    ivStatus = addInVariable<WoodBoolDataBox>("Status");
+    ivStatus = addInVariable<DataBoxBool>("Status");
     {
       const char *outVariableNames[] = {"Status"};
       ieOccupy = addInEvent("Occupy", outVariableNames, ARRAY_SIZE(outVariableNames));
@@ -27,7 +27,7 @@ public:
   }
   ~WebPortal() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
     if (inEvent.getName().equals("Occupy"))
     {
@@ -52,17 +52,17 @@ public:
   }
 
 private:
-  WoodInDataImpl<WoodBoolDataBox> *ivStatus;
-  WoodInEvent *ieOccupy;
+  VariableInputImpl<DataBoxBool> *ivStatus;
+  EventInput *ieOccupy;
 };
 
-class OccupySensor : public WoodServiceInterfaceBlock
+class OccupySensor : public ServiceInterfaceBlock
 {
 public:
   OccupySensor(const char *name)
-      : WoodServiceInterfaceBlock(name), ovStatus(nullptr), oeOccupy(nullptr), status(false)
+      : ServiceInterfaceBlock(name), ovStatus(nullptr), oeOccupy(nullptr), status(false)
   {
-    ovStatus = addOutVariable<WoodBoolDataBox>("Status");
+    ovStatus = addOutVariable<DataBoxBool>("Status");
     {
       const char *outVariableNames[] = {"Status"};
       oeOccupy = addOutEvent("Occupy", outVariableNames, ARRAY_SIZE(outVariableNames));
@@ -70,7 +70,7 @@ public:
   }
   ~OccupySensor() {}
 
-  void executeInEvent(WoodInEvent &inEvent)
+  void executeInEvent(EventInput &inEvent)
   {
     Serial.printf("TODO: Don't deal event(%s), line:%d\n", inEvent.getName().c_str(), __LINE__);
   }
@@ -104,23 +104,23 @@ public:
   }
 
 private:
-  WoodOutDataImpl<WoodBoolDataBox> *ovStatus;
-  WoodOutEvent *oeOccupy;
+  VariableOutputImpl<DataBoxBool> *ovStatus;
+  EventOutput *oeOccupy;
   bool status;
 };
 
 OccupySensor occupySensor("OccupySensor");
 WebPortal webPortal("WebPortal");
 
-WoodBlockContainer blockContainer;
+FunctionBlockContainer blockContainer;
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  blockContainer.hostWoodBlock(occupySensor);
-  blockContainer.hostWoodBlock(webPortal);
+  blockContainer.hostFunctionBlock(occupySensor);
+  blockContainer.hostFunctionBlock(webPortal);
 
   {
     const char *outVariableNames[] = {"Status"};
