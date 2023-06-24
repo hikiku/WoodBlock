@@ -6,16 +6,13 @@
 
 #include <WoodBlock/version.hpp>
 
-#define WOODBLOCK_BEGIN_PUBLIC_NAMESPACE \
-  namespace WoodBlock {
+#define WOODBLOCK_BEGIN_PUBLIC_NAMESPACE namespace WoodBlock {
+#define WOODBLOCK_END_PUBLIC_NAMESPACE }
 
-#define WOODBLOCK_END_PUBLIC_NAMESPACE \
-  }
-
-#define WOODBLOCK_BEGIN_PRIVATE_NAMESPACE        \
-  namespace WoodBlock {                          \
+#define WOODBLOCK_BEGIN_PRIVATE_NAMESPACE \
+  namespace WoodBlock {                   \
   namespace detail {
 
 #define WOODBLOCK_END_PRIVATE_NAMESPACE \
-  }                                       \
+  }                                     \
   }
