@@ -2,19 +2,17 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef FunctionBlockContainer_class_h
-#define FunctionBlockContainer_class_h
-#ifdef __cplusplus
+#pragma once
 
 #include <list>
 #include <iterator> //
+#include <WString.h> // Arduino
 
-#include <WString.h>
+#include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Core/Macro.h>
+#include <WoodBlock/Core/FunctionBlock.h>
 
-#include "Macro.h"
-#include "FunctionBlock.h"
-
-// class FunctionBlock;
+WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class FunctionBlockContainer
 {
@@ -107,5 +105,4 @@ private:
     std::list<FunctionBlock*> functionBlocks;
 };
 
-#endif // __cplusplus
-#endif // FunctionBlockContainer_class_h
+WOODBLOCK_END_PUBLIC_NAMESPACE

@@ -2,16 +2,19 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef Variable_class_h
-#define Variable_class_h
-#ifdef __cplusplus
+#pragma once
 
 #include <list>
 #include <iterator> //
+#include <WString.h> // Arduino
 
-#include <WString.h>
+#include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Core/Macro.h>
 
-#include "Macro.h"
+// For user extend data type
+extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType);
+
+WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class VariableInput;
 class VariableOutput;
@@ -200,9 +203,6 @@ public:
 private:
     TDataBox dataBox;
 };
-
-// For user extend data type
-extern bool extend_check4ConnectDataType(unsigned int outDataType, unsigned int inDataType);
 
 class VariableInput : public Variable
 {
@@ -621,5 +621,4 @@ private:
 // BOOL
 // typedef VariableInputImpl<DataBoxBool> VarInBool; // Has two states FALSE, equivalent to 0, and TRUE equivalent to 1.
 
-#endif // __cplusplus
-#endif // Variable_class_h
+WOODBLOCK_END_PUBLIC_NAMESPACE

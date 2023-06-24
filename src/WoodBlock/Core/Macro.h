@@ -2,8 +2,7 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef __Macro_h_
-#define __Macro_h_
+#pragma once
 
 #ifndef NULL
     #define NULL (void*)0
@@ -36,5 +35,3 @@
     {                                        \
         return (result);                     \
     }
-
-#endif // __Macro_h_

@@ -2,7 +2,9 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#include "Variable.h"
+#include <WoodBlock/Core/Variable.h>
+
+WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 // check that outVariable and inVariable are match
 bool VariableInput::checkForConnectFrom(VariableOutput &outData) const 
@@ -26,3 +28,5 @@ bool VariableInput::checkForConnectFrom(VariableOutput &outData) const
         return true;
     }
 }
+
+WOODBLOCK_END_PUBLIC_NAMESPACE

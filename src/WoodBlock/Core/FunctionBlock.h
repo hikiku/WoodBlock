@@ -2,18 +2,18 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef FunctionBlock_class_h
-#define FunctionBlock_class_h
-#ifdef __cplusplus
+#pragma once
 
 #include <list>
 #include <iterator> //
+#include <WString.h> // Arduino
 
-#include <WString.h>
+#include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Core/Macro.h>
+#include <WoodBlock/Core/Variable.h>
+#include <WoodBlock/Core/Event.h>
 
-#include "Macro.h"
-#include "Variable.h"
-#include "Event.h"
+WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class FunctionBlock
 {
@@ -361,5 +361,4 @@ private:
     // std::list<ServiceInterfaceInEvent*> siiEvents;
 };
 
-#endif // __cplusplus
-#endif // FunctionBlock_class_h
+WOODBLOCK_END_PUBLIC_NAMESPACE

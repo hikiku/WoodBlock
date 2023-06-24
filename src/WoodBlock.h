@@ -10,7 +10,7 @@
 
 #  include "WoodBlock.hpp"
 
-//using namespace WoodBlock;
+using namespace WoodBlock;
 
 #else
 

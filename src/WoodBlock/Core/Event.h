@@ -2,22 +2,20 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#ifndef Event_class_h
-#define Event_class_h
-#ifdef __cplusplus
-
-#include <Arduino.h>
+#pragma once
 
 #include <list>
 #include <iterator> //
+#include <Arduino.h> // Arduino
+#include <WString.h> // Arduino
 
-#include <WString.h>
+#include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Core/Macro.h>
+#include <WoodBlock/Core/Variable.h>
 
-#include "Macro.h"
-#include "Variable.h"
+WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class FunctionBlock;
-
 class EventInput;
 class EventOutput;
 
@@ -359,5 +357,4 @@ class ServiceInterfaceInEvent : public EventInput
     //
 };
 
-#endif // __cplusplus
-#endif // Event_class_h
+WOODBLOCK_END_PUBLIC_NAMESPACE

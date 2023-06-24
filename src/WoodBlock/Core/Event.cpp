@@ -2,8 +2,10 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#include "Event.h"
-#include "FunctionBlock.h"
+#include <WoodBlock/Core/Event.h>
+#include <WoodBlock/Core/FunctionBlock.h>
+
+WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 bool EventInput::addInVariableByName(const char *inVariableName)
 {
@@ -107,3 +109,5 @@ bool EventOutput::check4AddingOutVariableByName(const char *outVariableName)
         return true;
     }
 }
+
+WOODBLOCK_END_PUBLIC_NAMESPACE
