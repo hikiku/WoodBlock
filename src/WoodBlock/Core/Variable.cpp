@@ -13,12 +13,12 @@ bool VariableInput::checkForConnectFrom(VariableOutput& outData) const {
     return false;
   }
   // check data type
-  unsigned int outDataType = outData.getDataType();
-  unsigned int inDataType = getDataType();
-  bool result = check4ConnectDataType(outDataType, inDataType);
+  unsigned int outNumberOfDataType = outData.getNumberOfDataType();
+  unsigned int inNumberOfDataType = getNumberOfDataType();
+  bool result = check4ConnectDataType(outNumberOfDataType, inNumberOfDataType);
   if (!result) {
-    // TODO: printf(WARNING, "DataType of outDataType(%u) and inDataType(%u) do
-    // not match!\n", outDataTyp, inDataType)
+    // TODO: printf(WARNING, "outNumberOfDataType(%u) and inNumberOfDataType(%u) are
+    // not matched!\n", outNumberOfDataType, inNumberOfDataType)
     return false;
   } else {
     return true;

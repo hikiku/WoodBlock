@@ -2,6 +2,7 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
+// TODO: rename "name" or "description" to Identifier
 // TODO: Lookup Event / Feedback Event!
 
 #pragma once

@@ -109,7 +109,7 @@ class FunctionBlock {
   }
 
   // ====================== Constructor: adding =========================
-  // eg: DataBoxSInt
+  // eg: SINT
   template <class TDataBox>
   VariableInputImpl<TDataBox>* addInVariable(const char* name) {
     // push a inVariable to std::list<VariableInput*> inVariables!
@@ -121,7 +121,7 @@ class FunctionBlock {
     }
     return nullptr;
   }
-  // eg: DataBoxSInt
+  // eg: SINT
   template <class TDataBox>
   VariableOutputImpl<TDataBox>* addOutVariable(const char* name) {
     // push a outVariable to std::list<VariableOutput*> outVariables!

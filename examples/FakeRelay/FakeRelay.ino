@@ -19,7 +19,7 @@ class WebPortal : public ServiceInterfaceBlock {
         ovOnOff(nullptr),
         oeControl(nullptr),
         onOff(nullptr) {
-    ovOnOff = addOutVariable<DataBoxBool>("OnOff");
+    ovOnOff = addOutVariable<BOOL>("OnOff");
     {
       const char* outVariableNames[] = {"OnOff"};
       oeControl = addOutEvent("Control", outVariableNames,
@@ -64,7 +64,7 @@ class WebPortal : public ServiceInterfaceBlock {
   }
 
  private:
-  VariableOutputImpl<DataBoxBool>* ovOnOff;
+  VariableOutputImpl<BOOL>* ovOnOff;
   EventOutput* oeControl;
   bool onOff;
 };
@@ -72,7 +72,7 @@ class WebPortal : public ServiceInterfaceBlock {
 class Relay : public FunctionBlock {
  public:
   Relay(const char* name) : FunctionBlock(name) {
-    ivOnOff = addInVariable<DataBoxBool>("OnOff");
+    ivOnOff = addInVariable<BOOL>("OnOff");
     {
       const char* inVariableNames[] = {"OnOff"};
       ieControl =
@@ -84,7 +84,7 @@ class Relay : public FunctionBlock {
   void executeInEvent(EventInput& inEvent) {
     if (inEvent.getName().equals("Control")) {
       if (ivOnOff) {
-        BOOL* onOff = ivOnOff->getDataBox().getData();
+        BOOL_T* onOff = ivOnOff->getDataBox().getData();
         if (onOff) {
           Serial.printf(
               "%s \t\tProcess: \tEVENT_INPUT \t%s \tWITH \tOnOff \t(* %s, "
@@ -100,7 +100,7 @@ class Relay : public FunctionBlock {
   }
 
  private:
-  VariableInputImpl<DataBoxBool>* ivOnOff;
+  VariableInputImpl<BOOL>* ivOnOff;
   EventInput* ieControl;
 };
 

@@ -16,7 +16,7 @@ class WebPortal : public ServiceInterfaceBlock {
  public:
   WebPortal(const char* name)
       : ServiceInterfaceBlock(name), ivStatus(nullptr), ieOccupy(nullptr) {
-    ivStatus = addInVariable<DataBoxBool>("Status");
+    ivStatus = addInVariable<BOOL>("Status");
     {
       const char* outVariableNames[] = {"Status"};
       ieOccupy =
@@ -28,7 +28,7 @@ class WebPortal : public ServiceInterfaceBlock {
   void executeInEvent(EventInput& inEvent) {
     if (inEvent.getName().equals("Occupy")) {
       if (ivStatus) {
-        BOOL* status = ivStatus->getDataBox().getData();
+        BOOL_T* status = ivStatus->getDataBox().getData();
         if (status) {
           Serial.printf(
               "%s \tProcess: \tEVENT_INPUT \t%s \t\tWITH \tStatus \t(* %s, "
@@ -47,7 +47,7 @@ class WebPortal : public ServiceInterfaceBlock {
   }
 
  private:
-  VariableInputImpl<DataBoxBool>* ivStatus;
+  VariableInputImpl<BOOL>* ivStatus;
   EventInput* ieOccupy;
 };
 
@@ -58,7 +58,7 @@ class OccupySensor : public ServiceInterfaceBlock {
         ovStatus(nullptr),
         oeOccupy(nullptr),
         status(false) {
-    ovStatus = addOutVariable<DataBoxBool>("Status");
+    ovStatus = addOutVariable<BOOL>("Status");
     {
       const char* outVariableNames[] = {"Status"};
       oeOccupy =
@@ -103,7 +103,7 @@ class OccupySensor : public ServiceInterfaceBlock {
   }
 
  private:
-  VariableOutputImpl<DataBoxBool>* ovStatus;
+  VariableOutputImpl<BOOL>* ovStatus;
   EventOutput* oeOccupy;
   bool status;
 };
