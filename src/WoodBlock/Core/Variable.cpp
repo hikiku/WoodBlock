@@ -15,7 +15,7 @@ bool VariableInput::checkForConnectFrom(VariableOutput& outData) const {
   // check data type
   unsigned int outNumberOfDataType = outData.getNumberOfDataType();
   unsigned int inNumberOfDataType = getNumberOfDataType();
-  bool result = check4ConnectDataType(outNumberOfDataType, inNumberOfDataType);
+  bool result = DataBox::check4ConnectDataType(outNumberOfDataType, inNumberOfDataType);
   if (!result) {
     // TODO: printf(WARNING, "outNumberOfDataType(%u) and inNumberOfDataType(%u) are
     // not matched!\n", outNumberOfDataType, inNumberOfDataType)

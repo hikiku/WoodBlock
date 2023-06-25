@@ -3,6 +3,7 @@
 // MIT License
 
 // TODO: rename "name" or "description" to Identifier
+// TODO: check data type of connection
 // TODO: Lookup Event / Feedback Event!
 
 #pragma once
