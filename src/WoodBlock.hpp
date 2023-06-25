@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "WoodBlock/Core/DataBox.h"
+#include "WoodBlock/Core/DataType.h"
 #include "WoodBlock/Core/Event.h"
 #include "WoodBlock/Core/FunctionBlock.h"
 #include "WoodBlock/Core/FunctionBlockContainer.h "

@@ -40,7 +40,7 @@ class VariableOutput : public Variable {
  private:
 };
 
-// VariableOutputImpl<SINT>;
+// VariableOutputImpl<SInt>;
 template <class TDataBox>
 class VariableOutputImpl : public VariableOutput {
  public:
@@ -56,6 +56,8 @@ class VariableOutputImpl : public VariableOutput {
  private:
   TDataBox dataBox;
 };
+
+template<class TDataBox> using Vo = VariableOutputImpl<TDataBox>;
 
 class VariableInput : public Variable {
  public:
@@ -92,7 +94,7 @@ class VariableInput : public Variable {
   VariableOutput* outData;  // start of connection, Output data variable
 };
 
-// VariableInputImpl<SINT>;
+// VariableInputImpl<SInt>, Vi<SInt>, ...
 template <class TDataBox>
 class VariableInputImpl : public VariableInput {
  public:
@@ -105,7 +107,7 @@ class VariableInputImpl : public VariableInput {
     return dataBox;
   }
 
-  // VariableInputImpl<SINT>;
+  // VariableInputImpl<SInt>, Vi<SInt>, ...
   // template <class TDataBox>
   bool sample()  // clone data from 'fromData'
   {
@@ -130,5 +132,7 @@ class VariableInputImpl : public VariableInput {
  private:
   TDataBox dataBox;
 };
+
+template<class TDataBox> using Vi = VariableInputImpl<TDataBox>;
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

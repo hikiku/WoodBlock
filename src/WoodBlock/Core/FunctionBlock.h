@@ -109,24 +109,24 @@ class FunctionBlock {
   }
 
   // ====================== Constructor: adding =========================
-  // eg: SINT
+  // eg: SInt
   template <class TDataBox>
-  VariableInputImpl<TDataBox>* addInVariable(const char* name) {
+  Vi<TDataBox>* addInVariable(const char* name) {
     // push a inVariable to std::list<VariableInput*> inVariables!
-    VariableInputImpl<TDataBox>* inVariable =
-        new VariableInputImpl<TDataBox>(name);
+    Vi<TDataBox>* inVariable =
+        new Vi<TDataBox>(name);
     if (inVariable) {
       inVariables.push_back(inVariable);
       return inVariable;
     }
     return nullptr;
   }
-  // eg: SINT
+  // eg: SInt
   template <class TDataBox>
-  VariableOutputImpl<TDataBox>* addOutVariable(const char* name) {
+  Vo<TDataBox>* addOutVariable(const char* name) {
     // push a outVariable to std::list<VariableOutput*> outVariables!
-    VariableOutputImpl<TDataBox>* outVariable =
-        new VariableOutputImpl<TDataBox>(name);  // VariableOutput
+    Vo<TDataBox>* outVariable =
+        new Vo<TDataBox>(name);  // VariableOutput
     if (outVariable) {
       outVariables.push_back(outVariable);
       return outVariable;
