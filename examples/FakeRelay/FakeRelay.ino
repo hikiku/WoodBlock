@@ -109,6 +109,8 @@ WebPortal webPortal("WebPortal");
 
 FunctionBlockContainer blockContainer;
 
+Vi<Time> myTime();
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);

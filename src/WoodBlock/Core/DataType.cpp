@@ -23,4 +23,24 @@ const char LREAL_NAME[] = "LREAL";
 // Boolean data type
 const char BOOL_NAME[] = "BOOL";
 
+// Time data types
+const char TIME_NAME[] = "TIME";
+
+// Dates and times of day data types
+const char DATE_NAME[] = "DATE";
+const char TOD_NAME[] = "TOD";
+const char DT_NAME[] = "DT";
+
+// String data type
+const char STRING_NAME[] = "STRING";
+
+// Double-byte character string data type
+const char WSTRING_NAME[] = "WSTRING";
+
+// Bit string data types
+extern const char BYTE_NAME[] = "BYTE";
+extern const char WORD_NAME[] = "WORD";
+extern const char DWORD_NAME[] = "DWORD";
+extern const char LWORD_NAME[] = "LWORD";
+
 WOODBLOCK_END_PUBLIC_NAMESPACE

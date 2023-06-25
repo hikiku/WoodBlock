@@ -47,7 +47,7 @@ class WebPortal : public ServiceInterfaceBlock {
   }
 
  private:
-  VariableInputImpl<Bool>* ivStatus;
+  Vi<Bool>* ivStatus;
   EventInput* ieOccupy;
 };
 
@@ -103,7 +103,7 @@ class OccupySensor : public ServiceInterfaceBlock {
   }
 
  private:
-  VariableOutputImpl<Bool>* ovStatus;
+  Vo<Bool>* ovStatus;
   EventOutput* oeOccupy;
   bool status;
 };
