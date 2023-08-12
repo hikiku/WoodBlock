@@ -17,16 +17,16 @@
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 // TODO: FBInstance?
-class FunctionBlock {
+class FBInstance {
  public:
-  FunctionBlock(const char* name)
+  FBInstance(const char* name)
       : name(name),
         eventInputs(),
         eventOutputs(),
         inputVariables(),
         outputVariables(),
         triggeredOutEvents() {}
-  virtual ~FunctionBlock()  // TODO: = 0;
+  virtual ~FBInstance()  // TODO: = 0;
   {
     // std::list<EventOutput*> triggeredOutEvents;
     triggeredOutEvents.clear();
@@ -186,7 +186,7 @@ class FunctionBlock {
 
   // ====================== Constructor: connecting =========================
   bool connectTo(const char* outEventName, const char* outVariableNames[],
-                 FunctionBlock& destFunctionBlock, const char* inEventName,
+                 FBInstance& destFunctionBlock, const char* inEventName,
                  const char* inVariableNames[], int sizeofVariables) {
     bool result = true;
     EventOutput* outEvent = findOutEventByName(outEventName);
@@ -235,7 +235,7 @@ class FunctionBlock {
   }
 
   // ====================== Deconstructor: removing =========================
-  // Some private functions in ~FunctionBlock()
+  // Some private functions in ~FBInstance()
 
  protected:
   virtual void executeInEvent(EventInput& inEvent) = 0;
@@ -289,10 +289,10 @@ class FunctionBlock {
       triggeredOutEvents;  // pop_front() & push_back(), erase()/clear()
 };
 
-class ServiceInterfaceBlock : public FunctionBlock {
+class ServiceInterfaceBlock : public FBInstance {
  public:
   ServiceInterfaceBlock(const char* name)
-      : FunctionBlock(name) {}  //, siiEvents()
+      : FBInstance(name) {}  //, siiEvents()
   ~ServiceInterfaceBlock() {
     // // std::list<ServiceInterfaceInEvent*> siiEvents;
     // for (std::list<ServiceInterfaceInEvent*>::iterator it =

@@ -16,7 +16,7 @@
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class FunctionBlock;
+class FBInstance;
 class EventInput;
 class EventOutput;
 
@@ -26,7 +26,7 @@ class EventOutput;
 
 class Event {
  public:
-  Event(FunctionBlock& owner, const String& name,
+  Event(FBInstance& owner, const String& name,
         unsigned int eventType = EVENT_ANY)
       : owner(owner), name(name), eventType(eventType) {}
   virtual ~Event() {}  // TODO: = 0;
@@ -38,19 +38,19 @@ class Event {
   }
 
  protected:
-  FunctionBlock& getOwner() {
+  FBInstance& getOwner() {
     return owner;
   }
 
  private:
-  FunctionBlock& owner;  // belongs to
+  FBInstance& owner;  // belongs to
   String name;
   unsigned int eventType;
 };
 
 class EventInput : public Event {
  public:
-  EventInput(FunctionBlock& owner, const char* name)
+  EventInput(FBInstance& owner, const char* name)
       : Event(owner, name), inputVariables(), outEvent(nullptr) {
     //
   }
@@ -149,7 +149,7 @@ class EventInput : public Event {
 
 class EventOutput : public Event {
  public:
-  EventOutput(FunctionBlock& owner, const char* name)
+  EventOutput(FBInstance& owner, const char* name)
       : Event(owner, name), outputVariables(), inEvent(nullptr) {}
   ~EventOutput() {
     // std::list<OutputVariable*> outputVariables;

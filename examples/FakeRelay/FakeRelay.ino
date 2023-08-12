@@ -69,9 +69,9 @@ class WebPortal : public ServiceInterfaceBlock {
   bool onOff;
 };
 
-class Relay : public FunctionBlock {
+class Relay : public FBInstance {
  public:
-  Relay(const char* name) : FunctionBlock(name) {
+  Relay(const char* name) : FBInstance(name) {
     ivOnOff = addInVariable<Bool>("OnOff");
     {
       const char* inVariableNames[] = {"OnOff"};

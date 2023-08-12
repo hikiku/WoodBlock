@@ -6,10 +6,12 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-FunctionBlock		    KEYWORD1	FunctionBlock
-FBNetwork	KEYWORD1	FBNetwork
-InputVariable		    KEYWORD1	InputVariable
-Event		        KEYWORD1	Event
+FBNetwork	        KEYWORD1	FBNetwork
+FBInstance		    KEYWORD1	FBInstance
+EventInput          KEYWORD1	EventInput
+EventOutput          KEYWORD1	EventOutput
+InputVariable		KEYWORD1	InputVariable
+OutputVariable		KEYWORD1	OutputVariable
 
 #######################################
 # Methods and Functions (KEYWORD2)

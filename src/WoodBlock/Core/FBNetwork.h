@@ -1,4 +1,4 @@
-// FunctionBlock - https://hikiku.io
+// FBInstance - https://hikiku.io
 // Copyright © 2023, HiKiku
 // MIT License
 
@@ -11,7 +11,7 @@
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
 
-#include <WoodBlock/Core/FunctionBlock.h>
+#include <WoodBlock/Core/FBInstance.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
@@ -19,17 +19,17 @@ class FBNetwork {
  public:
   FBNetwork() : fbInstances() {}
   ~FBNetwork() {
-    std::list<FunctionBlock*> fbInstances;
-    for (std::list<FunctionBlock*>::iterator it = fbInstances.begin();
+    std::list<FBInstance*> fbInstances;
+    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       delete *it;
     }
     fbInstances.clear();
   }
 
-  FunctionBlock* findFbInstanceByName(const String& fbInstanceName) {
-    // std::list<FunctionBlock*> fbInstances;
-    for (std::list<FunctionBlock*>::iterator it = fbInstances.begin();
+  FBInstance* findFbInstanceByName(const String& fbInstanceName) {
+    // std::list<FBInstance*> fbInstances;
+    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       if ((*it)->getName().equals(fbInstanceName)) {
         return *it;
@@ -39,15 +39,15 @@ class FBNetwork {
     return nullptr;
   }
 
-  // Don't delete a managed FunctionBlock directly. Please call
+  // Don't delete a managed FBInstance directly. Please call
   // detachAndDeleteFbInstance()!
-  bool attachFbInstance(FunctionBlock& functionBlock) {
+  bool attachFbInstance(FBInstance& functionBlock) {
     fbInstances.push_back(&functionBlock);
     return true;
   }
   bool detachAndDeleteFbInstance(const String& fbInstanceName) {
-    // std::list<FunctionBlock *> fbInstances;
-    for (std::list<FunctionBlock*>::iterator it = fbInstances.begin();
+    // std::list<FBInstance *> fbInstances;
+    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       if ((*it)->getName().equals(fbInstanceName)) {
         delete *it;
@@ -74,8 +74,8 @@ class FBNetwork {
     WB_CHECK_EXP_RETURN_VALUE((sizeofInVariables <= 0), false);
     WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables != sizeofInVariables), false);
 
-    FunctionBlock* srcBlock = findFbInstanceByName(srcBlockName);
-    FunctionBlock* dstBlock = findFbInstanceByName(destBlockName);
+    FBInstance* srcBlock = findFbInstanceByName(srcBlockName);
+    FBInstance* dstBlock = findFbInstanceByName(destBlockName);
     if (srcBlock == nullptr) {
       // TODO: printf(WARNING, "srcBlock is nullptr!");
       return false;
@@ -95,9 +95,11 @@ class FBNetwork {
   }
 
  private:
-  std::list<FunctionBlock*> fbInstances;
+  std::list<FBInstance*> fbInstances;
+
   // TODO: std::list<DataConnection> dataConnections;
   // TODO: std::List<EventConnection> eventConnections;
+
   // TODO: std::List<AdapterConnection> adapterConnections
 };
 
