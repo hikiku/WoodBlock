@@ -115,8 +115,8 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  fbNetwork.hostFunctionBlock(relay);
-  fbNetwork.hostFunctionBlock(webPortal);
+  fbNetwork.attachFbInstance(relay);
+  fbNetwork.attachFbInstance(webPortal);
 
   {
     const char* outVariableNames[] = {"OnOff"};

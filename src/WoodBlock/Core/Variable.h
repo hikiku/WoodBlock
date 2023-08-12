@@ -137,4 +137,6 @@ class InputVariableImpl : public InputVariable {
 
 template<class TDataBox> using Vi = InputVariableImpl<TDataBox>;
 
+// TODO: InternalVariable!
+
 WOODBLOCK_END_PUBLIC_NAMESPACE

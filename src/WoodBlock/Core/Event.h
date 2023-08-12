@@ -51,7 +51,7 @@ class Event {
 class EventInput : public Event {
  public:
   EventInput(FunctionBlock& owner, const char* name)
-      : Event(owner, name), inVariables(), outEvent(nullptr) {
+      : Event(owner, name), inputVariables(), outEvent(nullptr) {
     //
   }
   ~EventInput() {}
@@ -63,8 +63,8 @@ class EventInput : public Event {
     }
 
     String name(inVariableName);
-    for (std::list<InputVariable*>::iterator it = inVariables.begin();
-         it != inVariables.end(); ++it) {
+    for (std::list<InputVariable*>::iterator it = inputVariables.begin();
+         it != inputVariables.end(); ++it) {
       if ((*it)->getName().equals(name)) {
         return *it;
       }
@@ -110,9 +110,9 @@ class EventInput : public Event {
   void trigger();
 
   void sample() {
-    // sample all of inVariables
-    for (std::list<InputVariable*>::iterator it = inVariables.begin();
-         it != inVariables.end(); ++it) {
+    // sample all of inputVariables
+    for (std::list<InputVariable*>::iterator it = inputVariables.begin();
+         it != inputVariables.end(); ++it) {
       (*it)->sample();
     }
   }
@@ -143,17 +143,17 @@ class EventInput : public Event {
     return true;
   }
 
-  std::list<InputVariable*> inVariables;
+  std::list<InputVariable*> inputVariables;
   EventOutput* outEvent;
 };
 
 class EventOutput : public Event {
  public:
   EventOutput(FunctionBlock& owner, const char* name)
-      : Event(owner, name), outVariables(), inEvent(nullptr) {}
+      : Event(owner, name), outputVariables(), inEvent(nullptr) {}
   ~EventOutput() {
-    // std::list<OutputVariable*> outVariables;
-    outVariables.clear();
+    // std::list<OutputVariable*> outputVariables;
+    outputVariables.clear();
   }
 
   bool addOutVariableByName(const char* outVariableName);
@@ -170,7 +170,7 @@ class EventOutput : public Event {
     for (int i = 0; i < sizeofOutVariables; i++) {
       bool result = addOutVariableByName(outVariableNames[i]);
       if (!result) {
-        // TODO: printf (ERROR, "outVariables[%d] is error!", %d);
+        // TODO: printf (ERROR, "outputVariables[%d] is error!", %d);
         return false;
       }
     }
@@ -184,8 +184,8 @@ class EventOutput : public Event {
     }
 
     String name(outVariableName);
-    for (std::list<OutputVariable*>::iterator it = outVariables.begin();
-         it != outVariables.end(); ++it) {
+    for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
+         it != outputVariables.end(); ++it) {
       if ((*it)->getName().equals(name)) {
         return *it;
       }
@@ -245,7 +245,7 @@ class EventOutput : public Event {
       return false;
     }
 
-    // connect inVariables from outVariables
+    // connect inputVariables from outputVariables
     for (int i = 0; i < sizeofVariables; i++) {
       OutputVariable* outVariable = findOutVariableByName(outVariableNames[i]);
       InputVariable* inVariable =
@@ -332,7 +332,7 @@ class EventOutput : public Event {
     generated = false;
   }
 
-  std::list<OutputVariable*> outVariables;
+  std::list<OutputVariable*> outputVariables;
   EventInput* inEvent;  // event observer, to event, connect to
   bool generated;       // Has a out event been alreay generated?
 };

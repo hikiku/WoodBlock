@@ -117,8 +117,8 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  fbNetwork.hostFunctionBlock(occupySensor);
-  fbNetwork.hostFunctionBlock(webPortal);
+  fbNetwork.attachFbInstance(occupySensor);
+  fbNetwork.attachFbInstance(webPortal);
 
   {
     const char* outVariableNames[] = {"Status"};

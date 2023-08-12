@@ -8,31 +8,30 @@
 #include <iterator>   //
 #include <list>
 
-#include <WoodBlock/Namespace.hpp>
 #include <WoodBlock/Macro.h>
+#include <WoodBlock/Namespace.hpp>
 
 #include <WoodBlock/Core/FunctionBlock.h>
-
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class FBNetwork {
  public:
-  FBNetwork() : functionBlocks() {}
+  FBNetwork() : fbInstances() {}
   ~FBNetwork() {
-    std::list<FunctionBlock*> functionBlocks;
-    for (std::list<FunctionBlock*>::iterator it = functionBlocks.begin();
-         it != functionBlocks.end(); ++it) {
+    std::list<FunctionBlock*> fbInstances;
+    for (std::list<FunctionBlock*>::iterator it = fbInstances.begin();
+         it != fbInstances.end(); ++it) {
       delete *it;
     }
-    functionBlocks.clear();
+    fbInstances.clear();
   }
 
-  FunctionBlock* findFunctionBlockByName(const String& functionBlockName) {
-    // std::list<FunctionBlock*> functionBlocks;
-    for (std::list<FunctionBlock*>::iterator it = functionBlocks.begin();
-         it != functionBlocks.end(); ++it) {
-      if ((*it)->getName().equals(functionBlockName)) {
+  FunctionBlock* findFbInstanceByName(const String& fbInstanceName) {
+    // std::list<FunctionBlock*> fbInstances;
+    for (std::list<FunctionBlock*>::iterator it = fbInstances.begin();
+         it != fbInstances.end(); ++it) {
+      if ((*it)->getName().equals(fbInstanceName)) {
         return *it;
       }
     }
@@ -41,18 +40,18 @@ class FBNetwork {
   }
 
   // Don't delete a managed FunctionBlock directly. Please call
-  // unhostAndDeleteFunctionBlock()!
-  bool hostFunctionBlock(FunctionBlock& functionBlock) {
-    functionBlocks.push_back(&functionBlock);
+  // detachAndDeleteFbInstance()!
+  bool attachFbInstance(FunctionBlock& functionBlock) {
+    fbInstances.push_back(&functionBlock);
     return true;
   }
-  bool unhostAndDeleteFunctionBlock(const String& functionBlockName) {
-    // std::list<FunctionBlock *> functionBlocks;
-    for (std::list<FunctionBlock*>::iterator it = functionBlocks.begin();
-         it != functionBlocks.end(); ++it) {
-      if ((*it)->getName().equals(functionBlockName)) {
+  bool detachAndDeleteFbInstance(const String& fbInstanceName) {
+    // std::list<FunctionBlock *> fbInstances;
+    for (std::list<FunctionBlock*>::iterator it = fbInstances.begin();
+         it != fbInstances.end(); ++it) {
+      if ((*it)->getName().equals(fbInstanceName)) {
         delete *it;
-        functionBlocks.erase(it);
+        fbInstances.erase(it);
         return true;
       }
     }
@@ -75,8 +74,8 @@ class FBNetwork {
     WB_CHECK_EXP_RETURN_VALUE((sizeofInVariables <= 0), false);
     WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables != sizeofInVariables), false);
 
-    FunctionBlock* srcBlock = findFunctionBlockByName(srcBlockName);
-    FunctionBlock* dstBlock = findFunctionBlockByName(destBlockName);
+    FunctionBlock* srcBlock = findFbInstanceByName(srcBlockName);
+    FunctionBlock* dstBlock = findFbInstanceByName(destBlockName);
     if (srcBlock == nullptr) {
       // TODO: printf(WARNING, "srcBlock is nullptr!");
       return false;
@@ -96,7 +95,10 @@ class FBNetwork {
   }
 
  private:
-  std::list<FunctionBlock*> functionBlocks;
+  std::list<FunctionBlock*> fbInstances;
+  // TODO: std::list<DataConnection> dataConnections;
+  // TODO: std::List<EventConnection> eventConnections;
+  // TODO: std::List<AdapterConnection> adapterConnections
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

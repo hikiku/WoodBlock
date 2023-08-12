@@ -13,7 +13,7 @@ bool EventInput::addInVariableByName(const char* inVariableName) {
     return false;
   } else {
     InputVariable* inData = getOwner().findInVariableByName(inVariableName);
-    inVariables.push_back(inData);
+    inputVariables.push_back(inData);
     return true;
   }
 }
@@ -25,7 +25,7 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
   }
 
   if (findInVariableByName(inVariableName)) {
-    // TODO: printf (WARNING, "inVariableName(%s) is already in the inVariables
+    // TODO: printf (WARNING, "inVariableName(%s) is already in the inputVariables
     // list!", inVariableNames);
     return false;
   }
@@ -44,9 +44,9 @@ void EventInput::disconnect() {
   if (this->outEvent == nullptr) {
     return;
   }
-  // disconnect all of inVariables
-  for (std::list<InputVariable*>::iterator it = inVariables.begin();
-       it != inVariables.end(); ++it) {
+  // disconnect all of inputVariables
+  for (std::list<InputVariable*>::iterator it = inputVariables.begin();
+       it != inputVariables.end(); ++it) {
     (*it)->disconnect();
   }
 
@@ -64,7 +64,7 @@ bool EventOutput::addOutVariableByName(const char* outVariableName) {
     return false;
   } else {
     OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
-    outVariables.push_back(outData);
+    outputVariables.push_back(outData);
     return true;
   }
 }
@@ -76,7 +76,7 @@ bool EventOutput::check4AddingOutVariableByName(const char* outVariableName) {
   }
 
   if (findOutVariableByName(outVariableName)) {
-    // TODO: printf (WARNING, "outVariableName is already in the outVariables
+    // TODO: printf (WARNING, "outVariableName is already in the outputVariables
     // list!");
     return false;
   }

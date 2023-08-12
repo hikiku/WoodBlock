@@ -16,48 +16,49 @@
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
+// TODO: FBInstance?
 class FunctionBlock {
  public:
   FunctionBlock(const char* name)
       : name(name),
-        inEvents(),
-        outEvents(),
-        inVariables(),
-        outVariables(),
+        eventInputs(),
+        eventOutputs(),
+        inputVariables(),
+        outputVariables(),
         triggeredOutEvents() {}
   virtual ~FunctionBlock()  // TODO: = 0;
   {
     // std::list<EventOutput*> triggeredOutEvents;
     triggeredOutEvents.clear();
 
-    // clear some connects of inEvents & outEvents, inVariables & outVariables
+    // clear some connects of eventInputs & eventOutputs, inputVariables & outputVariables
     disconnect();
 
     // remove member variables
-    // std::list<EventInput*> inEvents;
-    for (std::list<EventInput*>::iterator it = inEvents.begin();
-         it != inEvents.end(); ++it) {
+    // std::list<EventInput*> eventInputs;
+    for (std::list<EventInput*>::iterator it = eventInputs.begin();
+         it != eventInputs.end(); ++it) {
       delete *it;
     }
-    inEvents.clear();
-    // std::list<EventOutput*> outEvents;
-    for (std::list<EventOutput*>::iterator it = outEvents.begin();
-         it != outEvents.end(); ++it) {
+    eventInputs.clear();
+    // std::list<EventOutput*> eventOutputs;
+    for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
+         it != eventOutputs.end(); ++it) {
       delete *it;
     }
-    outEvents.clear();
-    // std::list<InputVariable*> inVariables;
-    for (std::list<InputVariable*>::iterator it = inVariables.begin();
-         it != inVariables.end(); ++it) {
+    eventOutputs.clear();
+    // std::list<InputVariable*> inputVariables;
+    for (std::list<InputVariable*>::iterator it = inputVariables.begin();
+         it != inputVariables.end(); ++it) {
       delete *it;
     }
-    inVariables.clear();
-    // std::list<OutputVariable*> outVariables;
-    for (std::list<OutputVariable*>::iterator it = outVariables.begin();
-         it != outVariables.end(); ++it) {
+    inputVariables.clear();
+    // std::list<OutputVariable*> outputVariables;
+    for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
+         it != outputVariables.end(); ++it) {
       delete *it;
     }
-    outVariables.clear();
+    outputVariables.clear();
   }
 
   const String& getName() {
@@ -65,9 +66,9 @@ class FunctionBlock {
   }
 
   EventInput* findInEventByName(const String& inEventName) {
-    // std::list<EventInput*> inEvents;
-    for (std::list<EventInput*>::iterator it = inEvents.begin();
-         it != inEvents.end(); ++it) {
+    // std::list<EventInput*> eventInputs;
+    for (std::list<EventInput*>::iterator it = eventInputs.begin();
+         it != eventInputs.end(); ++it) {
       if ((*it)->getName().equals(inEventName)) {
         return *it;
       }
@@ -76,9 +77,9 @@ class FunctionBlock {
     return nullptr;
   }
   EventOutput* findOutEventByName(const String& outEventName) {
-    // std::list<EventOutput*> outEvents;
-    for (std::list<EventOutput*>::iterator it = outEvents.begin();
-         it != outEvents.end(); ++it) {
+    // std::list<EventOutput*> eventOutputs;
+    for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
+         it != eventOutputs.end(); ++it) {
       if ((*it)->getName().equals(outEventName)) {
         return *it;
       }
@@ -87,9 +88,9 @@ class FunctionBlock {
     return nullptr;
   }
   InputVariable* findInVariableByName(const String& inVariableName) {
-    // std::list<InputVariable*> inVariables;
-    for (std::list<InputVariable*>::iterator it = inVariables.begin();
-         it != inVariables.end(); ++it) {
+    // std::list<InputVariable*> inputVariables;
+    for (std::list<InputVariable*>::iterator it = inputVariables.begin();
+         it != inputVariables.end(); ++it) {
       if ((*it)->getName().equals(inVariableName)) {
         return *it;
       }
@@ -98,9 +99,9 @@ class FunctionBlock {
     return nullptr;
   }
   OutputVariable* findOutVariableByName(const String& outVariableName) {
-    // std::list<OutputVariable*> outVariables;
-    for (std::list<OutputVariable*>::iterator it = outVariables.begin();
-         it != outVariables.end(); ++it) {
+    // std::list<OutputVariable*> outputVariables;
+    for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
+         it != outputVariables.end(); ++it) {
       if ((*it)->getName().equals(outVariableName)) {
         return *it;
       }
@@ -113,11 +114,11 @@ class FunctionBlock {
   // eg: SInt
   template <class TDataBox>
   Vi<TDataBox>* addInVariable(const char* name) {
-    // push a inVariable to std::list<InputVariable*> inVariables!
+    // push a inVariable to std::list<InputVariable*> inputVariables!
     Vi<TDataBox>* inVariable =
         new Vi<TDataBox>(name);
     if (inVariable) {
-      inVariables.push_back(inVariable);
+      inputVariables.push_back(inVariable);
       return inVariable;
     }
     return nullptr;
@@ -125,11 +126,11 @@ class FunctionBlock {
   // eg: SInt
   template <class TDataBox>
   Vo<TDataBox>* addOutVariable(const char* name) {
-    // push a outVariable to std::list<OutputVariable*> outVariables!
+    // push a outVariable to std::list<OutputVariable*> outputVariables!
     Vo<TDataBox>* outVariable =
         new Vo<TDataBox>(name);  // OutputVariable
     if (outVariable) {
-      outVariables.push_back(outVariable);
+      outputVariables.push_back(outVariable);
       return outVariable;
     }
     return nullptr;
@@ -143,9 +144,9 @@ class FunctionBlock {
     if (inEvent) {
       bool result =
           inEvent->addInVariablesByNames(inVariableNames, sizeofInVariables);
-      // add inEvents ot std::list<EventInput*> inEvents;
+      // add eventInputs ot std::list<EventInput*> eventInputs;
       if (result) {
-        inEvents.push_back(inEvent);
+        eventInputs.push_back(inEvent);
         return inEvent;
       } else {
         // TODO: printf (ERROR, "It fail for calling
@@ -167,9 +168,9 @@ class FunctionBlock {
     if (outEvent) {
       bool result = outEvent->addOutVariablesByNames(outVariableNames,
                                                      sizeofOutVariables);
-      // add outEvent to std::list<EventOutput*> outEvents;
+      // add outEvent to std::list<EventOutput*> eventOutputs;
       if (result) {
-        outEvents.push_back(outEvent);
+        eventOutputs.push_back(outEvent);
         return outEvent;
       } else {
         // TODO: printf (ERROR, "It fail for calling
@@ -220,15 +221,15 @@ class FunctionBlock {
     // std::list<EventOutput*> triggeredOutEvents;
     triggeredOutEvents.clear();
 
-    // std::list<EventInput*> inEvents;
-    for (std::list<EventInput*>::iterator it = inEvents.begin();
-         it != inEvents.end(); ++it) {
+    // std::list<EventInput*> eventInputs;
+    for (std::list<EventInput*>::iterator it = eventInputs.begin();
+         it != eventInputs.end(); ++it) {
       (*it)->disconnect();
     }
 
-    // std::list<EventOutput*> outEvents;
-    for (std::list<EventOutput*>::iterator it = outEvents.begin();
-         it != outEvents.end(); ++it) {
+    // std::list<EventOutput*> eventOutputs;
+    for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
+         it != eventOutputs.end(); ++it) {
       (*it)->disconnect();
     }
   }
@@ -277,11 +278,12 @@ class FunctionBlock {
 
   String name;
 
-  std::list<EventInput*> inEvents;
-  std::list<EventOutput*> outEvents;
+  std::list<EventInput*> eventInputs;
+  std::list<EventOutput*> eventOutputs;
 
-  std::list<InputVariable*> inVariables;
-  std::list<OutputVariable*> outVariables;
+  std::list<InputVariable*> inputVariables;
+  std::list<OutputVariable*> outputVariables;
+  // TODO: std::list<InternalVariable*> internalVariables;
 
   std::list<EventOutput*>
       triggeredOutEvents;  // pop_front() & push_back(), erase()/clear()
