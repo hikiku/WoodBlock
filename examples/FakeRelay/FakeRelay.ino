@@ -107,7 +107,7 @@ class Relay : public FunctionBlock {
 Relay relay("Relay");
 WebPortal webPortal("WebPortal");
 
-FunctionBlockContainer blockContainer;
+FBNetwork fbNetwork;
 
 Vi<Time> myTime();
 
@@ -115,13 +115,13 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  blockContainer.hostFunctionBlock(relay);
-  blockContainer.hostFunctionBlock(webPortal);
+  fbNetwork.hostFunctionBlock(relay);
+  fbNetwork.hostFunctionBlock(webPortal);
 
   {
     const char* outVariableNames[] = {"OnOff"};
     const char* inVariableNames[] = {"OnOff"};
-    blockContainer.connect("WebPortal", "Control", outVariableNames,
+    fbNetwork.connect("WebPortal", "Control", outVariableNames,
                            ARRAY_SIZE(outVariableNames), "Relay", "Control",
                            inVariableNames, ARRAY_SIZE(inVariableNames));
   }

@@ -16,10 +16,10 @@
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class FunctionBlockContainer {
+class FBNetwork {
  public:
-  FunctionBlockContainer() : functionBlocks() {}
-  ~FunctionBlockContainer() {
+  FBNetwork() : functionBlocks() {}
+  ~FBNetwork() {
     std::list<FunctionBlock*> functionBlocks;
     for (std::list<FunctionBlock*>::iterator it = functionBlocks.begin();
          it != functionBlocks.end(); ++it) {

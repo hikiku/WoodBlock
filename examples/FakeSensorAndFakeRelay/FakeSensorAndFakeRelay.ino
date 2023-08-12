@@ -190,28 +190,28 @@ Relay relay("Relay");
 OccupySensor occupySensor("OccupySensor");
 WebPortal webPortal("WebPortal");
 
-FunctionBlockContainer blockContainer;
+FBNetwork fbNetwork;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  blockContainer.hostFunctionBlock(relay);
-  blockContainer.hostFunctionBlock(occupySensor);
-  blockContainer.hostFunctionBlock(webPortal);
+  fbNetwork.hostFunctionBlock(relay);
+  fbNetwork.hostFunctionBlock(occupySensor);
+  fbNetwork.hostFunctionBlock(webPortal);
 
   {
     const char* outVariableNames[] = {"Status"};
     const char* inVariableNames[] = {"Status"};
 
-    blockContainer.connect("OccupySensor", "Occupy", outVariableNames,
+    fbNetwork.connect("OccupySensor", "Occupy", outVariableNames,
                            ARRAY_SIZE(outVariableNames), "WebPortal", "Occupy",
                            inVariableNames, ARRAY_SIZE(inVariableNames));
   }
   {
     const char* outVariableNames[] = {"OnOff"};
     const char* inVariableNames[] = {"OnOff"};
-    blockContainer.connect("WebPortal", "Control", outVariableNames,
+    fbNetwork.connect("WebPortal", "Control", outVariableNames,
                            ARRAY_SIZE(outVariableNames), "Relay", "Control",
                            inVariableNames, ARRAY_SIZE(inVariableNames));
   }

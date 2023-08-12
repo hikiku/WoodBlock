@@ -13,5 +13,5 @@
 
 #include <WoodBlock/Core/Event.h>
 #include <WoodBlock/Core/FunctionBlock.h>
-#include <WoodBlock/Core/FunctionBlockContainer.h >
+#include <WoodBlock/Core/FBNetwork.h >
 #include <WoodBlock/Core/Variable.h>

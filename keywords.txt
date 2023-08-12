@@ -7,7 +7,7 @@
 #######################################
 
 FunctionBlock		    KEYWORD1	FunctionBlock
-FunctionBlockContainer	KEYWORD1	FunctionBlockContainer
+FBNetwork	KEYWORD1	FBNetwork
 InputVariable		    KEYWORD1	InputVariable
 Event		        KEYWORD1	Event
 
