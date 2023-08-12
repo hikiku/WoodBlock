@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include <WString.h>  // Arduino
-#include <WoodBlock/Core/Macro.h>
+#include <stddef.h>
+// #include <WString.h>  // Arduino
+
 #include <WoodBlock/Namespace.hpp>
+// #include <WoodBlock/Macro.h>
 
 // For user extend data type
 extern bool extend_check4ConnectDataType(unsigned int outNumberOfDataType,

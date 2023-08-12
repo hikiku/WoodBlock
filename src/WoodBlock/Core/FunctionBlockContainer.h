@@ -8,9 +8,11 @@
 #include <iterator>   //
 #include <list>
 
-#include <WoodBlock/Core/FunctionBlock.h>
-#include <WoodBlock/Core/Macro.h>
 #include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Macro.h>
+
+#include <WoodBlock/Core/FunctionBlock.h>
+
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 

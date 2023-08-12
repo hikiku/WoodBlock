@@ -8,7 +8,7 @@
 
 FunctionBlock		    KEYWORD1	FunctionBlock
 FunctionBlockContainer	KEYWORD1	FunctionBlockContainer
-VariableInput		    KEYWORD1	VariableInput
+InputVariable		    KEYWORD1	InputVariable
 Event		        KEYWORD1	Event
 
 #######################################

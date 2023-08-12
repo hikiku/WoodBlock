@@ -5,10 +5,16 @@
 #pragma once
 
 #include <WString.h>  // Arduino
-#include <WoodBlock/Core/DataBox.h>
-#include <WoodBlock/Core/Macro.h>
-#include <stdint.h>
+
 #include <WoodBlock/Namespace.hpp>
+// #include <WoodBlock/Macro.h>
+
+// #include <WoodBlock/DataTypes/DataTypes.h>
+#include <WoodBlock/DataTypes/ElementaryDataTypes.h>
+// #include <WoodBlock/DataTypes/GenericDataTypes.h>
+#include <WoodBlock/DataTypes/DataBox.h>
+#include <WoodBlock/DataTypes/DataBoxType.h>
+
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
@@ -25,15 +31,6 @@ WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 // UDINT         Unsigned double integer   32        0 to 2^32-1
 // ULINT         Unsigned long integer     64        0 to 2^64-1
 // =============== ========================= ========= ========================
-typedef int8_t SINT;     // Short integer            8   -128 to 127
-typedef int16_t INT;     // Integer                  16  -32768 to 32767
-typedef int32_t DINT;    // Double integer           32  -2^31 to 2^31-1
-typedef int64_t LINT;    // Long integer             64  -2^63 to 2^63-1
-typedef uint8_t USINT;   // Unsigned short integer   8   0 to 255
-typedef uint16_t UINT;   // Unsigned integer         16  0 to 2^16-1
-typedef uint32_t UDINT;  // Unsigned double integer  32  0 to 2^32-1
-typedef uint64_t ULINT;  // Unsigned long integer    64  0 to 2^64-1
-
 extern const char SINT_NAME[];
 extern const char INT_NAME[];
 extern const char DINT_NAME[];
@@ -61,21 +58,18 @@ typedef DataBoxImpl<ULINT, ULINT_NAME> ULInt;
 // =============== ========================= ========= ========================
 // Note 1: Real values have a precision of 1 part in 2^23.
 // Note 2: LReal values have a precision of 1 part in 2^52.
-typedef float REAL;    // Real numbers         32      +-10^(+-38)
-typedef double LREAL;  // Long real numbers    64      +-10^(+-308)
 extern const char REAL_NAME[];
 extern const char LREAL_NAME[];
 typedef DataBoxImpl<REAL, REAL_NAME> Real;
 typedef DataBoxImpl<LREAL, LREAL_NAME> LReal;
 
-// Boolean data type
-// =============== ==========================================================
-// IEC data type   Description
-// =============== ==========================================================
-// Bool            Has two states. FALSE equivalent to 0,
-//                 and TRUE equivalent to 1.
-// =============== ==========================================================
-typedef bool BOOL;  // Has two states. FALSE = 0, TRUE = 1.
+// // Boolean data type
+// // =============== ==========================================================
+// // IEC data type   Description
+// // =============== ==========================================================
+// // Bool            Has two states. FALSE equivalent to 0,
+// //                 and TRUE equivalent to 1.
+// // =============== ==========================================================
 extern const char BOOL_NAME[];
 typedef DataBoxImpl<BOOL, BOOL_NAME> Bool;
 
@@ -88,13 +82,6 @@ typedef DataBoxImpl<BOOL, BOOL_NAME> Bool;
 // Note: The length and precision of this data type are implementation
 // dependent. The TIME data type is used to store durations, i.e. in days,
 // hours, minutes, seconds and milliseconds
-typedef struct tagTIME {
-  int32_t days;
-  int16_t hours;         // 0~23
-  int16_t minutes;       // 0~59
-  int16_t seconds;       // 0~59, to 61
-  int16_t milliseconds;  // 0~999
-} TIME;
 extern const char TIME_NAME[];
 typedef DataBoxImpl<TIME, TIME_NAME> Time;
 
@@ -110,39 +97,12 @@ typedef DataBoxImpl<TIME, TIME_NAME> Time;
 // ==================== ==================== ====== ===========================
 // Note: The length of this data type is implementation dependent.
 
-// #include <ctime>
-// struct tm {
-//    int tm_sec;   // seconds of minutes from 0 to 61
-//    int tm_min;   // minutes of hour from 0 to 59
-//    int tm_hour;  // hours of day from 0 to 24
-//    int tm_mday;  // day of month from 1 to 31
-//    int tm_mon;   // month of year from 0 to 11
-//    int tm_year;  // year since 1900
-//    int tm_wday;  // days since sunday
-//    int tm_yday;  // days since January 1st
-//    int tm_isdst; // hours of daylight savings time
-// }
-
-typedef struct tmDate {
-  int tm_mday;   // day of month from 1 to 31
-  int tm_mon;    // month of year from 0 to 11
-  int tm_year;   // year since 1900
-  int tm_wday;   // days since sunday
-  int tm_yday;   // days since January 1st
-  int tm_isdst;  // hours of daylight savings time
-} DATE;
 extern const char DATE_NAME[];
 typedef DataBoxImpl<DATE, DATE_NAME> Date;
 
-typedef struct tmTime {
-  int tm_sec;   // seconds of minutes from 0 to 61
-  int tm_min;   // minutes of hour from 0 to 59
-  int tm_hour;  // hours of day from 0 to 24
-} TIME_OF_DAY, TOD;
 extern const char TOD_NAME[];
 typedef DataBoxImpl<TOD, TOD_NAME> ToD;
 
-typedef struct tm DATE_AND_TIME, DT;
 extern const char DT_NAME[];
 typedef DataBoxImpl<DT, DT_NAME> Dt;
 
@@ -152,7 +112,6 @@ typedef DataBoxImpl<DT, DT_NAME> Dt;
 // ========== ===================== =============== ===========================
 // STRING     Character strings     8 per character Storing textual information
 // ========== ===================== =============== ===========================
-typedef String STRING;
 extern const char STRING_NAME[];
 typedef DataBoxImpl<STRING, STRING_NAME> XString;
 
@@ -163,7 +122,6 @@ typedef DataBoxImpl<STRING, STRING_NAME> XString;
 // WSTRING    Character strings     16 per character Storing unicode textual
 //                                                   information
 // ========== ===================== ================ ==========================
-typedef String WSTRING;
 extern const char WSTRING_NAME[];
 typedef DataBoxImpl<WSTRING, WSTRING_NAME> XWString;
 
@@ -177,10 +135,6 @@ typedef DataBoxImpl<WSTRING, WSTRING_NAME> XWString;
 // DWORD      Bit string of 32 bits 32      ’’ ’’
 // LWORD      Bit string of 64 bits 64      ’’ ’’
 // ========== ===================== ======= ===================================
-typedef uint8_t BYTE;
-typedef uint16_t WORD;
-typedef uint32_t DWORD;
-typedef uint64_t LWORD;
 extern const char BYTE_NAME[];
 extern const char WORD_NAME[];
 extern const char DWORD_NAME[];

@@ -7,7 +7,7 @@
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 // check that outVariable and inVariable are match
-bool VariableInput::checkForConnectFrom(VariableOutput& outData) const {
+bool InputVariable::checkForConnectFrom(OutputVariable& outData) const {
   if (isAlreadyConnected()) {
     // TODO: printf(WARN, "inData is alreay connected!\n");
     return false;

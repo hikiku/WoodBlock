@@ -8,14 +8,16 @@
 #include <iterator>   //
 #include <list>
 
-#include <WoodBlock/Core/DataType.h>
-#include <WoodBlock/Core/Macro.h>
+
 #include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Macro.h>
+
+#include "WoodBlock/DataTypes/DataTypes.h"
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class VariableInput;
-class VariableOutput;
+class InputVariable;
+class OutputVariable;
 
 class Variable {
  public:
@@ -32,19 +34,19 @@ class Variable {
   String name;
 };
 
-class VariableOutput : public Variable {
+class OutputVariable : public Variable {
  public:
-  VariableOutput(const char* name) : Variable(name) {}
-  // virtual ~VariableOutput() {}
+  OutputVariable(const char* name) : Variable(name) {}
+  // virtual ~OutputVariable() {}
 
  private:
 };
 
-// VariableOutputImpl<SInt>;
+// OutputVariableImpl<SInt>;
 template <class TDataBox>
-class VariableOutputImpl : public VariableOutput {
+class OutputVariableImpl : public OutputVariable {
  public:
-  VariableOutputImpl(const char* name) : VariableOutput(name), dataBox() {}
+  OutputVariableImpl(const char* name) : OutputVariable(name), dataBox() {}
 
   unsigned int getNumberOfDataType() const {
     return dataBox.getNumberOfDataType();
@@ -57,23 +59,23 @@ class VariableOutputImpl : public VariableOutput {
   TDataBox dataBox;
 };
 
-template<class TDataBox> using Vo = VariableOutputImpl<TDataBox>;
+template<class TDataBox> using Vo = OutputVariableImpl<TDataBox>;
 
-class VariableInput : public Variable {
+class InputVariable : public Variable {
  public:
-  VariableInput(const char* name) : Variable(name), outData(nullptr) {}
-  // virtual ~VariableInput() {}
+  InputVariable(const char* name) : Variable(name), outData(nullptr) {}
+  // virtual ~InputVariable() {}
 
   bool isAlreadyConnected() const {
     return (outData == nullptr) ? false : true;
   }
   // check that outVariable and inVariable are match
-  bool checkForConnectFrom(VariableOutput& outData) const;
-  bool connectFrom(VariableOutput& outData) {
+  bool checkForConnectFrom(OutputVariable& outData) const;
+  bool connectFrom(OutputVariable& outData) {
     if (!checkForConnectFrom(outData)) {
       return false;
     }
-    // connect VariableInput from VariableOutput
+    // connect InputVariable from OutputVariable
     this->outData = &outData;
     return true;
   }
@@ -86,19 +88,19 @@ class VariableInput : public Variable {
   virtual bool sample() = 0;  // clone data from 'outData'
  
  protected:
-  VariableOutput* getVariableOutput() {
+  OutputVariable* getVariableOutput() {
     return outData;
   }
 
  private:
-  VariableOutput* outData;  // start of connection, Output data variable
+  OutputVariable* outData;  // start of connection, Output data variable
 };
 
-// VariableInputImpl<SInt>, Vi<SInt>, ...
+// InputVariableImpl<SInt>, Vi<SInt>, ...
 template <class TDataBox>
-class VariableInputImpl : public VariableInput {
+class InputVariableImpl : public InputVariable {
  public:
-  VariableInputImpl(const char* name) : VariableInput(name), dataBox() {}
+  InputVariableImpl(const char* name) : InputVariable(name), dataBox() {}
 
   unsigned int getNumberOfDataType() const {
     return dataBox.getNumberOfDataType();
@@ -107,11 +109,11 @@ class VariableInputImpl : public VariableInput {
     return dataBox;
   }
 
-  // VariableInputImpl<SInt>, Vi<SInt>, ...
+  // InputVariableImpl<SInt>, Vi<SInt>, ...
   // template <class TDataBox>
   bool sample()  // clone data from 'fromData'
   {
-    // VariableOutput *outData = getVariableOutput();
+    // OutputVariable *outData = getVariableOutput();
     // if (outData)
     // {
     //     dataBox.copy((TDataBox&)outData->getDataBox()); // TODO:
@@ -119,8 +121,8 @@ class VariableInputImpl : public VariableInput {
     // }
 
     // TODO: only same data type fields may be converted!
-    VariableOutputImpl<TDataBox>* outData =
-        (VariableOutputImpl<TDataBox>*)getVariableOutput();
+    OutputVariableImpl<TDataBox>* outData =
+        (OutputVariableImpl<TDataBox>*)getVariableOutput();
     if (outData) {
       dataBox.copy(
           outData->getDataBox());  // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -133,6 +135,6 @@ class VariableInputImpl : public VariableInput {
   TDataBox dataBox;
 };
 
-template<class TDataBox> using Vi = VariableInputImpl<TDataBox>;
+template<class TDataBox> using Vi = InputVariableImpl<TDataBox>;
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

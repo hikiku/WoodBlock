@@ -12,7 +12,7 @@ bool EventInput::addInVariableByName(const char* inVariableName) {
   if (!result) {
     return false;
   } else {
-    VariableInput* inData = getOwner().findInVariableByName(inVariableName);
+    InputVariable* inData = getOwner().findInVariableByName(inVariableName);
     inVariables.push_back(inData);
     return true;
   }
@@ -30,7 +30,7 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
     return false;
   }
 
-  VariableInput* inData = getOwner().findInVariableByName(inVariableName);
+  InputVariable* inData = getOwner().findInVariableByName(inVariableName);
   if (!inData) {
     // TODO: printf (WARNING, "Don't find InVariable by  inVariableName(%s)!",
     // inVariableName);
@@ -45,7 +45,7 @@ void EventInput::disconnect() {
     return;
   }
   // disconnect all of inVariables
-  for (std::list<VariableInput*>::iterator it = inVariables.begin();
+  for (std::list<InputVariable*>::iterator it = inVariables.begin();
        it != inVariables.end(); ++it) {
     (*it)->disconnect();
   }
@@ -63,7 +63,7 @@ bool EventOutput::addOutVariableByName(const char* outVariableName) {
   if (!result) {
     return false;
   } else {
-    VariableOutput* outData = getOwner().findOutVariableByName(outVariableName);
+    OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
     outVariables.push_back(outData);
     return true;
   }
@@ -81,7 +81,7 @@ bool EventOutput::check4AddingOutVariableByName(const char* outVariableName) {
     return false;
   }
 
-  VariableOutput* outData = getOwner().findOutVariableByName(outVariableName);
+  OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
   if (!outData) {
     // TODO: printf (WARNING, "Don't find OutVariable by  outVariableName(%s)!",
     // outVariableName);

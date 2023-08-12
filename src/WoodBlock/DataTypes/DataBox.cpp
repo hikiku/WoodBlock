@@ -2,7 +2,8 @@
 // Copyright © 2023, HiKiku
 // MIT License
 
-#include <WoodBlock/Core/DataBox.h>
+#include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/DataTypes/DataBox.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
@@ -348,5 +349,6 @@ bool DataBox::check4ConnectDataType(unsigned int outNumberOfDataType, unsigned i
 
   return extend_check4ConnectDataType(outNumberOfDataType, inNumberOfDataType);
 }
+
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

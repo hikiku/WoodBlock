@@ -9,9 +9,10 @@
 #include <iterator>   //
 #include <list>
 
-#include <WoodBlock/Core/Macro.h>
-#include <WoodBlock/Core/Variable.h>
 #include <WoodBlock/Namespace.hpp>
+#include <WoodBlock/Macro.h>
+
+#include <WoodBlock/Core/Variable.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
@@ -55,14 +56,14 @@ class EventInput : public Event {
   }
   ~EventInput() {}
 
-  VariableInput* findInVariableByName(const char* inVariableName) {
+  InputVariable* findInVariableByName(const char* inVariableName) {
     if (inVariableName == nullptr) {
       // printf (DEBUG, "inVariableName is NULL!");
       return nullptr;
     }
 
     String name(inVariableName);
-    for (std::list<VariableInput*>::iterator it = inVariables.begin();
+    for (std::list<InputVariable*>::iterator it = inVariables.begin();
          it != inVariables.end(); ++it) {
       if ((*it)->getName().equals(name)) {
         return *it;
@@ -110,7 +111,7 @@ class EventInput : public Event {
 
   void sample() {
     // sample all of inVariables
-    for (std::list<VariableInput*>::iterator it = inVariables.begin();
+    for (std::list<InputVariable*>::iterator it = inVariables.begin();
          it != inVariables.end(); ++it) {
       (*it)->sample();
     }
@@ -142,7 +143,7 @@ class EventInput : public Event {
     return true;
   }
 
-  std::list<VariableInput*> inVariables;
+  std::list<InputVariable*> inVariables;
   EventOutput* outEvent;
 };
 
@@ -151,7 +152,7 @@ class EventOutput : public Event {
   EventOutput(FunctionBlock& owner, const char* name)
       : Event(owner, name), outVariables(), inEvent(nullptr) {}
   ~EventOutput() {
-    // std::list<VariableOutput*> outVariables;
+    // std::list<OutputVariable*> outVariables;
     outVariables.clear();
   }
 
@@ -176,14 +177,14 @@ class EventOutput : public Event {
     return true;
   }
 
-  VariableOutput* findOutVariableByName(const char* outVariableName) {
+  OutputVariable* findOutVariableByName(const char* outVariableName) {
     if (outVariableName == nullptr) {
       // printf (DEBUG, "outVariableName is NULL!");
       return nullptr;
     }
 
     String name(outVariableName);
-    for (std::list<VariableOutput*>::iterator it = outVariables.begin();
+    for (std::list<OutputVariable*>::iterator it = outVariables.begin();
          it != outVariables.end(); ++it) {
       if ((*it)->getName().equals(name)) {
         return *it;
@@ -219,18 +220,18 @@ class EventOutput : public Event {
 
     // check that each of outVariableNames and each of inVariableNames are match
     for (int i = 0; i < sizeofVariables; i++) {
-      VariableOutput* outVariable = findOutVariableByName(outVariableNames[i]);
-      VariableInput* inVariable =
+      OutputVariable* outVariable = findOutVariableByName(outVariableNames[i]);
+      InputVariable* inVariable =
           inEvent.findInVariableByName(inVariableNames[i]);
 
       if (!outVariable) {
         Serial.printf(
-            "ERROR: Check: It Can't find VariableOutput by name %s!\n",
+            "ERROR: Check: It Can't find OutputVariable by name %s!\n",
             outVariableNames[i]);
         result = false;
       }
       if (!inVariable) {
-        Serial.printf("ERROR: Check: It Can't find VariableInput by name %s!\n",
+        Serial.printf("ERROR: Check: It Can't find InputVariable by name %s!\n",
                       inVariableNames[i]);
         result = false;
       }
@@ -246,17 +247,17 @@ class EventOutput : public Event {
 
     // connect inVariables from outVariables
     for (int i = 0; i < sizeofVariables; i++) {
-      VariableOutput* outVariable = findOutVariableByName(outVariableNames[i]);
-      VariableInput* inVariable =
+      OutputVariable* outVariable = findOutVariableByName(outVariableNames[i]);
+      InputVariable* inVariable =
           inEvent.findInVariableByName(inVariableNames[i]);
 
       if (!outVariable) {
-        //// printf(ERROR, "Connect: It Can't find VariableOutput by name
+        //// printf(ERROR, "Connect: It Can't find OutputVariable by name
         ///%s!\n", outVariableNames[i])
         continue;  // result = false;
       }
       if (!inVariable) {
-        //// printf(ERROR, "Connect: It Can't find VariableInput by name %s!\n",
+        //// printf(ERROR, "Connect: It Can't find InputVariable by name %s!\n",
         /// inVariableNames[i])
         continue;  // result = false;
       }
@@ -331,7 +332,7 @@ class EventOutput : public Event {
     generated = false;
   }
 
-  std::list<VariableOutput*> outVariables;
+  std::list<OutputVariable*> outVariables;
   EventInput* inEvent;  // event observer, to event, connect to
   bool generated;       // Has a out event been alreay generated?
 };

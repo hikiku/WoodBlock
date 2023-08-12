@@ -1,0 +1,29 @@
+
+
+// TODO: rename "name" or "description" to Identifier
+
+// TODO: Double-byte character strings: WSTRING
+// TODO: Generic data types: ANY_...
+        // ANY g)
+            // ANY_DERIVED
+            // ANY_ELEMENTARY
+                // ANY_MAGNITUDE
+                    // ANY_NUM
+                        // ANY_REAL h) REAL, LREAL
+                            // ANY_INT
+                                // ANY_UNSIGNED USINT, UINT, UDINT, ULINT
+                                // ANY_SIGNED SINT, INT, DINT, LINT
+                    // ANY_DURATION TIME, LTIME
+                // ANY_BIT BOOL, BYTE, WORD, DWORD, LWORD
+                // ANY_CHARS
+                    // ANY_STRING STRING, WSTRING       : array<width, length>
+                // ANY_CHAR CHAR, WCHAR
+                // ANY_DATE DATE_AND_TIME, LDT, DATE, TIME_OF_DAY, LTOD
+// TODO: Derived data types: ARRAY, RANGE, ENUM, STRUCT
+        // enum T.  template <class T> class ENUM : public ANY_DERIVED {}
+        // struct T. template <class T> class STRUCT : public ANY_DERIVED {}
+        // template<class T, lower_limits, upper_limits> class SUBRANGE : public ANY_DERIVED {}
+        // template<class T, lower_index, upper_index> class ARRAY : public ANY_DERIVED {}
+// TODO: check data type of connection
+
+// TODO: Lookup Event / Feedback Event!
