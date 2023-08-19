@@ -8,9 +8,8 @@
 #include <iterator>   //
 #include <list>
 
-
-#include <WoodBlock/Namespace.hpp>
 #include <WoodBlock/Macro.h>
+#include <WoodBlock/Namespace.hpp>
 
 #include "WoodBlock/DataTypes/DataTypes.h"
 
@@ -59,7 +58,8 @@ class OutputVariableImpl : public OutputVariable {
   TDataBox dataBox;
 };
 
-template<class TDataBox> using Vo = OutputVariableImpl<TDataBox>;
+template <class TDataBox>
+using Vo = OutputVariableImpl<TDataBox>;
 
 class InputVariable : public Variable {
  public:
@@ -86,7 +86,7 @@ class InputVariable : public Variable {
   }
 
   virtual bool sample() = 0;  // clone data from 'outData'
- 
+
  protected:
   OutputVariable* getVariableOutput() {
     return outData;
@@ -135,8 +135,31 @@ class InputVariableImpl : public InputVariable {
   TDataBox dataBox;
 };
 
-template<class TDataBox> using Vi = InputVariableImpl<TDataBox>;
+template <class TDataBox>
+using Vi = InputVariableImpl<TDataBox>;
 
-// TODO: InternalVariable!
+class InternalVariable : public Variable {
+  // TODO:
+
+  InternalVariable(const char* name) : Variable(name), internalData(nullptr) {}
+  // virtual ~InternalVariable() {}
+
+ protected:
+ private:
+  InternalVariable* internalData;
+};
+
+// InternalVariableImpl<SInt>, Vi<SInt>, ...
+template <class TDataBox>
+class InternalVariableImpl : public InternalVariable {
+ public:
+  InternalVariableImpl(const char* name) : InternalVariable(name), dataBox() {}
+
+ private:
+  TDataBox dataBox;
+};
+
+template <class TDataBox>
+using Vt = InternalVariableImpl<TDataBox>;
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

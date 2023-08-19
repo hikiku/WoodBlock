@@ -15,10 +15,13 @@ using namespace WoodBlock;
 // TODO: System
 // TODO: Device
 // TODO: Resource
+
 // TODO: FBManager
-// TODO: ManagedObject
-// TODO: ManagedConnection
-// TODO: NameObject
-// TODO: DataType
-// TODO: FBType：Plug, Socket, Service. create a FBInstance from CompiledCode & Declaraitons.
-// TODO: FBInstance
+
+// TODO: Algorithm
+// =============================
+// TODO: DeviceType ???
+// TODO: ResourceType ???
+// TODO: SubapplicationType ???
+// TODO: AdapterType ???
+// TODO: DataType ???

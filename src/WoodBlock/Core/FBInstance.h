@@ -13,11 +13,12 @@
 
 #include <WoodBlock/Core/Event.h>
 #include <WoodBlock/Core/Variable.h>
+#include <WoodBlock/Core/NamedObject.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 // TODO: FBInstance?
-class FBInstance {
+class FBInstance : public NamedObject{
  public:
   FBInstance(const char* name)
       : name(name),
