@@ -9,8 +9,8 @@
 #include <iterator>   //
 #include <list>
 
-#include <WoodBlock/Namespace.hpp>
 #include <WoodBlock/Macro.h>
+#include <WoodBlock/Namespace.hpp>
 
 #include <WoodBlock/Core/Variable.h>
 
@@ -23,6 +23,12 @@ class EventOutput;
 // Event Type
 #define EVENT_ANY (0)
 #define EVENT_USER_EXTENDED_BASE (10000)
+
+class EventInput;
+
+typedef OutputVariable* (*SearchOutDataCallback)(
+    /*FBNetwork**/ void* fbNetwork, /*EventConnection**/ void* eventConnect,
+    EventInput* eventInput, InputVariable* inputVariable);
 
 class Event {
  public:
@@ -38,7 +44,7 @@ class Event {
   }
 
  protected:
-  FBInstance& getOwner() {
+  FBInstance& getFBInstance() {
     return owner;
   }
 
@@ -51,9 +57,7 @@ class Event {
 class EventInput : public Event {
  public:
   EventInput(FBInstance& owner, const char* name)
-      : Event(owner, name), inputVariables(), outEvent(nullptr) {
-    //
-  }
+      : Event(owner, name), inputVariables() {}  //, outEvent(nullptr)
   ~EventInput() {}
 
   InputVariable* findInVariableByName(const char* inVariableName) {
@@ -72,6 +76,16 @@ class EventInput : public Event {
 
     return nullptr;
   }
+  // bool isContainedInputVariable(const InputVariable& inputVariable) const {
+  //   for (std::list<InputVariable*>::iterator it = inputVariables.begin();
+  //        it != inputVariables.end(); ++it) {
+  //     InputVariable* temp = &(*it);
+  //     if (temp == &inputVariable) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   bool addInVariableByName(const char* inVariableName);
 
@@ -94,27 +108,25 @@ class EventInput : public Event {
     return true;
   }
 
-  bool isAlreadyConnected() const {
-    return (outEvent == nullptr) ? false : true;
-  }
-  bool setConnectSource(EventOutput& outEvent)  // friend class method
-  {
-    if (this->outEvent == nullptr) {
-      this->outEvent = &outEvent;
-      return true;
-    }
-    return false;
-  }
-  void disconnect();
+  // void trigger();
 
-  void trigger();
-
-  void sample() {
-    // sample all of inputVariables
+  void _sample(/*FBNetwork**/ void* fbNetwork,
+               /*EventConnection**/ void* eventConnect,
+               SearchOutDataCallback searchOutDataCallback) {
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
-      (*it)->sample();
+      OutputVariable* outputVariable =
+          searchOutDataCallback(fbNetwork, eventConnect, this, *it);
+      // (*it)->sample(*outputVariable);  //**it = outputVariable
+       (*it)->getDataBox() = outputVariable->getDataBox();
     }
+  }
+
+  static void sample(/*FBNetwork**/ void* fbNetwork,
+                     /*EventConnection**/ void* eventConnect,
+                     EventInput* eventInput,
+                     SearchOutDataCallback searchOutDataCallback) {
+    eventInput->_sample(fbNetwork, eventConnect, searchOutDataCallback);
   }
 
  private:
@@ -144,15 +156,14 @@ class EventInput : public Event {
   }
 
   std::list<InputVariable*> inputVariables;
-  EventOutput* outEvent;
+  // EventOutput* outEvent;
 };
 
 class EventOutput : public Event {
  public:
   EventOutput(FBInstance& owner, const char* name)
-      : Event(owner, name), outputVariables(), inEvent(nullptr) {}
+      : Event(owner, name), outputVariables() {}  //, inEvent(nullptr)
   ~EventOutput() {
-    // std::list<OutputVariable*> outputVariables;
     outputVariables.clear();
   }
 
@@ -190,97 +201,20 @@ class EventOutput : public Event {
         return *it;
       }
     }
-
     return nullptr;
   }
 
-  bool isAlreadyConnected() const {
-    return (inEvent == nullptr) ? false : true;
-  }
-  bool connectTo(const char* outVariableNames[], EventInput& inEvent,
-                 const char* inVariableNames[], int sizeofVariables) {
-    bool result = true;
-
-    // Whether the Event Type of A and B match
-    unsigned int srcEventType = getEventType();
-    unsigned int dstEventType = inEvent.getEventType();
-    if ((dstEventType != EVENT_ANY) && (dstEventType != srcEventType)) {
-      // TODO: printf(WARNING, "EventType of srcEventType(%u) and
-      // dstEventType(%u) do not match!\n", srcEventType, dstEventType)
-      result = false;
-    }
-    if (isAlreadyConnected()) {
-      // TODO: printf(WARNING, "outEvent is already connected!\n")
-      result = false;
-    }
-    if (inEvent.isAlreadyConnected()) {
-      // TODO: printf(WARNING, "inEvent is already connected!\n")
-      result = false;
-    }
-
-    // check that each of outVariableNames and each of inVariableNames are match
-    for (int i = 0; i < sizeofVariables; i++) {
-      OutputVariable* outVariable = findOutVariableByName(outVariableNames[i]);
-      InputVariable* inVariable =
-          inEvent.findInVariableByName(inVariableNames[i]);
-
-      if (!outVariable) {
-        Serial.printf(
-            "ERROR: Check: It Can't find OutputVariable by name %s!\n",
-            outVariableNames[i]);
-        result = false;
-      }
-      if (!inVariable) {
-        Serial.printf("ERROR: Check: It Can't find InputVariable by name %s!\n",
-                      inVariableNames[i]);
-        result = false;
-      }
-      // check that outVariable and inVariable are match
-      if (result) {
-        inVariable->checkForConnectFrom(*outVariable);
-      }
-    }
-    if (!result) {
-      //// printf(HINT, "arguments of connection is error!\n");
-      return false;
-    }
-
-    // connect inputVariables from outputVariables
-    for (int i = 0; i < sizeofVariables; i++) {
-      OutputVariable* outVariable = findOutVariableByName(outVariableNames[i]);
-      InputVariable* inVariable =
-          inEvent.findInVariableByName(inVariableNames[i]);
-
-      if (!outVariable) {
-        //// printf(ERROR, "Connect: It Can't find OutputVariable by name
-        ///%s!\n", outVariableNames[i])
-        continue;  // result = false;
-      }
-      if (!inVariable) {
-        //// printf(ERROR, "Connect: It Can't find InputVariable by name %s!\n",
-        /// inVariableNames[i])
-        continue;  // result = false;
-      }
-      inVariable->connectFrom(*outVariable);
-    }
-
-    // connect outEvent to inEvent
-    this->inEvent = &inEvent;
-    inEvent.setConnectSource(*this);
-    return true;
-  }
-
-  void disconnect() {
-    if (inEvent) {
-      inEvent->disconnect();
-    }
-  }
-  // friend class method
-  void clearConnectDestination() {
-    if (inEvent) {
-      inEvent = nullptr;
-    }
-  }
+  // bool isContainedOutputVariable(const OutputVariable& outputVariable) const
+  // {
+  //   for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
+  //        it != outputVariables.end(); ++it) {
+  //     OutputVariable* temp = &(*it);
+  //     if (temp == &outputVariable) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   void generate() {
     generated = true;
@@ -289,18 +223,18 @@ class EventOutput : public Event {
     return generated;
   }
 
-  bool dispatchAndExecute() {
-    // TODO:
-    if (!isGenerated()) {
-      return false;
-    }
-    if (!inEvent) {
-      return false;
-    }
-    inEvent->trigger();
-    clear();
-    return true;
-  }
+  // bool dispatchAndExecute() {
+  //   // TODO:
+  //   if (!isGenerated()) {
+  //     return false;
+  //   }
+  //   if (!inEvent) {
+  //     return false;
+  //   }
+  //   inEvent->trigger();
+  //   clear();
+  //   return true;
+  // }
 
  private:
   bool check4AddingOutVariableByName(const char* outVariableName);
@@ -333,12 +267,10 @@ class EventOutput : public Event {
   }
 
   std::list<OutputVariable*> outputVariables;
-  EventInput* inEvent;  // event observer, to event, connect to
-  bool generated;       // Has a out event been alreay generated?
+  // EventInput* inEvent;
+  bool generated;  // Has a out event been alreay generated?
 };
 
-class ServiceInterfaceInEvent : public EventInput {
-  //
-};
+class ServiceInterfaceInEvent : public EventInput {};
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

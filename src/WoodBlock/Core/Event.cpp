@@ -12,7 +12,7 @@ bool EventInput::addInVariableByName(const char* inVariableName) {
   if (!result) {
     return false;
   } else {
-    InputVariable* inData = getOwner().findInVariableByName(inVariableName);
+    InputVariable* inData = getFBInstance().findInVariableByName(inVariableName);
     inputVariables.push_back(inData);
     return true;
   }
@@ -30,7 +30,7 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
     return false;
   }
 
-  InputVariable* inData = getOwner().findInVariableByName(inVariableName);
+  InputVariable* inData = getFBInstance().findInVariableByName(inVariableName);
   if (!inData) {
     // TODO: printf (WARNING, "Don't find InVariable by  inVariableName(%s)!",
     // inVariableName);
@@ -40,30 +40,16 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
   }
 }
 
-void EventInput::disconnect() {
-  if (this->outEvent == nullptr) {
-    return;
-  }
-  // disconnect all of inputVariables
-  for (std::list<InputVariable*>::iterator it = inputVariables.begin();
-       it != inputVariables.end(); ++it) {
-    (*it)->disconnect();
-  }
-
-  this->outEvent->clearConnectDestination();
-  this->outEvent = nullptr;
-}
-
-void EventInput::trigger() {
-  getOwner().processInEvent(*this);
-}
+// void EventInput::trigger() {
+//   getFBInstance().processEventInput(*this);
+// }
 
 bool EventOutput::addOutVariableByName(const char* outVariableName) {
   bool result = check4AddingOutVariableByName(outVariableName);
   if (!result) {
     return false;
   } else {
-    OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
+    OutputVariable* outData = getFBInstance().findOutVariableByName(outVariableName);
     outputVariables.push_back(outData);
     return true;
   }
@@ -81,7 +67,7 @@ bool EventOutput::check4AddingOutVariableByName(const char* outVariableName) {
     return false;
   }
 
-  OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
+  OutputVariable* outData = getFBInstance().findOutVariableByName(outVariableName);
   if (!outData) {
     // TODO: printf (WARNING, "Don't find OutVariable by  outVariableName(%s)!",
     // outVariableName);

@@ -25,7 +25,7 @@ class WebPortal : public ServiceInterfaceBlock {
   }
   ~WebPortal() {}
 
-  void executeInEvent(EventInput& inEvent) {
+  void executeEventInput(EventInput& inEvent) {
     if (inEvent.getName().equals("Occupy")) {
       if (ivStatus) {
         BOOL* status = ivStatus->getDataBox().getData();
@@ -67,7 +67,7 @@ class OccupySensor : public ServiceInterfaceBlock {
   }
   ~OccupySensor() {}
 
-  void executeInEvent(EventInput& inEvent) {
+  void executeEventInput(EventInput& inEvent) {
     Serial.printf("TODO: Don't deal event(%s), line:%d\n",
                   inEvent.getName().c_str(), __LINE__);
   }
@@ -77,7 +77,7 @@ class OccupySensor : public ServiceInterfaceBlock {
             // with SNTP response!
     long unsigned int time =
         millis();  //(uint32_t)std::time(0); //Fixed bug: std::time(0) is
-                   //changed with SNTP response!
+                   // changed with SNTP response!
 
     if (lasttime == 0) {
       lasttime = time;
@@ -117,24 +117,23 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  fbNetwork.attachFbInstance(occupySensor);
-  fbNetwork.attachFbInstance(webPortal);
+  fbNetwork.attachSifbInstance(occupySensor);
+  fbNetwork.attachSifbInstance(webPortal);
 
   {
     const char* outVariableNames[] = {"Status"};
     const char* inVariableNames[] = {"Status"};
 
     fbNetwork.connect("OccupySensor", "Occupy", outVariableNames,
-                           ARRAY_SIZE(outVariableNames), "WebPortal", "Occupy",
-                           inVariableNames, ARRAY_SIZE(inVariableNames));
+                      ARRAY_SIZE(outVariableNames), "WebPortal", "Occupy",
+                      inVariableNames, ARRAY_SIZE(inVariableNames));
   }
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  occupySensor.fetchExternalEvents();
-  webPortal.fetchExternalEvents();
+  fbNetwork.fetchExternalEvents();
 
   delay(1000);
 }

@@ -8,17 +8,22 @@
 #include <iterator>   //
 #include <list>
 
-#include <WoodBlock/Namespace.hpp>
 #include <WoodBlock/Macro.h>
+#include <WoodBlock/Namespace.hpp>
 
 #include <WoodBlock/Core/Event.h>
-#include <WoodBlock/Core/Variable.h>
 #include <WoodBlock/Core/NamedObject.h>
+#include <WoodBlock/Core/Variable.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-// TODO: FBInstance?
-class FBInstance : public NamedObject{
+class FBInstance;
+
+typedef void (*HandleEventOutputCallback)(/*FBNetwork**/ void* fbNetwork,
+                                          FBInstance* fbInstance,
+                                          EventOutput* eventOutput);
+
+class FBInstance : public NamedObject {
  public:
   FBInstance(const char* name)
       : name(name),
@@ -26,35 +31,28 @@ class FBInstance : public NamedObject{
         eventOutputs(),
         inputVariables(),
         outputVariables(),
-        triggeredOutEvents() {}
+        triggeredEventOutputs() {}
   virtual ~FBInstance()  // TODO: = 0;
   {
-    // std::list<EventOutput*> triggeredOutEvents;
-    triggeredOutEvents.clear();
-
-    // clear some connects of eventInputs & eventOutputs, inputVariables & outputVariables
-    disconnect();
+    // std::list<EventOutput*> triggeredEventOutputs;
+    clearTriggeredEventOutputs();
 
     // remove member variables
-    // std::list<EventInput*> eventInputs;
     for (std::list<EventInput*>::iterator it = eventInputs.begin();
          it != eventInputs.end(); ++it) {
       delete *it;
     }
     eventInputs.clear();
-    // std::list<EventOutput*> eventOutputs;
     for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
          it != eventOutputs.end(); ++it) {
       delete *it;
     }
     eventOutputs.clear();
-    // std::list<InputVariable*> inputVariables;
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
       delete *it;
     }
     inputVariables.clear();
-    // std::list<OutputVariable*> outputVariables;
     for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
          it != outputVariables.end(); ++it) {
       delete *it;
@@ -67,57 +65,80 @@ class FBInstance : public NamedObject{
   }
 
   EventInput* findInEventByName(const String& inEventName) {
-    // std::list<EventInput*> eventInputs;
     for (std::list<EventInput*>::iterator it = eventInputs.begin();
          it != eventInputs.end(); ++it) {
       if ((*it)->getName().equals(inEventName)) {
         return *it;
       }
     }
-
     return nullptr;
   }
   EventOutput* findOutEventByName(const String& outEventName) {
-    // std::list<EventOutput*> eventOutputs;
     for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
          it != eventOutputs.end(); ++it) {
       if ((*it)->getName().equals(outEventName)) {
         return *it;
       }
     }
-
     return nullptr;
   }
   InputVariable* findInVariableByName(const String& inVariableName) {
-    // std::list<InputVariable*> inputVariables;
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
       if ((*it)->getName().equals(inVariableName)) {
         return *it;
       }
     }
-
     return nullptr;
   }
   OutputVariable* findOutVariableByName(const String& outVariableName) {
-    // std::list<OutputVariable*> outputVariables;
     for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
          it != outputVariables.end(); ++it) {
       if ((*it)->getName().equals(outVariableName)) {
         return *it;
       }
     }
-
     return nullptr;
   }
+
+  // bool isContainedEventInput(const EventInput& eventInput) const {
+  //   for (std::list<EventInput*>::iterator it = eventInputs.begin();
+  //        it != eventInputs.end(); ++it) {
+  //     EventInput* temp = &(*it);
+  //     if (temp == &eventInput) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+  // bool isContainedEventOutput(const EventOutput& eventOutput) const {
+  //   for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
+  //        it != eventOutputs.end(); ++it) {
+  //     EventOutput* temp = &(*it);
+  //     if (temp == &eventOutput) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+  // bool isContainedInputVariable(const EventInput& eventInput,
+  //                               const InputVariable& inputVariable) const {
+  //   return isContainedEventInput(eventInput) &&
+  //          eventInput.isContainedInputVariable(inputVariable);
+  // }
+  // bool isContainedOutputVariable(const EventOutput& eventOutput,
+  //                                const OutputVariable& outputVariable) const
+  //                                {
+  //   return isContainedEventOutput(eventOutput) &&
+  //          eventOutput.isContainedOutputVariable(outputVariable);
+  // }
 
   // ====================== Constructor: adding =========================
   // eg: SInt
   template <class TDataBox>
   Vi<TDataBox>* addInVariable(const char* name) {
     // push a inVariable to std::list<InputVariable*> inputVariables!
-    Vi<TDataBox>* inVariable =
-        new Vi<TDataBox>(name);
+    Vi<TDataBox>* inVariable = new Vi<TDataBox>(name);
     if (inVariable) {
       inputVariables.push_back(inVariable);
       return inVariable;
@@ -128,8 +149,7 @@ class FBInstance : public NamedObject{
   template <class TDataBox>
   Vo<TDataBox>* addOutVariable(const char* name) {
     // push a outVariable to std::list<OutputVariable*> outputVariables!
-    Vo<TDataBox>* outVariable =
-        new Vo<TDataBox>(name);  // OutputVariable
+    Vo<TDataBox>* outVariable = new Vo<TDataBox>(name);  // OutputVariable
     if (outVariable) {
       outputVariables.push_back(outVariable);
       return outVariable;
@@ -185,61 +205,26 @@ class FBInstance : public NamedObject{
     }
   }
 
-  // ====================== Constructor: connecting =========================
-  bool connectTo(const char* outEventName, const char* outVariableNames[],
-                 FBInstance& destFunctionBlock, const char* inEventName,
-                 const char* inVariableNames[], int sizeofVariables) {
-    bool result = true;
-    EventOutput* outEvent = findOutEventByName(outEventName);
-    EventInput* inEvent = destFunctionBlock.findInEventByName(inEventName);
-    if (!outEvent) {
-      //// printf(ERROR, "It Can't find EventOutput by name %s!\n",
-      ///outEventName)
-      result = false;
-    }
-    if (!inEvent) {
-      //// printf(ERROR, "It Can't find EventInput by name %s!\n", inEventName)
-      result = false;
-    }
-    if (!result) {
-      return false;
-    }
-
-    return outEvent->connectTo(outVariableNames, *inEvent, inVariableNames,
-                               sizeofVariables);
-  }
-
   // ====================== Normal: running =========================
-  void processInEvent(EventInput& inEvent) {
-    inEvent.sample();                  // sample input variables
-    executeInEvent(inEvent);           // execution ecc
-    dispatchAndExecuteAllOutEvents();  // dispatch and execute all output events
+  void processEventInput(/*FBNetwork**/ void* fbNetwork,
+                         /*EventConnection**/ void* eventConnect,
+                         EventInput* eventInput,
+                         SearchOutDataCallback searchOutDataCallback,
+                         HandleEventOutputCallback handleEventOutputCallback) {
+    EventInput::sample(fbNetwork, eventConnect, eventInput, searchOutDataCallback);
+    executeEventInput(*eventInput);  // execution ecc
+    handleAllOfEventOutputs(fbNetwork, handleEventOutputCallback);
   }
 
-  // ====================== Deconstructor: disconnecting
-  // =========================
-  void disconnect() {
-    // std::list<EventOutput*> triggeredOutEvents;
-    triggeredOutEvents.clear();
-
-    // std::list<EventInput*> eventInputs;
-    for (std::list<EventInput*>::iterator it = eventInputs.begin();
-         it != eventInputs.end(); ++it) {
-      (*it)->disconnect();
-    }
-
-    // std::list<EventOutput*> eventOutputs;
-    for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
-         it != eventOutputs.end(); ++it) {
-      (*it)->disconnect();
-    }
+  void clearTriggeredEventOutputs() {
+    triggeredEventOutputs.clear();
   }
 
   // ====================== Deconstructor: removing =========================
   // Some private functions in ~FBInstance()
 
  protected:
-  virtual void executeInEvent(EventInput& inEvent) = 0;
+  virtual void executeEventInput(EventInput& inEvent) = 0;
   //{
   // TODO: ......
   // if inEvent.is("INIT") { ... }
@@ -250,33 +235,20 @@ class FBInstance : public NamedObject{
 
   void generateOutEvent(EventOutput& outEvent) {
     outEvent.generate();
-    triggeredOutEvents.push_back(&outEvent);
+    triggeredEventOutputs.push_back(&outEvent);
   }
 
-  // dispatch and execute all output events
-  void dispatchAndExecuteAllOutEvents() {
-    for (std::list<EventOutput*>::iterator it = triggeredOutEvents.begin();
-         it != triggeredOutEvents.end();) {
-      (*it)->dispatchAndExecute();
-      it = triggeredOutEvents.erase(it);  // it++;
+  void handleAllOfEventOutputs(
+      /*FBNetwork**/ void* fbNetwork,
+      HandleEventOutputCallback handleEventOutputCallback) {
+    for (std::list<EventOutput*>::iterator it = triggeredEventOutputs.begin();
+         it != triggeredEventOutputs.end();) {
+      handleEventOutputCallback(fbNetwork, this, *it);
+      it = triggeredEventOutputs.erase(it);  // it++;
     }
-    // triggeredOutEvents.clear();
   }
 
  private:
-  void disconnectInEvent(const String& inEventName) {
-    EventInput* inEvent = findInEventByName(inEventName);
-    if (inEvent) {
-      inEvent->disconnect();
-    }
-  }
-  void disconnectOutEvent(const String& outEventName) {
-    EventOutput* outEvent = findOutEventByName(outEventName);
-    if (outEvent) {
-      outEvent->disconnect();
-    }
-  }
-
   String name;
 
   std::list<EventInput*> eventInputs;
@@ -287,13 +259,12 @@ class FBInstance : public NamedObject{
   // TODO: std::list<InternalVariable*> internalVariables;
 
   std::list<EventOutput*>
-      triggeredOutEvents;  // pop_front() & push_back(), erase()/clear()
+      triggeredEventOutputs;  // pop_front() & push_back(), erase()/clear()
 };
 
 class ServiceInterfaceBlock : public FBInstance {
  public:
-  ServiceInterfaceBlock(const char* name)
-      : FBInstance(name) {}  //, siiEvents()
+  ServiceInterfaceBlock(const char* name) : FBInstance(name) {}  //, siiEvents()
   ~ServiceInterfaceBlock() {
     // // std::list<ServiceInterfaceInEvent*> siiEvents;
     // for (std::list<ServiceInterfaceInEvent*>::iterator it =
@@ -304,11 +275,13 @@ class ServiceInterfaceBlock : public FBInstance {
     // }
   }
 
-  bool fetchExternalEvents() {
+  // TODO: add callback of eventoutputs
+  bool fetchExternalEvents(
+      /*FBNetwork**/ void* fbNetwork,
+      HandleEventOutputCallback handleEventOutputCallback) {
     bool result = captureAndExecuteServiceInterfaceInEvent();  // execution ecc
     if (result) {
-      dispatchAndExecuteAllOutEvents();  // dispatch and execute all output
-                                         // events
+      handleAllOfEventOutputs(fbNetwork, handleEventOutputCallback);
     }
     return true;
   }

@@ -63,37 +63,18 @@ using Vo = OutputVariableImpl<TDataBox>;
 
 class InputVariable : public Variable {
  public:
-  InputVariable(const char* name) : Variable(name), outData(nullptr) {}
+  InputVariable(const char* name) : Variable(name) {}  //, outData(nullptr)
   // virtual ~InputVariable() {}
 
-  bool isAlreadyConnected() const {
-    return (outData == nullptr) ? false : true;
-  }
-  // check that outVariable and inVariable are match
-  bool checkForConnectFrom(OutputVariable& outData) const;
-  bool connectFrom(OutputVariable& outData) {
-    if (!checkForConnectFrom(outData)) {
-      return false;
-    }
-    // connect InputVariable from OutputVariable
-    this->outData = &outData;
-    return true;
-  }
-  void disconnect() {
-    if (this->outData) {
-      this->outData = nullptr;
-    }
-  }
-
-  virtual bool sample() = 0;  // clone data from 'outData'
+  // virtual bool sample(OutputVariable& outData) = 0;  // clone data from 'outData'
 
  protected:
-  OutputVariable* getVariableOutput() {
-    return outData;
-  }
+  // OutputVariable* getVariableOutput() {
+  //   return outData;
+  // }
 
  private:
-  OutputVariable* outData;  // start of connection, Output data variable
+  // OutputVariable* outData;
 };
 
 // InputVariableImpl<SInt>, Vi<SInt>, ...
@@ -109,27 +90,28 @@ class InputVariableImpl : public InputVariable {
     return dataBox;
   }
 
-  // InputVariableImpl<SInt>, Vi<SInt>, ...
-  // template <class TDataBox>
-  bool sample()  // clone data from 'fromData'
-  {
-    // OutputVariable *outData = getVariableOutput();
-    // if (outData)
-    // {
-    //     dataBox.copy((TDataBox&)outData->getDataBox()); // TODO:
-    //     error!!!!!!!!!!!!!!!!!!!!!!!!! return true;
-    // }
+  // // TODO: depended on FBNewwork!!!!!!!!!!!!!!!
+  // // FROM: eg: OutputVariableImpl<SInt>, Vi<SInt>, ...
+  // // template <class FROM>
+  // // bool sample(FROM& outData)  // clone data from 'fromData'
+  // bool sample(OutputVariable& outData)
+  // {
+  //   // OutputVariable *outData = getVariableOutput();
+  //   // if (outData)
+  //   // {
+  //   //     dataBox.copy((TDataBox&)outData->getDataBox()); // TODO:
+  //   //     error!!!!!!!!!!!!!!!!!!!!!!!!! return true;
+  //   // }
 
-    // TODO: only same data type fields may be converted!
-    OutputVariableImpl<TDataBox>* outData =
-        (OutputVariableImpl<TDataBox>*)getVariableOutput();
-    if (outData) {
-      dataBox.copy(
-          outData->getDataBox());  // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
-      return true;
-    }
-    return false;
-  }
+  //   // TODO: only same data type fields may be converted!
+  //   // OutputVariableImpl<TDataBox>* outData =
+  //   //     (OutputVariableImpl<TDataBox>*)getVariableOutput();
+  //     // return dataBox.copy(
+  //     //     outData.getDataBox());  // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  //     *(dataBox.getData()) = *(outData.getDataBox().getData());
+  //     return true;
+  // }
 
  private:
   TDataBox dataBox;
