@@ -24,11 +24,13 @@ class EventOutput;
 #define EVENT_ANY (0)
 #define EVENT_USER_EXTENDED_BASE (10000)
 
+class FBNetwork;
 class EventInput;
+class EventConnection;
 
 typedef OutputVariable* (*SearchOutDataCallback)(
-    /*FBNetwork**/ void* fbNetwork, /*EventConnection**/ void* eventConnect,
-    EventInput* eventInput, InputVariable* inputVariable);
+    FBNetwork& fbNetwork, EventConnection& eventConnect,
+    EventInput& eventInput, InputVariable& inputVariable);
 
 class Event {
  public:
@@ -110,23 +112,23 @@ class EventInput : public Event {
 
   // void trigger();
 
-  void _sample(/*FBNetwork**/ void* fbNetwork,
-               /*EventConnection**/ void* eventConnect,
+  void _sample(FBNetwork& fbNetwork,
+               EventConnection& eventConnect,
                SearchOutDataCallback searchOutDataCallback) {
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
       OutputVariable* outputVariable =
-          searchOutDataCallback(fbNetwork, eventConnect, this, *it);
+          searchOutDataCallback(fbNetwork, eventConnect, *this, **it);
       // (*it)->sample(*outputVariable);  //**it = outputVariable
-       (*it)->getDataBox() = outputVariable->getDataBox();
+      (*it)->getDataBox() = outputVariable->getDataBox();
     }
   }
 
-  static void sample(/*FBNetwork**/ void* fbNetwork,
-                     /*EventConnection**/ void* eventConnect,
-                     EventInput* eventInput,
+  static void sample(FBNetwork& fbNetwork,
+                     EventConnection& eventConnect,
+                     EventInput& eventInput,
                      SearchOutDataCallback searchOutDataCallback) {
-    eventInput->_sample(fbNetwork, eventConnect, searchOutDataCallback);
+    eventInput._sample(fbNetwork, eventConnect, searchOutDataCallback);
   }
 
  private:

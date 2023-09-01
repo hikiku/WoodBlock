@@ -17,11 +17,12 @@
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
+class FBNetwork;
 class FBInstance;
 
-typedef void (*HandleEventOutputCallback)(/*FBNetwork**/ void* fbNetwork,
-                                          FBInstance* fbInstance,
-                                          EventOutput* eventOutput);
+typedef void (*HandleEventOutputCallback)(FBNetwork& fbNetwork,
+                                          FBInstance& fbInstance,
+                                          EventOutput& eventOutput);
 
 class FBInstance : public NamedObject {
  public:
@@ -206,13 +207,13 @@ class FBInstance : public NamedObject {
   }
 
   // ====================== Normal: running =========================
-  void processEventInput(/*FBNetwork**/ void* fbNetwork,
-                         /*EventConnection**/ void* eventConnect,
-                         EventInput* eventInput,
+  void processEventInput(FBNetwork& fbNetwork,
+                         EventConnection& eventConnect,
+                         EventInput& eventInput,
                          SearchOutDataCallback searchOutDataCallback,
                          HandleEventOutputCallback handleEventOutputCallback) {
     EventInput::sample(fbNetwork, eventConnect, eventInput, searchOutDataCallback);
-    executeEventInput(*eventInput);  // execution ecc
+    executeEventInput(eventInput);  // execution ecc
     handleAllOfEventOutputs(fbNetwork, handleEventOutputCallback);
   }
 
@@ -239,11 +240,11 @@ class FBInstance : public NamedObject {
   }
 
   void handleAllOfEventOutputs(
-      /*FBNetwork**/ void* fbNetwork,
+      FBNetwork& fbNetwork,
       HandleEventOutputCallback handleEventOutputCallback) {
     for (std::list<EventOutput*>::iterator it = triggeredEventOutputs.begin();
          it != triggeredEventOutputs.end();) {
-      handleEventOutputCallback(fbNetwork, this, *it);
+      handleEventOutputCallback(fbNetwork, *this, **it);
       it = triggeredEventOutputs.erase(it);  // it++;
     }
   }
@@ -277,7 +278,7 @@ class ServiceInterfaceBlock : public FBInstance {
 
   // TODO: add callback of eventoutputs
   bool fetchExternalEvents(
-      /*FBNetwork**/ void* fbNetwork,
+      FBNetwork& fbNetwork,
       HandleEventOutputCallback handleEventOutputCallback) {
     bool result = captureAndExecuteServiceInterfaceInEvent();  // execution ecc
     if (result) {

@@ -137,18 +137,18 @@ class FBNetwork {
   }
 
   // ====================== execute =========================
-  static void handleEventOutputCallback(/*FBNetwork**/ void* fbNetwork,
-                                        FBInstance* fbInstance,
-                                        EventOutput* eventOutput) {
-    FBNetwork* _fbNetwork = (FBNetwork*)fbNetwork;
-    _fbNetwork->_handleEventOutputCallback(fbInstance, eventOutput);
+  static void handleEventOutputCallback(FBNetwork& fbNetwork,
+                                        FBInstance& fbInstance,
+                                        EventOutput& eventOutput) {
+    //FBNetwork* _fbNetwork = (FBNetwork*)fbNetwork;
+    fbNetwork._handleEventOutputCallback(fbInstance, eventOutput);
   }
   static OutputVariable* searchOutDataCallback(
-      /*FBNetwork**/ void* fbNetwork, /*EventConnection**/ void* eventConnect,
-      EventInput* eventInput, InputVariable* inputVariable) {
-    FBNetwork* _fbNetwork = (FBNetwork*)fbNetwork;
-    EventConnection* _eventConnect = (EventConnection*)eventConnect;
-    return _fbNetwork->_searchOutDataCallback(_eventConnect, eventInput,
+      FBNetwork& fbNetwork, EventConnection& eventConnect,
+      EventInput& eventInput, InputVariable& inputVariable) {
+    //FBNetwork* _fbNetwork = (FBNetwork*)fbNetwork;
+    // EventConnection* _eventConnect = (EventConnection*)eventConnect;
+    return fbNetwork._searchOutDataCallback(eventConnect, eventInput,
                                              inputVariable);
   }
 
@@ -156,33 +156,33 @@ class FBNetwork {
     bool result = false;
     for (std::list<ServiceInterfaceBlock*>::iterator it = sifbInstances.begin();
          it != sifbInstances.end(); ++it) {
-      result |= (*it)->fetchExternalEvents(this, FBNetwork::handleEventOutputCallback);
+      result |= (*it)->fetchExternalEvents(*this, FBNetwork::handleEventOutputCallback);
     }
     return result;
   }
 
   // TODO: move to private
-  void _handleEventOutputCallback(FBInstance* fbInstance,
-                                  EventOutput* eventOutput) {
+  void _handleEventOutputCallback(FBInstance& fbInstance,
+                                  EventOutput& eventOutput) {
     for (std::list<EventConnection*>::iterator it = eventConnections.begin();
          it != eventConnections.end(); ++it) {
-      if (((*it)->getSourceFBInstance() == fbInstance) &&
-          ((*it)->getSourceEvent() == eventOutput)) {
+      if (((*it)->getSourceFBInstance() == &fbInstance) &&
+          ((*it)->getSourceEvent() == &eventOutput)) {
         (*it)->getDestinationFBInstance()->processEventInput(
-            this, *it, (*it)->getDestinationEvent(),
+            *this, **it, *((*it)->getDestinationEvent()),
             FBNetwork::searchOutDataCallback,
             FBNetwork::handleEventOutputCallback);
       }
     }
   }
   // TODO: move to private
-  OutputVariable* _searchOutDataCallback(EventConnection* eventConnect,
-                                         EventInput* eventInput,
-                                         InputVariable* inputVariable) {
+  OutputVariable* _searchOutDataCallback(EventConnection& eventConnect,
+                                         EventInput& eventInput,
+                                         InputVariable& inputVariable) {
     for (std::list<DataConnection*>::iterator it = dataConnections.begin();
          it != dataConnections.end(); ++it) {
-      if (((*it)->eventConnection() == eventConnect) &&
-          ((*it)->destination() == inputVariable)) {
+      if (((*it)->eventConnection() == &eventConnect) &&
+          ((*it)->destination() == &inputVariable)) {
         return (*it)->source();
       }
     }
