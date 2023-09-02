@@ -61,7 +61,7 @@ class EventInput : public Event {
       : Event(owner, name), inputVariables() {}  //, outEvent(nullptr)
   ~EventInput() {}
 
-  InputVariable* findInVariableByName(const char* inVariableName) {
+  InputVariable* findInputVariableByName(const char* inVariableName) {
     if (inVariableName == nullptr) {
       // printf (DEBUG, "inVariableName is NULL!");
       return nullptr;
@@ -189,7 +189,7 @@ class EventOutput : public Event {
     return true;
   }
 
-  OutputVariable* findOutVariableByName(const char* outVariableName) {
+  OutputVariable* findOutputVariableByName(const char* outVariableName) {
     if (outVariableName == nullptr) {
       // printf (DEBUG, "outVariableName is NULL!");
       return nullptr;

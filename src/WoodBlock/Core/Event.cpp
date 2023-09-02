@@ -12,7 +12,7 @@ bool EventInput::addInVariableByName(const char* inVariableName) {
   if (!result) {
     return false;
   } else {
-    InputVariable* inData = getOwner().findInVariableByName(inVariableName);
+    InputVariable* inData = getOwner().findInputVariableByName(inVariableName);
     inputVariables.push_back(inData);
     return true;
   }
@@ -24,13 +24,13 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
     return false;
   }
 
-  if (findInVariableByName(inVariableName)) {
+  if (findInputVariableByName(inVariableName)) {
     // TODO: printf (WARNING, "inVariableName(%s) is already in the inputVariables
     // list!", inVariableNames);
     return false;
   }
 
-  InputVariable* inData = getOwner().findInVariableByName(inVariableName);
+  InputVariable* inData = getOwner().findInputVariableByName(inVariableName);
   if (!inData) {
     // TODO: printf (WARNING, "Don't find InVariable by  inVariableName(%s)!",
     // inVariableName);
@@ -49,7 +49,7 @@ bool EventOutput::addOutVariableByName(const char* outVariableName) {
   if (!result) {
     return false;
   } else {
-    OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
+    OutputVariable* outData = getOwner().findOutputVariableByName(outVariableName);
     outputVariables.push_back(outData);
     return true;
   }
@@ -61,13 +61,13 @@ bool EventOutput::check4AddingOutVariableByName(const char* outVariableName) {
     return false;
   }
 
-  if (findOutVariableByName(outVariableName)) {
+  if (findOutputVariableByName(outVariableName)) {
     // TODO: printf (WARNING, "outVariableName is already in the outputVariables
     // list!");
     return false;
   }
 
-  OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
+  OutputVariable* outData = getOwner().findOutputVariableByName(outVariableName);
   if (!outData) {
     // TODO: printf (WARNING, "Don't find OutVariable by  outVariableName(%s)!",
     // outVariableName);

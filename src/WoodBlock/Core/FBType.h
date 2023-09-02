@@ -62,37 +62,37 @@ class FBType : public NamedObject {
     outputVariables.clear();
   }
 
-  EventInput* findInEventByName(const String& inEventName) {
+  EventInput* findEventInputByName(const String& nameOfEventInput) {
     for (std::list<EventInput*>::iterator it = eventInputs.begin();
          it != eventInputs.end(); ++it) {
-      if ((*it)->getName().equals(inEventName)) {
+      if ((*it)->getName().equals(nameOfEventInput)) {
         return *it;
       }
     }
     return nullptr;
   }
-  EventOutput* findOutEventByName(const String& outEventName) {
+  EventOutput* findEventOutputByName(const String& nameOfEventOutput) {
     for (std::list<EventOutput*>::iterator it = eventOutputs.begin();
          it != eventOutputs.end(); ++it) {
-      if ((*it)->getName().equals(outEventName)) {
+      if ((*it)->getName().equals(nameOfEventOutput)) {
         return *it;
       }
     }
     return nullptr;
   }
-  InputVariable* findInVariableByName(const String& inVariableName) {
+  InputVariable* findInputVariableByName(const String& nameOfInputVariable) {
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
-      if ((*it)->getName().equals(inVariableName)) {
+      if ((*it)->getName().equals(nameOfInputVariable)) {
         return *it;
       }
     }
     return nullptr;
   }
-  OutputVariable* findOutVariableByName(const String& outVariableName) {
+  OutputVariable* findOutputVariableByName(const String& nameOfOutputVariable) {
     for (std::list<OutputVariable*>::iterator it = outputVariables.begin();
          it != outputVariables.end(); ++it) {
-      if ((*it)->getName().equals(outVariableName)) {
+      if ((*it)->getName().equals(nameOfOutputVariable)) {
         return *it;
       }
     }
@@ -134,9 +134,9 @@ class FBType : public NamedObject {
   // ====================== Constructor: adding =========================
   // eg: SInt
   template <class TDataBox>
-  Vi<TDataBox>* addInVariable(const char* name) {
+  Vi<TDataBox>* addInputVariable(const char* nameOfInputVariable) {
     // push a inVariable to std::list<InputVariable*> inputVariables!
-    Vi<TDataBox>* inVariable = new Vi<TDataBox>(name);
+    Vi<TDataBox>* inVariable = new Vi<TDataBox>(nameOfInputVariable);
     if (inVariable) {
       inputVariables.push_back(inVariable);
       return inVariable;
@@ -145,9 +145,9 @@ class FBType : public NamedObject {
   }
   // eg: SInt
   template <class TDataBox>
-  Vo<TDataBox>* addOutVariable(const char* name) {
+  Vo<TDataBox>* addOutputVariable(const char* nameOfOutputVariable) {
     // push a outVariable to std::list<OutputVariable*> outputVariables!
-    Vo<TDataBox>* outVariable = new Vo<TDataBox>(name);  // OutputVariable
+    Vo<TDataBox>* outVariable = new Vo<TDataBox>(nameOfOutputVariable);  // OutputVariable
     if (outVariable) {
       outputVariables.push_back(outVariable);
       return outVariable;
@@ -157,35 +157,35 @@ class FBType : public NamedObject {
 
   // eg: EVENT_ANY, ...
   // template <class TEventType>
-  EventInput* addInEvent(const char* name, const char* inVariableNames[],
+  EventInput* addEventInput(const char* nameOfEventInput, const char* inputVariableNames[],
                          int sizeofInVariables) {
-    EventInput* inEvent = new EventInput(*this, name);
+    EventInput* inEvent = new EventInput(*this, nameOfEventInput);
     if (inEvent) {
       bool result =
-          inEvent->addInVariablesByNames(inVariableNames, sizeofInVariables);
+          inEvent->addInVariablesByNames(inputVariableNames, sizeofInVariables);
       // add eventInputs ot std::list<EventInput*> eventInputs;
       if (result) {
         eventInputs.push_back(inEvent);
         return inEvent;
       } else {
         // TODO: printf (ERROR, "It fail for calling
-        // addInVariablesByNames(EventInput[%s])!", name);
+        // addInVariablesByNames(EventInput[%s])!", nameOfEventInput);
         delete inEvent;
         return nullptr;
       }
     } else {
-      // TODO: printf (ERROR, "It fail for adding EventInput[%s]!", name);
+      // TODO: printf (ERROR, "It fail for adding EventInput[%s]!", nameOfEventInput);
       return nullptr;
     }
   }
   // eg: EVENT_ANY, ...
   // template <class TEventType>
-  EventOutput* addOutEvent(const char* name, const char* outVariableNames[],
+  EventOutput* addEventOutput(const char* nameOfEventOutput, const char* outputVariableNames[],
                            int sizeofOutVariables) {
     // TODO: ...
-    EventOutput* outEvent = new EventOutput(*this, name);
+    EventOutput* outEvent = new EventOutput(*this, nameOfEventOutput);
     if (outEvent) {
-      bool result = outEvent->addOutVariablesByNames(outVariableNames,
+      bool result = outEvent->addOutVariablesByNames(outputVariableNames,
                                                      sizeofOutVariables);
       // add outEvent to std::list<EventOutput*> eventOutputs;
       if (result) {
@@ -193,12 +193,12 @@ class FBType : public NamedObject {
         return outEvent;
       } else {
         // TODO: printf (ERROR, "It fail for calling
-        // addOutVariablesByNames(EventInput[%s])!", name);
+        // addOutVariablesByNames(EventInput[%s])!", nameOfEventOutput);
         delete outEvent;
         return nullptr;
       }
     } else {
-      // TODO: printf (ERROR, "It fail for adding addOutEvent[%s]!", name);
+      // TODO: printf (ERROR, "It fail for adding addEventOutput[%s]!", nameOfEventOutput);
       return nullptr;
     }
   }
@@ -278,10 +278,10 @@ class BasicFBType : public FBType {
   }
 
   InternalVariable* findInternalVariableByName(
-      const String& internalVariableName) {
+      const String& nameOfInternalVariable) {
     for (std::list<InternalVariable*>::iterator it = internalVariables.begin();
          it != internalVariables.end(); ++it) {
-      if ((*it)->getName().equals(internalVariableName)) {
+      if ((*it)->getName().equals(nameOfInternalVariable)) {
         return *it;
       }
     }
@@ -290,10 +290,10 @@ class BasicFBType : public FBType {
 
   // eg: SInt
   template <class TDataBox>
-  Vt<TDataBox>* addInternalVariable(const char* name) {
+  Vt<TDataBox>* addInternalVariable(const char* nameOfInternalVariable) {
     // push a internalVariable to std::list<InternalVariable*>
     // internalVariables!
-    Vt<TDataBox>* internalVariable = new Vt<TDataBox>(name);
+    Vt<TDataBox>* internalVariable = new Vt<TDataBox>(nameOfInternalVariable);
     if (internalVariable) {
       internalVariables.push_back(internalVariable);
       return internalVariable;

@@ -23,11 +23,11 @@ class WebPortal : public SIFBType {
     Vt<Bool>* tvOnOff = addInternalVariable<Bool>(WebPortal::TV_ONOFF);
     tvOnOff->getDataBox().setData(true);
 
-    /*Vo<Bool>* ovOnOff =*/addOutVariable<Bool>(WebPortal::OV_ONOFF);
+    /*Vo<Bool>* ovOnOff =*/addOutputVariable<Bool>(WebPortal::OV_ONOFF);
 
     {
       const char* outVariableNames[] = {WebPortal::OV_ONOFF};
-      /*EventOutput* oeControl =*/addOutEvent(WebPortal::OE_CONTROL,
+      /*EventOutput* oeControl =*/addEventOutput(WebPortal::OE_CONTROL,
                                               outVariableNames,
                                               ARRAY_SIZE(outVariableNames));
     }
@@ -52,8 +52,8 @@ class WebPortal : public SIFBType {
 
     if (time - lasttime > 10 * 1000) {
       EventOutput* oeControl =
-          (EventOutput*)findOutEventByName(WebPortal::OE_CONTROL);
-      Vo<Bool>* ovOnOff = (Vo<Bool>*)findOutVariableByName(WebPortal::OV_ONOFF);
+          (EventOutput*)findEventOutputByName(WebPortal::OE_CONTROL);
+      Vo<Bool>* ovOnOff = (Vo<Bool>*)findOutputVariableByName(WebPortal::OV_ONOFF);
       Vt<Bool>* tvOnOff =
           (Vt<Bool>*)findInternalVariableByName(WebPortal::TV_ONOFF);
       if (tvOnOff && ovOnOff && oeControl) {
@@ -85,11 +85,11 @@ class Relay : public BasicFBType {
   static const char* IE_CONTROL;
 
   Relay() : BasicFBType(Relay::FB_TYPE_NAME) {
-    /*Vi<Bool>* ivOnOff =*/addInVariable<Bool>(Relay::IV_ONOFF);
+    /*Vi<Bool>* ivOnOff =*/addInputVariable<Bool>(Relay::IV_ONOFF);
 
     {
       const char* inVariableNames[] = {Relay::IV_ONOFF};
-      /*EventInput* ieControl =*/addInEvent(Relay::IE_CONTROL, inVariableNames,
+      /*EventInput* ieControl =*/addEventInput(Relay::IE_CONTROL, inVariableNames,
                                             ARRAY_SIZE(inVariableNames));
     }
   }
@@ -97,7 +97,7 @@ class Relay : public BasicFBType {
 
   void executeEventInput(EventInput& inEvent) {
     if (inEvent.getName().equals(Relay::IE_CONTROL)) {
-      Vi<Bool>* ivOnOff = (Vi<Bool>*)findInVariableByName(Relay::IV_ONOFF);
+      Vi<Bool>* ivOnOff = (Vi<Bool>*)findInputVariableByName(Relay::IV_ONOFF);
       EventInput* ieControl = &inEvent;
       if (ivOnOff) {
         BOOL* onOff = ivOnOff->getDataBox().getData();

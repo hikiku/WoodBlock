@@ -19,12 +19,12 @@ class WebPortal : public SIFBType {
   static const char* IE_OCCUPY;
 
   WebPortal() : SIFBType(WebPortal::FB_TYPE_NAME) {
-    /*Vi<Bool>* ivStatus =*/addInVariable<Bool>(WebPortal::IV_STATUS);
+    /*Vi<Bool>* ivStatus =*/addInputVariable<Bool>(WebPortal::IV_STATUS);
 
     {
       const char* outVariableNames[] = {WebPortal::IV_STATUS};
       /*EventInput* ieOccupy =*/
-      addInEvent(WebPortal::IE_OCCUPY, outVariableNames,
+      addEventInput(WebPortal::IE_OCCUPY, outVariableNames,
                  ARRAY_SIZE(outVariableNames));
     }
   }
@@ -34,7 +34,7 @@ class WebPortal : public SIFBType {
     if (inEvent.getName().equals(WebPortal::IE_OCCUPY)) {
       EventInput* ieOccupy = &inEvent;
       Vi<Bool>* ivStatus =
-          (Vi<Bool>*)findInVariableByName(WebPortal::IV_STATUS);
+          (Vi<Bool>*)findInputVariableByName(WebPortal::IV_STATUS);
       if (ivStatus) {
         BOOL* status = ivStatus->getDataBox().getData();
         if (status) {
@@ -69,12 +69,12 @@ class OccupySensor : public SIFBType {
     Vt<Bool>* tvStatus = addInternalVariable<Bool>(OccupySensor::TV_STATUS);
     tvStatus->getDataBox().setData(false);
 
-    /*Vo<Bool>* ovStatus =*/addOutVariable<Bool>(OccupySensor::OV_STATUS);
+    /*Vo<Bool>* ovStatus =*/addOutputVariable<Bool>(OccupySensor::OV_STATUS);
 
     {
       const char* outVariableNames[] = {OccupySensor::OV_STATUS};
       /*EventOutput* oeOccupy =*/
-      addOutEvent(OccupySensor::OE_OCCUPY, outVariableNames,
+      addEventOutput(OccupySensor::OE_OCCUPY, outVariableNames,
                   ARRAY_SIZE(outVariableNames));
     }
   }
@@ -98,9 +98,9 @@ class OccupySensor : public SIFBType {
 
     if (time - lasttime > 10 * 1000) {
       EventOutput* oeOccupy =
-          (EventOutput*)findOutEventByName(OccupySensor::OE_OCCUPY);
+          (EventOutput*)findEventOutputByName(OccupySensor::OE_OCCUPY);
       Vo<Bool>* ovStatus =
-          (Vo<Bool>*)findOutVariableByName(OccupySensor::OV_STATUS);
+          (Vo<Bool>*)findOutputVariableByName(OccupySensor::OV_STATUS);
       Vt<Bool>* tvStatus =
           (Vt<Bool>*)findInternalVariableByName(OccupySensor::TV_STATUS);
       if (oeOccupy && ovStatus && tvStatus) {

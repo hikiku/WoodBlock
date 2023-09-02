@@ -179,8 +179,8 @@ class FBNetwork {
                     const char* inEventName, const char* inVariableNames[],
                     int sizeofVariables) {
     bool result = true;
-    EventOutput* outEvent = sourceFBInstance.getFBType().findOutEventByName(outEventName);
-    EventInput* inEvent = destFBInstance.getFBType().findInEventByName(inEventName);
+    EventOutput* outEvent = sourceFBInstance.getFBType().findEventOutputByName(outEventName);
+    EventInput* inEvent = destFBInstance.getFBType().findEventInputByName(inEventName);
     if (!outEvent) {
       //// printf(ERROR, "It Can't find EventOutput by name %s!\n",
       /// outEventName)
@@ -216,9 +216,9 @@ class FBNetwork {
     // match
     for (int i = 0; i < sizeofVariables; i++) {
       OutputVariable* outVariable =
-          outEvent->findOutVariableByName(outVariableNames[i]);
+          outEvent->findOutputVariableByName(outVariableNames[i]);
       InputVariable* inVariable =
-          inEvent->findInVariableByName(inVariableNames[i]);
+          inEvent->findInputVariableByName(inVariableNames[i]);
 
       if (!outVariable) {
         Serial.printf(
@@ -254,9 +254,9 @@ class FBNetwork {
     // connect inputVariables from outputVariables
     for (int i = 0; i < sizeofVariables; i++) {
       OutputVariable* outVariable =
-          outEvent->findOutVariableByName(outVariableNames[i]);
+          outEvent->findOutputVariableByName(outVariableNames[i]);
       InputVariable* inVariable =
-          inEvent->findInVariableByName(inVariableNames[i]);
+          inEvent->findInputVariableByName(inVariableNames[i]);
 
       if (!outVariable) {
         //// printf(ERROR, "Connect: It Can't find OutputVariable by name
