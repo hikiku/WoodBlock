@@ -17,26 +17,27 @@
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class FBType;
-class EventInput;
-class EventOutput;
-
 // Event Type
 #define EVENT_ANY (0)
 #define EVENT_USER_EXTENDED_BASE (10000)
 
 class FBNetwork;
-class EventInput;
 class EventConnection;
+class FBInstance;
 
-typedef OutputVariable* (*SearchOutDataCallback)(
-    FBNetwork& fbNetwork, EventConnection& eventConnect,
-    EventInput& eventInput, InputVariable& inputVariable);
+class FBType;
+class EventInput;
+class EventOutput;
+
+typedef OutputVariable* (*SearchOutDataCallback)(FBNetwork& fbNetwork,
+                                                 EventConnection& eventConnect,
+                                                 FBInstance& fbInstance,
+                                                 EventInput& eventInput,
+                                                 InputVariable& inputVariable);
 
 class Event : public NamedObject {
  public:
-  Event(FBType& owner, const String& name,
-        unsigned int eventType = EVENT_ANY)
+  Event(FBType& owner, const String& name, unsigned int eventType = EVENT_ANY)
       : NamedObject(name), owner(owner), eventType(eventType) {}
   virtual ~Event() {}  // TODO: = 0;
 
@@ -45,7 +46,7 @@ class Event : public NamedObject {
   }
 
  protected:
-  FBType& getFBInstance() {
+  FBType& getOwner() {
     return owner;
   }
 
@@ -110,23 +111,23 @@ class EventInput : public Event {
 
   // void trigger();
 
-  void _sample(FBNetwork& fbNetwork,
-               EventConnection& eventConnect,
+  void _sample(FBNetwork& fbNetwork, EventConnection& eventConnect,
+               FBInstance& fbInstance,
                SearchOutDataCallback searchOutDataCallback) {
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
       OutputVariable* outputVariable =
-          searchOutDataCallback(fbNetwork, eventConnect, *this, **it);
+          searchOutDataCallback(fbNetwork, eventConnect, fbInstance, *this, **it);
       // (*it)->sample(*outputVariable);  //**it = outputVariable
       (*it)->getDataBox() = outputVariable->getDataBox();
     }
   }
 
-  static void sample(FBNetwork& fbNetwork,
-                     EventConnection& eventConnect,
-                     EventInput& eventInput,
+  static void sample(FBNetwork& fbNetwork, EventConnection& eventConnect,
+                     FBInstance& fbInstance, EventInput& eventInput,
                      SearchOutDataCallback searchOutDataCallback) {
-    eventInput._sample(fbNetwork, eventConnect, searchOutDataCallback);
+    eventInput._sample(fbNetwork, eventConnect, fbInstance,
+                       searchOutDataCallback);
   }
 
  private:

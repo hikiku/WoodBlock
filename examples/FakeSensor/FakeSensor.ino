@@ -14,8 +14,8 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType,
 
 class WebPortal : public SIFBType {
  public:
-  WebPortal(const char* name)
-      : SIFBType(name), ivStatus(nullptr), ieOccupy(nullptr) {
+  WebPortal()
+      : SIFBType("WebPortal"), ivStatus(nullptr), ieOccupy(nullptr) {
     ivStatus = addInVariable<Bool>("Status");
     {
       const char* outVariableNames[] = {"Status"};
@@ -53,8 +53,8 @@ class WebPortal : public SIFBType {
 
 class OccupySensor : public SIFBType {
  public:
-  OccupySensor(const char* name)
-      : SIFBType(name),
+  OccupySensor()
+      : SIFBType("OccupySensor"),
         ovStatus(nullptr),
         oeOccupy(nullptr),
         status(false) {
@@ -108,17 +108,17 @@ class OccupySensor : public SIFBType {
   bool status;
 };
 
-OccupySensor occupySensor("OccupySensor");
-WebPortal webPortal("WebPortal");
-
 FBNetwork fbNetwork;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  fbNetwork.attachSifbInstance(occupySensor);
-  fbNetwork.attachSifbInstance(webPortal);
+  FBInstance* occupySensor = FBInstance::create<OccupySensor>("OccupySensor");
+  FBInstance* webPortal = FBInstance::create<WebPortal>("WebPortal");
+
+  fbNetwork.attachFBInstance(occupySensor);
+  fbNetwork.attachFBInstance(webPortal);
 
   {
     const char* outVariableNames[] = {"Status"};

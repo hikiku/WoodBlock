@@ -18,10 +18,10 @@
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class FBNetwork;
-class FBType;
+class FBInstance;
 
 typedef void (*HandleEventOutputCallback)(FBNetwork& fbNetwork,
-                                          FBType& fbInstance,
+                                          FBInstance& fbInstance,
                                           EventOutput& eventOutput);
 
 // TODO: FBType：Plug, Socket, Service. create a FBInstance from CompiledCode
@@ -206,14 +206,18 @@ class FBType : public NamedObject {
 
   // ====================== Normal: running =========================
   void processEventInput(FBNetwork& fbNetwork, EventConnection& eventConnect,
-                         EventInput& eventInput,
+                         FBInstance& fbInstance, EventInput& eventInput,
                          SearchOutDataCallback searchOutDataCallback,
                          HandleEventOutputCallback handleEventOutputCallback) {
-    EventInput::sample(fbNetwork, eventConnect, eventInput,
+    EventInput::sample(fbNetwork, eventConnect, fbInstance, eventInput,
                        searchOutDataCallback);
     executeEventInput(eventInput);  // execution ecc
-    handleAllOfEventOutputs(fbNetwork, handleEventOutputCallback);
+    handleAllOfEventOutputs(fbNetwork, fbInstance, handleEventOutputCallback);
   }
+
+  virtual bool fetchExternalEvents(
+      FBNetwork& fbNetwork, FBInstance& fbInstance,
+      HandleEventOutputCallback handleEventOutputCallback) = 0;
 
   void clearTriggeredEventOutputs() {
     triggeredEventOutputs.clear();
@@ -238,11 +242,11 @@ class FBType : public NamedObject {
   }
 
   void handleAllOfEventOutputs(
-      FBNetwork& fbNetwork,
+      FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
     for (std::list<EventOutput*>::iterator it = triggeredEventOutputs.begin();
          it != triggeredEventOutputs.end();) {
-      handleEventOutputCallback(fbNetwork, *this, **it);
+      handleEventOutputCallback(fbNetwork, fbInstance, **it);
       it = triggeredEventOutputs.erase(it);  // it++;
     }
   }
@@ -265,6 +269,16 @@ class FBType : public NamedObject {
 
 class BasicFBType : public FBType {
   // TODO:
+ public:
+  BasicFBType(const char* name) : FBType(name) {} 
+  // TODO: add callback of eventoutputs
+  bool fetchExternalEvents(
+      FBNetwork& fbNetwork, FBInstance& fbInstance,
+      HandleEventOutputCallback handleEventOutputCallback) {
+    return true;
+  }
+
+ private:
   // TODO: std::list<InternalVariable> internalVariables; // 0..*
   // TODO: ECC ecc; // 0..1
   // TODO: Algorithm algorithm; // 0..1
@@ -272,6 +286,17 @@ class BasicFBType : public FBType {
 
 class CompositeFBType : public FBType {
   // TODO:
+ public:
+  CompositeFBType(const char* name) : FBType(name) {} 
+
+  // TODO: add callback of eventoutputs
+  bool fetchExternalEvents(
+      FBNetwork& fbNetwork, FBInstance& fbInstance,
+      HandleEventOutputCallback handleEventOutputCallback) {
+    return true;
+  }
+
+ private:
   // TODO: FBNetwork: fbNetwork; // 1..1 // fb_instance_list &&
   // fb_connection_list
 };
@@ -291,11 +316,11 @@ class SIFBType : public FBType {
 
   // TODO: add callback of eventoutputs
   bool fetchExternalEvents(
-      FBNetwork& fbNetwork,
+      FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
     bool result = captureAndExecuteServiceInterfaceInEvent();  // execution ecc
     if (result) {
-      handleAllOfEventOutputs(fbNetwork, handleEventOutputCallback);
+      handleAllOfEventOutputs(fbNetwork, fbInstance, handleEventOutputCallback);
     }
     return true;
   }

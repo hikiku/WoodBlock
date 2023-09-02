@@ -14,11 +14,8 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType,
 
 class WebPortal : public SIFBType {
  public:
-  WebPortal(const char* name)
-      : SIFBType(name),
-        ovOnOff(nullptr),
-        oeControl(nullptr),
-        onOff(nullptr) {
+  WebPortal()
+      : SIFBType("WebPortal"), ovOnOff(nullptr), oeControl(nullptr), onOff(nullptr) {
     ovOnOff = addOutVariable<Bool>("OnOff");
     {
       const char* outVariableNames[] = {"OnOff"};
@@ -38,7 +35,7 @@ class WebPortal : public SIFBType {
             // with SNTP response!
     long unsigned int time =
         millis();  //(uint32_t)std::time(0); //Fixed bug: std::time(0) is
-                   //changed with SNTP response!
+                   // changed with SNTP response!
 
     if (lasttime == 0) {
       lasttime = time + 5 * 1000;
@@ -69,9 +66,9 @@ class WebPortal : public SIFBType {
   bool onOff;
 };
 
-class Relay : public FBType {
- public:
-  Relay(const char* name) : FBType(name) {
+class Relay : public BasicFBType {
+ public: 
+  Relay() : BasicFBType("Relay") {
     ivOnOff = addInVariable<Bool>("OnOff");
     {
       const char* inVariableNames[] = {"OnOff"};
@@ -104,9 +101,6 @@ class Relay : public FBType {
   EventInput* ieControl;
 };
 
-Relay relay("Relay");
-WebPortal webPortal("WebPortal");
-
 FBNetwork fbNetwork;
 
 Vi<Time> myTime();
@@ -115,15 +109,17 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
+  FBInstance* relay = FBInstance::create<Relay>("Relay");
+  FBInstance* webPortal = FBInstance::create<WebPortal>("WebPortal");
   fbNetwork.attachFBInstance(relay);
-  fbNetwork.attachSifbInstance(webPortal);
+  fbNetwork.attachFBInstance(webPortal);
 
   {
     const char* outVariableNames[] = {"OnOff"};
     const char* inVariableNames[] = {"OnOff"};
     fbNetwork.connect("WebPortal", "Control", outVariableNames,
-                           ARRAY_SIZE(outVariableNames), "Relay", "Control",
-                           inVariableNames, ARRAY_SIZE(inVariableNames));
+                      ARRAY_SIZE(outVariableNames), "Relay", "Control",
+                      inVariableNames, ARRAY_SIZE(inVariableNames));
   }
 }
 

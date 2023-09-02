@@ -15,6 +15,8 @@
 #include <WoodBlock/Core/ManagedObject.h>
 #include <WoodBlock/Core/Variable.h>
 
+#include <WoodBlock/Core/FBInstance.h>
+
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class ManagedConnection : public ManagedObject {
@@ -23,21 +25,21 @@ class ManagedConnection : public ManagedObject {
 
 class EventConnection : public ManagedConnection {
  public:
-  EventConnection(FBType* sourceFBInstance, EventOutput* sourceEvent,
-                  FBType* destFBInstance, EventInput* destEvent)
+  EventConnection(FBInstance* sourceFBInstance, EventOutput* sourceEvent,
+                  FBInstance* destFBInstance, EventInput* destEvent)
       : sourceFBInstance(sourceFBInstance),
         sourceEvent(sourceEvent),
         destFBInstance(destFBInstance),
         destEvent(destEvent) {}
 
-  FBType* getSourceFBInstance() {
+  FBInstance* getSourceFBInstance() {
     return sourceFBInstance;
   }
   EventOutput* getSourceEvent() {
     return sourceEvent;
   }
 
-  FBType* getDestinationFBInstance() {
+  FBInstance* getDestinationFBInstance() {
     return destFBInstance;
   }
   EventInput* getDestinationEvent() {
@@ -45,10 +47,10 @@ class EventConnection : public ManagedConnection {
   };
 
  private:
-  FBType* sourceFBInstance;
+  FBInstance* sourceFBInstance;
   EventOutput* sourceEvent;  // from / source // outEvent
 
-  FBType* destFBInstance;
+  FBInstance* destFBInstance;
   EventInput* destEvent;  // to / destination // inEvent
 };
 

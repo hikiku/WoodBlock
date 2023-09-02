@@ -14,8 +14,8 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType,
 
 class WebPortal : public SIFBType {
  public:
-  WebPortal(const char* name)
-      : SIFBType(name),
+  WebPortal()
+      : SIFBType("WebPortal"),
         ivStatus(nullptr),
         ieOccupy(nullptr),
         ovOnOff(nullptr),
@@ -60,7 +60,7 @@ class WebPortal : public SIFBType {
             // with SNTP response!
     long unsigned int time =
         millis();  //(uint32_t)std::time(0); //Fixed bug: std::time(0) is
-                   //changed with SNTP response!
+                   // changed with SNTP response!
 
     if (lasttime == 0) {
       lasttime = time + 5 * 1000;
@@ -96,8 +96,8 @@ class WebPortal : public SIFBType {
 
 class OccupySensor : public SIFBType {
  public:
-  OccupySensor(const char* name)
-      : SIFBType(name),
+  OccupySensor()
+      : SIFBType("OccupySensor"),
         ovStatus(nullptr),
         oeOccupy(nullptr),
         status(false) {
@@ -120,7 +120,7 @@ class OccupySensor : public SIFBType {
             // with SNTP response!
     long unsigned int time =
         millis();  //(uint32_t)std::time(0); //Fixed bug: std::time(0) is
-                   //changed with SNTP response!
+                   // changed with SNTP response!
 
     if (lasttime == 0) {
       lasttime = time;
@@ -151,9 +151,9 @@ class OccupySensor : public SIFBType {
   bool status;
 };
 
-class Relay : public FBType {
+class Relay : public BasicFBType {
  public:
-  Relay(const char* name) : FBType(name) {
+  Relay() : BasicFBType("Relay") {
     ivOnOff = addInVariable<Bool>("OnOff");
     {
       const char* inVariableNames[] = {"OnOff"};
@@ -186,34 +186,34 @@ class Relay : public FBType {
   EventInput* ieControl;
 };
 
-Relay relay("Relay");
-OccupySensor occupySensor("OccupySensor");
-WebPortal webPortal("WebPortal");
-
 FBNetwork fbNetwork;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
+  FBInstance* relay = FBInstance::create<Relay>("Relay");
+  FBInstance* occupySensor = FBInstance::create<OccupySensor>("OccupySensor");
+  FBInstance* webPortal = FBInstance::create<WebPortal>("WebPortal");
+
   fbNetwork.attachFBInstance(relay);
-  fbNetwork.attachSifbInstance(occupySensor);
-  fbNetwork.attachSifbInstance(webPortal);
+  fbNetwork.attachFBInstance(occupySensor);
+  fbNetwork.attachFBInstance(webPortal);
 
   {
     const char* outVariableNames[] = {"Status"};
     const char* inVariableNames[] = {"Status"};
 
     fbNetwork.connect("OccupySensor", "Occupy", outVariableNames,
-                           ARRAY_SIZE(outVariableNames), "WebPortal", "Occupy",
-                           inVariableNames, ARRAY_SIZE(inVariableNames));
+                      ARRAY_SIZE(outVariableNames), "WebPortal", "Occupy",
+                      inVariableNames, ARRAY_SIZE(inVariableNames));
   }
   {
     const char* outVariableNames[] = {"OnOff"};
     const char* inVariableNames[] = {"OnOff"};
     fbNetwork.connect("WebPortal", "Control", outVariableNames,
-                           ARRAY_SIZE(outVariableNames), "Relay", "Control",
-                           inVariableNames, ARRAY_SIZE(inVariableNames));
+                      ARRAY_SIZE(outVariableNames), "Relay", "Control",
+                      inVariableNames, ARRAY_SIZE(inVariableNames));
   }
 }
 

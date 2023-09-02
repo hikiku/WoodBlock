@@ -12,7 +12,7 @@ bool EventInput::addInVariableByName(const char* inVariableName) {
   if (!result) {
     return false;
   } else {
-    InputVariable* inData = getFBInstance().findInVariableByName(inVariableName);
+    InputVariable* inData = getOwner().findInVariableByName(inVariableName);
     inputVariables.push_back(inData);
     return true;
   }
@@ -30,7 +30,7 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
     return false;
   }
 
-  InputVariable* inData = getFBInstance().findInVariableByName(inVariableName);
+  InputVariable* inData = getOwner().findInVariableByName(inVariableName);
   if (!inData) {
     // TODO: printf (WARNING, "Don't find InVariable by  inVariableName(%s)!",
     // inVariableName);
@@ -41,7 +41,7 @@ bool EventInput::check4AddingInVariableByName(const char* inVariableName) {
 }
 
 // void EventInput::trigger() {
-//   getFBInstance().processEventInput(*this);
+//   getOwner().processEventInput(*this);
 // }
 
 bool EventOutput::addOutVariableByName(const char* outVariableName) {
@@ -49,7 +49,7 @@ bool EventOutput::addOutVariableByName(const char* outVariableName) {
   if (!result) {
     return false;
   } else {
-    OutputVariable* outData = getFBInstance().findOutVariableByName(outVariableName);
+    OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
     outputVariables.push_back(outData);
     return true;
   }
@@ -67,7 +67,7 @@ bool EventOutput::check4AddingOutVariableByName(const char* outVariableName) {
     return false;
   }
 
-  OutputVariable* outData = getFBInstance().findOutVariableByName(outVariableName);
+  OutputVariable* outData = getOwner().findOutVariableByName(outVariableName);
   if (!outData) {
     // TODO: printf (WARNING, "Don't find OutVariable by  outVariableName(%s)!",
     // outVariableName);
