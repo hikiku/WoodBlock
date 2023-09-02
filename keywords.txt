@@ -7,9 +7,9 @@
 #######################################
 
 FBNetwork	        KEYWORD1	FBNetwork
-FBInstance		    KEYWORD1	FBInstance
+FBType		        KEYWORD1	FBType
 EventInput          KEYWORD1	EventInput
-EventOutput          KEYWORD1	EventOutput
+EventOutput         KEYWORD1	EventOutput
 InputVariable		KEYWORD1	InputVariable
 OutputVariable		KEYWORD1	OutputVariable
 

@@ -12,10 +12,10 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType,
   return false;
 }
 
-class WebPortal : public ServiceInterfaceBlock {
+class WebPortal : public SIFBType {
  public:
   WebPortal(const char* name)
-      : ServiceInterfaceBlock(name),
+      : SIFBType(name),
         ovOnOff(nullptr),
         oeControl(nullptr),
         onOff(nullptr) {
@@ -69,9 +69,9 @@ class WebPortal : public ServiceInterfaceBlock {
   bool onOff;
 };
 
-class Relay : public FBInstance {
+class Relay : public FBType {
  public:
-  Relay(const char* name) : FBInstance(name) {
+  Relay(const char* name) : FBType(name) {
     ivOnOff = addInVariable<Bool>("OnOff");
     {
       const char* inVariableNames[] = {"OnOff"};

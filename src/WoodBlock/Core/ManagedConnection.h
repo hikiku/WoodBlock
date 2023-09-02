@@ -23,21 +23,21 @@ class ManagedConnection : public ManagedObject {
 
 class EventConnection : public ManagedConnection {
  public:
-  EventConnection(FBInstance* sourceFBInstance, EventOutput* sourceEvent,
-                  FBInstance* destFBInstance, EventInput* destEvent)
+  EventConnection(FBType* sourceFBInstance, EventOutput* sourceEvent,
+                  FBType* destFBInstance, EventInput* destEvent)
       : sourceFBInstance(sourceFBInstance),
         sourceEvent(sourceEvent),
         destFBInstance(destFBInstance),
         destEvent(destEvent) {}
 
-  FBInstance* getSourceFBInstance() {
+  FBType* getSourceFBInstance() {
     return sourceFBInstance;
   }
   EventOutput* getSourceEvent() {
     return sourceEvent;
   }
 
-  FBInstance* getDestinationFBInstance() {
+  FBType* getDestinationFBInstance() {
     return destFBInstance;
   }
   EventInput* getDestinationEvent() {
@@ -45,10 +45,10 @@ class EventConnection : public ManagedConnection {
   };
 
  private:
-  FBInstance* sourceFBInstance;
+  FBType* sourceFBInstance;
   EventOutput* sourceEvent;  // from / source // outEvent
 
-  FBInstance* destFBInstance;
+  FBType* destFBInstance;
   EventInput* destEvent;  // to / destination // inEvent
 };
 

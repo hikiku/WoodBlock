@@ -1,4 +1,4 @@
-// FBInstance - https://hikiku.io
+// FBType - https://hikiku.io
 // Copyright © 2023, HiKiku
 // MIT License
 
@@ -11,7 +11,7 @@
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
 
-#include <WoodBlock/Core/FBInstance.h>
+#include <WoodBlock/Core/FBType.h>
 #include <WoodBlock/Core/ManagedConnection.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
@@ -34,16 +34,16 @@ class FBNetwork {
     }
     eventConnections.clear();
 
-    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
+    for (std::list<FBType*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       delete *it;
     }
     fbInstances.clear();
   }
 
-  FBInstance* findFBInstanceByName(const String& fbInstanceName) {
-    // std::list<FBInstance*> fbInstances;
-    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
+  FBType* findFBInstanceByName(const String& fbInstanceName) {
+    // std::list<FBType*> fbInstances;
+    for (std::list<FBType*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       if ((*it)->getName().equals(fbInstanceName)) {
         return *it;
@@ -51,14 +51,14 @@ class FBNetwork {
     }
     return nullptr;
   }
-  // Note: Don't delete a managed FBInstance directly. Please call
+  // Note: Don't delete a managed FBType directly. Please call
   // detachAndDeleteFBInstance()!
-  bool attachFBInstance(FBInstance& functionBlock) {
+  bool attachFBInstance(FBType& functionBlock) {
     fbInstances.push_back(&functionBlock);
     return true;
   }
   bool detachAndDeleteFBInstance(const String& fbInstanceName) {
-    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
+    for (std::list<FBType*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       if ((*it)->getName().equals(fbInstanceName)) {
         disconnectFBInstance(**it);
@@ -70,8 +70,8 @@ class FBNetwork {
     return false;
   }
 
-  FBInstance* findSifbInstanceByName(const String& sifbInstanceName) {
-    for (std::list<ServiceInterfaceBlock*>::iterator it = sifbInstances.begin();
+  FBType* findSifbInstanceByName(const String& sifbInstanceName) {
+    for (std::list<SIFBType*>::iterator it = sifbInstances.begin();
          it != sifbInstances.end(); ++it) {
       if ((*it)->getName().equals(sifbInstanceName)) {
         return *it;
@@ -79,14 +79,14 @@ class FBNetwork {
     }
     return nullptr;
   }
-  // Note: Don't delete a managed ServiceInterfaceBlock directly. Please call
+  // Note: Don't delete a managed SIFBType directly. Please call
   // detachAndDeleteSifbInstance()!
-  bool attachSifbInstance(ServiceInterfaceBlock& sifbInstance) {
+  bool attachSifbInstance(SIFBType& sifbInstance) {
     sifbInstances.push_back(&sifbInstance);
     return attachFBInstance(sifbInstance);
   }
   bool detachAndDeleteSifbInstance(const String& sifbInstanceName) {
-    for (std::list<ServiceInterfaceBlock*>::iterator it = sifbInstances.begin();
+    for (std::list<SIFBType*>::iterator it = sifbInstances.begin();
          it != sifbInstances.end(); ++it) {
       if ((*it)->getName().equals(sifbInstanceName)) {
         sifbInstances.erase(it);  // it =
@@ -109,8 +109,8 @@ class FBNetwork {
     WB_CHECK_EXP_RETURN_VALUE((sizeofInVariables <= 0), false);
     WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables != sizeofInVariables), false);
 
-    FBInstance* sourceFBInstance = findFBInstanceByName(srcFBName);
-    FBInstance* destFBInstance = findFBInstanceByName(destFBName);
+    FBType* sourceFBInstance = findFBInstanceByName(srcFBName);
+    FBType* destFBInstance = findFBInstanceByName(destFBName);
     if (sourceFBInstance == nullptr) {
       // TODO: printf(WARNING, "sourceFBInstance is nullptr!");
       return false;
@@ -130,7 +130,7 @@ class FBNetwork {
   }
 
   void disconnect() {
-    for (std::list<FBInstance*>::iterator it = fbInstances.begin();
+    for (std::list<FBType*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       disconnectFBInstance(**it);
     }
@@ -138,7 +138,7 @@ class FBNetwork {
 
   // ====================== execute =========================
   static void handleEventOutputCallback(FBNetwork& fbNetwork,
-                                        FBInstance& fbInstance,
+                                        FBType& fbInstance,
                                         EventOutput& eventOutput) {
     //FBNetwork* _fbNetwork = (FBNetwork*)fbNetwork;
     fbNetwork._handleEventOutputCallback(fbInstance, eventOutput);
@@ -154,7 +154,7 @@ class FBNetwork {
 
   bool fetchExternalEvents() {
     bool result = false;
-    for (std::list<ServiceInterfaceBlock*>::iterator it = sifbInstances.begin();
+    for (std::list<SIFBType*>::iterator it = sifbInstances.begin();
          it != sifbInstances.end(); ++it) {
       result |= (*it)->fetchExternalEvents(*this, FBNetwork::handleEventOutputCallback);
     }
@@ -162,7 +162,7 @@ class FBNetwork {
   }
 
   // TODO: move to private
-  void _handleEventOutputCallback(FBInstance& fbInstance,
+  void _handleEventOutputCallback(FBType& fbInstance,
                                   EventOutput& eventOutput) {
     for (std::list<EventConnection*>::iterator it = eventConnections.begin();
          it != eventConnections.end(); ++it) {
@@ -191,8 +191,8 @@ class FBNetwork {
 
  private:
   // ====================== Constructor: connecting =========================
-  bool connectEvent(FBInstance& sourceFBInstance, const char* outEventName,
-                    const char* outVariableNames[], FBInstance& destFBInstance,
+  bool connectEvent(FBType& sourceFBInstance, const char* outEventName,
+                    const char* outVariableNames[], FBType& destFBInstance,
                     const char* inEventName, const char* inVariableNames[],
                     int sizeofVariables) {
     bool result = true;
@@ -362,7 +362,7 @@ class FBNetwork {
   }
 
   //////////////////////////////////////////////
-  void disconnectFBInstance(FBInstance& fbInstance) {
+  void disconnectFBInstance(FBType& fbInstance) {
     fbInstance.clearTriggeredEventOutputs();
 
     for (std::list<EventConnection*>::iterator it = eventConnections.begin();
@@ -393,12 +393,12 @@ class FBNetwork {
   }
 
   //////////////////////////////////////////////
-  std::list<FBInstance*> fbInstances;
+  std::list<FBType*> fbInstances;
   std::list<EventConnection*> eventConnections;
   std::list<DataConnection*> dataConnections;
   // TODO: std::List<AdapterConnection> adapterConnections
 
-  std::list<ServiceInterfaceBlock*> sifbInstances;
+  std::list<SIFBType*> sifbInstances;
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

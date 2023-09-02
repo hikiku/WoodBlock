@@ -3,7 +3,7 @@
 // MIT License
 
 #include <WoodBlock/Core/Event.h>
-#include <WoodBlock/Core/FBInstance.h>
+#include <WoodBlock/Core/FBType.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 

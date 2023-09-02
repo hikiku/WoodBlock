@@ -16,7 +16,7 @@
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class FBInstance;
+class FBType;
 class EventInput;
 class EventOutput;
 
@@ -34,7 +34,7 @@ typedef OutputVariable* (*SearchOutDataCallback)(
 
 class Event {
  public:
-  Event(FBInstance& owner, const String& name,
+  Event(FBType& owner, const String& name,
         unsigned int eventType = EVENT_ANY)
       : owner(owner), name(name), eventType(eventType) {}
   virtual ~Event() {}  // TODO: = 0;
@@ -46,19 +46,19 @@ class Event {
   }
 
  protected:
-  FBInstance& getFBInstance() {
+  FBType& getFBInstance() {
     return owner;
   }
 
  private:
-  FBInstance& owner;  // belongs to
+  FBType& owner;  // belongs to
   String name;
   unsigned int eventType;
 };
 
 class EventInput : public Event {
  public:
-  EventInput(FBInstance& owner, const char* name)
+  EventInput(FBType& owner, const char* name)
       : Event(owner, name), inputVariables() {}  //, outEvent(nullptr)
   ~EventInput() {}
 
@@ -163,7 +163,7 @@ class EventInput : public Event {
 
 class EventOutput : public Event {
  public:
-  EventOutput(FBInstance& owner, const char* name)
+  EventOutput(FBType& owner, const char* name)
       : Event(owner, name), outputVariables() {}  //, inEvent(nullptr)
   ~EventOutput() {
     outputVariables.clear();
