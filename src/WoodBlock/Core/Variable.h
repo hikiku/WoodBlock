@@ -22,20 +22,27 @@ class OutputVariable;
 class Variable : public NamedObject {
  public:
   Variable(const char* name) : NamedObject(name) {}
-  virtual ~Variable() {}  // TODO: = 0;
+  virtual ~Variable() {}
 
   virtual unsigned int getNumberOfDataType() const = 0;
   virtual DataBox& getDataBox() = 0;
-
- private:
 };
 
 class OutputVariable : public Variable {
  public:
   OutputVariable(const char* name) : Variable(name) {}
   // virtual ~OutputVariable() {}
+};
 
- private:
+class InputVariable : public Variable {
+ public:
+  InputVariable(const char* name) : Variable(name) {}
+  // virtual ~InputVariable() {}
+};
+
+class InternalVariable : public Variable {
+  InternalVariable(const char* name) : Variable(name) {}
+  // virtual ~InternalVariable() {}
 };
 
 // OutputVariableImpl<SInt>;
@@ -55,26 +62,6 @@ class OutputVariableImpl : public OutputVariable {
   TDataBox dataBox;
 };
 
-template <class TDataBox>
-using Vo = OutputVariableImpl<TDataBox>;
-
-class InputVariable : public Variable {
- public:
-  InputVariable(const char* name) : Variable(name) {}  //, outData(nullptr)
-  // virtual ~InputVariable() {}
-
-  // virtual bool sample(OutputVariable& outData) = 0;  // clone data from
-  // 'outData'
-
- protected:
-  // OutputVariable* getVariableOutput() {
-  //   return outData;
-  // }
-
- private:
-  // OutputVariable* outData;
-};
-
 // InputVariableImpl<SInt>, Vi<SInt>, ...
 template <class TDataBox>
 class InputVariableImpl : public InputVariable {
@@ -88,45 +75,8 @@ class InputVariableImpl : public InputVariable {
     return dataBox;
   }
 
-  // // TODO: depended on FBNewwork!!!!!!!!!!!!!!!
-  // // FROM: eg: OutputVariableImpl<SInt>, Vi<SInt>, ...
-  // // template <class FROM>
-  // // bool sample(FROM& outData)  // clone data from 'fromData'
-  // bool sample(OutputVariable& outData)
-  // {
-  //   // OutputVariable *outData = getVariableOutput();
-  //   // if (outData)
-  //   // {
-  //   //     dataBox.copy((TDataBox&)outData->getDataBox()); // TODO:
-  //   //     error!!!!!!!!!!!!!!!!!!!!!!!!! return true;
-  //   // }
-
-  //   // TODO: only same data type fields may be converted!
-  //   // OutputVariableImpl<TDataBox>* outData =
-  //   //     (OutputVariableImpl<TDataBox>*)getVariableOutput();
-  //     // return dataBox.copy(
-  //     //     outData.getDataBox());  // TODO: error!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  //     *(dataBox.getData()) = *(outData.getDataBox().getData());
-  //     return true;
-  // }
-
  private:
   TDataBox dataBox;
-};
-
-template <class TDataBox>
-using Vi = InputVariableImpl<TDataBox>;
-
-class InternalVariable : public Variable {
-  // TODO:
-
-  InternalVariable(const char* name) : Variable(name), internalData(nullptr) {}
-  // virtual ~InternalVariable() {}
-
- protected:
- private:
-  InternalVariable* internalData;
 };
 
 // InternalVariableImpl<SInt>, Vi<SInt>, ...
@@ -135,9 +85,22 @@ class InternalVariableImpl : public InternalVariable {
  public:
   InternalVariableImpl(const char* name) : InternalVariable(name), dataBox() {}
 
+  unsigned int getNumberOfDataType() const {
+    return dataBox.getNumberOfDataType();
+  }
+  TDataBox& getDataBox() {
+    return dataBox;
+  }
+
  private:
   TDataBox dataBox;
 };
+
+template <class TDataBox>
+using Vo = OutputVariableImpl<TDataBox>;
+
+template <class TDataBox>
+using Vi = InputVariableImpl<TDataBox>;
 
 template <class TDataBox>
 using Vt = InternalVariableImpl<TDataBox>;

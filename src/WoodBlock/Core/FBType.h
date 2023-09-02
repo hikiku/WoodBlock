@@ -35,8 +35,7 @@ class FBType : public NamedObject {
         inputVariables(),
         outputVariables(),
         triggeredEventOutputs() {}
-  virtual ~FBType()  // TODO: = 0;
-  {
+  virtual ~FBType() {
     // std::list<EventOutput*> triggeredEventOutputs;
     clearTriggeredEventOutputs();
 
@@ -268,10 +267,40 @@ class FBType : public NamedObject {
 };
 
 class BasicFBType : public FBType {
-  // TODO:
  public:
-  BasicFBType(const char* name) : FBType(name) {} 
-  // TODO: add callback of eventoutputs
+  BasicFBType(const char* name) : FBType(name), internalVariables() {}
+  virtual ~BasicFBType() {
+    for (std::list<InternalVariable*>::iterator it = internalVariables.begin();
+         it != internalVariables.end(); ++it) {
+      delete *it;
+    }
+    internalVariables.clear();
+  }
+
+  InternalVariable* findInternalVariableByName(
+      const String& internalVariableName) {
+    for (std::list<InternalVariable*>::iterator it = internalVariables.begin();
+         it != internalVariables.end(); ++it) {
+      if ((*it)->getName().equals(internalVariableName)) {
+        return *it;
+      }
+    }
+    return nullptr;
+  }
+
+  // eg: SInt
+  template <class TDataBox>
+  Vt<TDataBox>* addInternalVariable(const char* name) {
+    // push a internalVariable to std::list<InternalVariable*>
+    // internalVariables!
+    Vt<TDataBox>* internalVariable = new Vt<TDataBox>(name);
+    if (internalVariable) {
+      internalVariables.push_back(internalVariable);
+      return internalVariable;
+    }
+    return nullptr;
+  }
+
   bool fetchExternalEvents(
       FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
@@ -279,15 +308,15 @@ class BasicFBType : public FBType {
   }
 
  private:
-  // TODO: std::list<InternalVariable> internalVariables; // 0..*
+  std::list<InternalVariable*> internalVariables;  // 0..*
   // TODO: ECC ecc; // 0..1
-  // TODO: Algorithm algorithm; // 0..1
+  // TODO: Algorithm algorithm; // 0..*
 };
 
 class CompositeFBType : public FBType {
   // TODO:
  public:
-  CompositeFBType(const char* name) : FBType(name) {} 
+  CompositeFBType(const char* name) : FBType(name) {}
 
   // TODO: add callback of eventoutputs
   bool fetchExternalEvents(
