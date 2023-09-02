@@ -8,14 +8,16 @@
 // #include <iterator>   //
 // #include <list>
 
+#include <WoodBlock/Core/NamedObject.h>
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
-#include <WoodBlock/Core/NamedObject.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class DataType :public NamedObject {
+class DataType : public NamedObject {
   // TODO:
+ public:
+  DataType(const char* name) : NamedObject(name) {}
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

@@ -11,6 +11,7 @@
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
 
+#include "WoodBlock/Core/NamedObject.h"
 #include "WoodBlock/DataTypes/DataTypes.h"
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
@@ -18,19 +19,15 @@ WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 class InputVariable;
 class OutputVariable;
 
-class Variable {
+class Variable : public NamedObject {
  public:
-  Variable(const char* name) : name(name) {}
+  Variable(const char* name) : NamedObject(name) {}
   virtual ~Variable() {}  // TODO: = 0;
 
-  const String& getName() const {
-    return name;
-  }
   virtual unsigned int getNumberOfDataType() const = 0;
   virtual DataBox& getDataBox() = 0;
 
  private:
-  String name;
 };
 
 class OutputVariable : public Variable {
@@ -66,7 +63,8 @@ class InputVariable : public Variable {
   InputVariable(const char* name) : Variable(name) {}  //, outData(nullptr)
   // virtual ~InputVariable() {}
 
-  // virtual bool sample(OutputVariable& outData) = 0;  // clone data from 'outData'
+  // virtual bool sample(OutputVariable& outData) = 0;  // clone data from
+  // 'outData'
 
  protected:
   // OutputVariable* getVariableOutput() {

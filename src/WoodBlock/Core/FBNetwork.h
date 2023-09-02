@@ -396,7 +396,7 @@ class FBNetwork {
   std::list<FBType*> fbInstances;
   std::list<EventConnection*> eventConnections;
   std::list<DataConnection*> dataConnections;
-  // TODO: std::List<AdapterConnection> adapterConnections
+  // TODO: std::List<AdapterConnection> adapterConnections;
 
   std::list<SIFBType*> sifbInstances;
 };

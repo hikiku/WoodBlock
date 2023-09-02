@@ -12,6 +12,7 @@
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
 
+#include <WoodBlock/Core/NamedObject.h>
 #include <WoodBlock/Core/Variable.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
@@ -32,15 +33,13 @@ typedef OutputVariable* (*SearchOutDataCallback)(
     FBNetwork& fbNetwork, EventConnection& eventConnect,
     EventInput& eventInput, InputVariable& inputVariable);
 
-class Event {
+class Event : public NamedObject {
  public:
   Event(FBType& owner, const String& name,
         unsigned int eventType = EVENT_ANY)
-      : owner(owner), name(name), eventType(eventType) {}
+      : NamedObject(name), owner(owner), eventType(eventType) {}
   virtual ~Event() {}  // TODO: = 0;
-  const String& getName() const {
-    return name;
-  }
+
   unsigned int getEventType() const {
     return eventType;
   }
@@ -52,7 +51,6 @@ class Event {
 
  private:
   FBType& owner;  // belongs to
-  String name;
   unsigned int eventType;
 };
 

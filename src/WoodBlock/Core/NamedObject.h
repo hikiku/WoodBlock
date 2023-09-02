@@ -15,7 +15,14 @@
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class NamedObject :public ManagedObject {
-  // TODO:
+public:
+  NamedObject(const String& name): name(name) {}
+
+  const String& getName() const {
+    return name;
+  }
+ private:
+  String name;
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

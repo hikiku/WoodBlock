@@ -29,7 +29,7 @@ typedef void (*HandleEventOutputCallback)(FBNetwork& fbNetwork,
 class FBType : public NamedObject {
  public:
   FBType(const char* name)
-      : name(name),
+      : NamedObject(name),
         eventInputs(),
         eventOutputs(),
         inputVariables(),
@@ -61,10 +61,6 @@ class FBType : public NamedObject {
       delete *it;
     }
     outputVariables.clear();
-  }
-
-  const String& getName() {
-    return name;
   }
 
   EventInput* findInEventByName(const String& inEventName) {
@@ -252,8 +248,6 @@ class FBType : public NamedObject {
   }
 
  private:
-  String name;
-
   std::list<EventInput*> eventInputs;    // 0..*
   std::list<EventOutput*> eventOutputs;  // 0..*
 
