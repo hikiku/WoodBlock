@@ -112,18 +112,18 @@ class DataBoxImpl : public DataBox {
     }
   }
 
-  // FROM: eg: SInt
-  template <class FROM>
-  bool copy(FROM& from)  // const
-  {
-    T* data = getData();
-    if (data && from.getData()) {
-      *data = *from.getData();  // TODO: copy assign value function!
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // // FROM: eg: SInt
+  // template <class FROM>
+  // bool copy(FROM& from)  // const
+  // {
+  //   T* data = getData();
+  //   if (data && from.getData()) {
+  //     *data = *from.getData();  // TODO: copy assign value function!
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

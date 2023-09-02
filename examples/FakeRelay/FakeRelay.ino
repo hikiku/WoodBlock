@@ -14,16 +14,22 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType,
 
 class WebPortal : public SIFBType {
  public:
-  WebPortal()
-      : SIFBType("WebPortal"),
-        ovOnOff(nullptr),
-        oeControl(nullptr),
-        onOff(nullptr) {
-    ovOnOff = addOutVariable<Bool>("OnOff");
+  static const char* FB_TYPE_NAME;
+  static const char* TV_ONOFF;
+  static const char* OV_ONOFF;
+  static const char* OE_CONTROL;
+
+  WebPortal() : SIFBType(WebPortal::FB_TYPE_NAME) {
+    Vt<Bool>* tvOnOff = addInternalVariable<Bool>(WebPortal::TV_ONOFF);
+    tvOnOff->getDataBox().setData(true);
+
+    /*Vo<Bool>* ovOnOff =*/addOutVariable<Bool>(WebPortal::OV_ONOFF);
+
     {
-      const char* outVariableNames[] = {"OnOff"};
-      oeControl = addOutEvent("Control", outVariableNames,
-                              ARRAY_SIZE(outVariableNames));
+      const char* outVariableNames[] = {WebPortal::OV_ONOFF};
+      /*EventOutput* oeControl =*/addOutEvent(WebPortal::OE_CONTROL,
+                                              outVariableNames,
+                                              ARRAY_SIZE(outVariableNames));
     }
   }
   ~WebPortal() {}
@@ -45,11 +51,15 @@ class WebPortal : public SIFBType {
     }
 
     if (time - lasttime > 10 * 1000) {
-      if (ovOnOff) {
-        onOff = !onOff;
+      EventOutput* oeControl =
+          (EventOutput*)findOutEventByName(WebPortal::OE_CONTROL);
+      Vo<Bool>* ovOnOff = (Vo<Bool>*)findOutVariableByName(WebPortal::OV_ONOFF);
+      Vt<Bool>* tvOnOff =
+          (Vt<Bool>*)findInternalVariableByName(WebPortal::TV_ONOFF);
+      if (tvOnOff && ovOnOff && oeControl) {
+        BOOL onOff = *(tvOnOff->getDataBox().getData());
+        tvOnOff->getDataBox().setData(!onOff);
         ovOnOff->getDataBox().setData(onOff);
-      }
-      if (oeControl) {
         Serial.printf(
             "%s \tGenerate: \tEVENT_OUTPUT \t%s \tWITH \tOnOff \t(* %s, "
             "\tline:%d *)\n",
@@ -62,34 +72,40 @@ class WebPortal : public SIFBType {
     }
     return false;
   }
-
- private:
-  Vo<Bool>* ovOnOff;
-  EventOutput* oeControl;
-  bool onOff;
 };
+const char* WebPortal::FB_TYPE_NAME = "WebPortal";
+const char* WebPortal::TV_ONOFF = "OnOff";
+const char* WebPortal::OV_ONOFF = "OnOff";
+const char* WebPortal::OE_CONTROL = "Control";
 
 class Relay : public BasicFBType {
  public:
-  Relay() : BasicFBType("Relay") {
-    ivOnOff = addInVariable<Bool>("OnOff");
+  static const char* FB_TYPE_NAME;
+  static const char* IV_ONOFF;
+  static const char* IE_CONTROL;
+
+  Relay() : BasicFBType(Relay::FB_TYPE_NAME) {
+    /*Vi<Bool>* ivOnOff =*/addInVariable<Bool>(Relay::IV_ONOFF);
+
     {
-      const char* inVariableNames[] = {"OnOff"};
-      ieControl =
-          addInEvent("Control", inVariableNames, ARRAY_SIZE(inVariableNames));
+      const char* inVariableNames[] = {Relay::IV_ONOFF};
+      /*EventInput* ieControl =*/addInEvent(Relay::IE_CONTROL, inVariableNames,
+                                            ARRAY_SIZE(inVariableNames));
     }
   }
   ~Relay() {}
 
   void executeEventInput(EventInput& inEvent) {
-    if (inEvent.getName().equals("Control")) {
+    if (inEvent.getName().equals(Relay::IE_CONTROL)) {
+      Vi<Bool>* ivOnOff = (Vi<Bool>*)findInVariableByName(Relay::IV_ONOFF);
+      EventInput* ieControl = &inEvent;
       if (ivOnOff) {
         BOOL* onOff = ivOnOff->getDataBox().getData();
         if (onOff) {
           Serial.printf(
               "%s \t\tProcess: \tEVENT_INPUT \t%s \tWITH \tOnOff \t(* %s, "
               "\tline:%d *) \n",
-              getName().c_str(), inEvent.getName().c_str(),
+              getName().c_str(), ieControl->getName().c_str(),
               (*onOff) ? "true" : "false", __LINE__);
         }
       }
@@ -98,30 +114,24 @@ class Relay : public BasicFBType {
                     inEvent.getName().c_str(), __LINE__);
     }
   }
-
- private:
-  Vi<Bool>* ivOnOff;
-  EventInput* ieControl;
 };
+const char* Relay::FB_TYPE_NAME = "Relay";
+const char* Relay::IV_ONOFF = "OnOff";
+const char* Relay::IE_CONTROL = "Control";
 
 FBNetwork fbNetwork;
-
-Vi<Time> myTime();
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  FBInstance* relay = FBInstance::create<Relay>("Relay");
-  FBInstance* webPortal = FBInstance::create<WebPortal>("WebPortal");
-  fbNetwork.attachFBInstance(relay);
-  fbNetwork.attachFBInstance(webPortal);
-
+  fbNetwork.attachFBInstance(FBInstance::create<Relay>("Relay"));
+  fbNetwork.attachFBInstance(FBInstance::create<WebPortal>("WebPortal"));
   {
-    const char* outVariableNames[] = {"OnOff"};
-    const char* inVariableNames[] = {"OnOff"};
-    fbNetwork.connect("WebPortal", "Control", outVariableNames,
-                      ARRAY_SIZE(outVariableNames), "Relay", "Control",
+    const char* outVariableNames[] = {WebPortal::OV_ONOFF};
+    const char* inVariableNames[] = {Relay::IV_ONOFF};
+    fbNetwork.connect("WebPortal", WebPortal::OE_CONTROL, outVariableNames,
+                      ARRAY_SIZE(outVariableNames), "Relay", Relay::IE_CONTROL,
                       inVariableNames, ARRAY_SIZE(inVariableNames));
   }
 }
@@ -130,6 +140,5 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   fbNetwork.fetchExternalEvents();
-
   delay(1000);
 }

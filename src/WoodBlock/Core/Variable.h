@@ -41,6 +41,7 @@ class InputVariable : public Variable {
 };
 
 class InternalVariable : public Variable {
+ public:
   InternalVariable(const char* name) : Variable(name) {}
   // virtual ~InternalVariable() {}
 };

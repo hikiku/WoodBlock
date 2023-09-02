@@ -330,9 +330,9 @@ class CompositeFBType : public FBType {
   // fb_connection_list
 };
 
-class SIFBType : public FBType {
+class SIFBType : public BasicFBType {  // FBType
  public:
-  SIFBType(const char* name) : FBType(name) {}  //, siiEvents()
+  SIFBType(const char* name) : BasicFBType(name) {}  //, siiEvents()
   ~SIFBType() {
     // // std::list<ServiceInterfaceInEvent*> siiEvents;
     // for (std::list<ServiceInterfaceInEvent*>::iterator it =
