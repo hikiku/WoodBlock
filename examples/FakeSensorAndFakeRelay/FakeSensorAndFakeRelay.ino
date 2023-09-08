@@ -12,7 +12,7 @@ extern bool extend_check4ConnectDataType(unsigned int outDataType,
   return false;
 }
 
-class WebPortal : public SIFBType {
+class WebPortalFBType : public SIFBType {
  public:
   static const char* FB_TYPE_NAME;
   static const char* IV_STATUS;
@@ -22,35 +22,35 @@ class WebPortal : public SIFBType {
   static const char* OV_ONOFF;
   static const char* OE_CONTROL;
 
-  WebPortal() : SIFBType(WebPortal::FB_TYPE_NAME) {
-    /*Vi<Bool>* ivStatus =*/addInputVariable<Bool>(WebPortal::IV_STATUS);
+  WebPortalFBType() : SIFBType(WebPortalFBType::FB_TYPE_NAME) {
+    /*Vi<Bool>* ivStatus =*/addInputVariable<Bool>(WebPortalFBType::IV_STATUS);
 
     {
-      const char* outVariableNames[] = {WebPortal::IV_STATUS};
+      const char* outVariableNames[] = {WebPortalFBType::IV_STATUS};
       /*EventInput* ieOccupy =*/
-      addEventInput(WebPortal::IE_OCCUPY, outVariableNames,
+      addEventInput(WebPortalFBType::IE_OCCUPY, outVariableNames,
                  ARRAY_SIZE(outVariableNames));
     }
 
-    Vt<Bool>* tvOnOff = addInternalVariable<Bool>(WebPortal::TV_ONOFF);
+    Vt<Bool>* tvOnOff = addInternalVariable<Bool>(WebPortalFBType::TV_ONOFF);
     tvOnOff->getDataBox().setData(true);
 
-    /*Vo<Bool>* ovOnOff =*/addOutputVariable<Bool>(WebPortal::OV_ONOFF);
+    /*Vo<Bool>* ovOnOff =*/addOutputVariable<Bool>(WebPortalFBType::OV_ONOFF);
 
     {
-      const char* outVariableNames[] = {WebPortal::OV_ONOFF};
-      /*EventOutput* oeControl =*/addEventOutput(WebPortal::OE_CONTROL,
+      const char* outVariableNames[] = {WebPortalFBType::OV_ONOFF};
+      /*EventOutput* oeControl =*/addEventOutput(WebPortalFBType::OE_CONTROL,
                                               outVariableNames,
                                               ARRAY_SIZE(outVariableNames));
     }
   }
-  ~WebPortal() {}
+  ~WebPortalFBType() {}
 
   void executeEventInput(EventInput& inEvent) {
-    if (inEvent.getName().equals(WebPortal::IE_OCCUPY)) {
+    if (inEvent.getName().equals(WebPortalFBType::IE_OCCUPY)) {
       EventInput* ieOccupy = &inEvent;
       Vi<Bool>* ivStatus =
-          (Vi<Bool>*)findInputVariableByName(WebPortal::IV_STATUS);
+          (Vi<Bool>*)findInputVariableByName(WebPortalFBType::IV_STATUS);
       if (ivStatus) {
         BOOL* status = ivStatus->getDataBox().getData();
         if (status) {
@@ -80,10 +80,10 @@ class WebPortal : public SIFBType {
 
     if (time - lasttime > 10 * 1000) {
       EventOutput* oeControl =
-          (EventOutput*)findEventOutputByName(WebPortal::OE_CONTROL);
-      Vo<Bool>* ovOnOff = (Vo<Bool>*)findOutputVariableByName(WebPortal::OV_ONOFF);
+          (EventOutput*)findEventOutputByName(WebPortalFBType::OE_CONTROL);
+      Vo<Bool>* ovOnOff = (Vo<Bool>*)findOutputVariableByName(WebPortalFBType::OV_ONOFF);
       Vt<Bool>* tvOnOff =
-          (Vt<Bool>*)findInternalVariableByName(WebPortal::TV_ONOFF);
+          (Vt<Bool>*)findInternalVariableByName(WebPortalFBType::TV_ONOFF);
       if (tvOnOff && ovOnOff && oeControl) {
         BOOL onOff = *(tvOnOff->getDataBox().getData());
         tvOnOff->getDataBox().setData(!onOff);
@@ -101,34 +101,34 @@ class WebPortal : public SIFBType {
     return false;
   }
 };
-const char* WebPortal::FB_TYPE_NAME = "WebPortal";
-const char* WebPortal::IV_STATUS = "Status";
-const char* WebPortal::IE_OCCUPY = "Occupy";
-const char* WebPortal::TV_ONOFF = "OnOff";
-const char* WebPortal::OV_ONOFF = "OnOff";
-const char* WebPortal::OE_CONTROL = "Control";
+const char* WebPortalFBType::FB_TYPE_NAME = "WebPortalFBType";
+const char* WebPortalFBType::IV_STATUS = "Status";
+const char* WebPortalFBType::IE_OCCUPY = "Occupy";
+const char* WebPortalFBType::TV_ONOFF = "OnOff";
+const char* WebPortalFBType::OV_ONOFF = "OnOff";
+const char* WebPortalFBType::OE_CONTROL = "Control";
 
-class OccupySensor : public SIFBType {
+class OccupySensorFBType : public SIFBType {
  public:
   static const char* FB_TYPE_NAME;
   static const char* TV_STATUS;
   static const char* OV_STATUS;
   static const char* OE_OCCUPY;
 
-  OccupySensor() : SIFBType(OccupySensor::FB_TYPE_NAME) {
-    Vt<Bool>* tvStatus = addInternalVariable<Bool>(OccupySensor::TV_STATUS);
+  OccupySensorFBType() : SIFBType(OccupySensorFBType::FB_TYPE_NAME) {
+    Vt<Bool>* tvStatus = addInternalVariable<Bool>(OccupySensorFBType::TV_STATUS);
     tvStatus->getDataBox().setData(false);
 
-    /*Vo<Bool>* ovStatus =*/addOutputVariable<Bool>(OccupySensor::OV_STATUS);
+    /*Vo<Bool>* ovStatus =*/addOutputVariable<Bool>(OccupySensorFBType::OV_STATUS);
 
     {
-      const char* outVariableNames[] = {OccupySensor::OV_STATUS};
+      const char* outVariableNames[] = {OccupySensorFBType::OV_STATUS};
       /*EventOutput* oeOccupy =*/
-      addEventOutput(OccupySensor::OE_OCCUPY, outVariableNames,
+      addEventOutput(OccupySensorFBType::OE_OCCUPY, outVariableNames,
                   ARRAY_SIZE(outVariableNames));
     }
   }
-  ~OccupySensor() {}
+  ~OccupySensorFBType() {}
 
   void executeEventInput(EventInput& inEvent) {
     Serial.printf("TODO: Don't deal event(%s), line:%d\n",
@@ -148,11 +148,11 @@ class OccupySensor : public SIFBType {
 
     if (time - lasttime > 10 * 1000) {
       EventOutput* oeOccupy =
-          (EventOutput*)findEventOutputByName(OccupySensor::OE_OCCUPY);
+          (EventOutput*)findEventOutputByName(OccupySensorFBType::OE_OCCUPY);
       Vo<Bool>* ovStatus =
-          (Vo<Bool>*)findOutputVariableByName(OccupySensor::OV_STATUS);
+          (Vo<Bool>*)findOutputVariableByName(OccupySensorFBType::OV_STATUS);
       Vt<Bool>* tvStatus =
-          (Vt<Bool>*)findInternalVariableByName(OccupySensor::TV_STATUS);
+          (Vt<Bool>*)findInternalVariableByName(OccupySensorFBType::TV_STATUS);
       if (oeOccupy && ovStatus && tvStatus) {
         BOOL status = *(tvStatus->getDataBox().getData());
         tvStatus->getDataBox().setData(!status);
@@ -171,31 +171,31 @@ class OccupySensor : public SIFBType {
     return false;
   }
 };
-const char* OccupySensor::FB_TYPE_NAME = "OccupySensor";
-const char* OccupySensor::TV_STATUS = "Status";
-const char* OccupySensor::OV_STATUS = "Status";
-const char* OccupySensor::OE_OCCUPY = "Occupy";
+const char* OccupySensorFBType::FB_TYPE_NAME = "OccupySensorFBType";
+const char* OccupySensorFBType::TV_STATUS = "Status";
+const char* OccupySensorFBType::OV_STATUS = "Status";
+const char* OccupySensorFBType::OE_OCCUPY = "Occupy";
 
-class Relay : public BasicFBType {
+class RelayFBType : public BasicFBType {
  public:
   static const char* FB_TYPE_NAME;
   static const char* IV_ONOFF;
   static const char* IE_CONTROL;
 
-  Relay() : BasicFBType(Relay::FB_TYPE_NAME) {
-    /*Vi<Bool>* ivOnOff =*/addInputVariable<Bool>(Relay::IV_ONOFF);
+  RelayFBType() : BasicFBType(RelayFBType::FB_TYPE_NAME) {
+    /*Vi<Bool>* ivOnOff =*/addInputVariable<Bool>(RelayFBType::IV_ONOFF);
 
     {
-      const char* inVariableNames[] = {Relay::IV_ONOFF};
-      /*EventInput* ieControl =*/addEventInput(Relay::IE_CONTROL, inVariableNames,
+      const char* inVariableNames[] = {RelayFBType::IV_ONOFF};
+      /*EventInput* ieControl =*/addEventInput(RelayFBType::IE_CONTROL, inVariableNames,
                                             ARRAY_SIZE(inVariableNames));
     }
   }
-  ~Relay() {}
+  ~RelayFBType() {}
 
   void executeEventInput(EventInput& inEvent) {
-    if (inEvent.getName().equals(Relay::IE_CONTROL)) {
-      Vi<Bool>* ivOnOff = (Vi<Bool>*)findInputVariableByName(Relay::IV_ONOFF);
+    if (inEvent.getName().equals(RelayFBType::IE_CONTROL)) {
+      Vi<Bool>* ivOnOff = (Vi<Bool>*)findInputVariableByName(RelayFBType::IV_ONOFF);
       EventInput* ieControl = &inEvent;
       if (ivOnOff) {
         BOOL* onOff = ivOnOff->getDataBox().getData();
@@ -213,9 +213,9 @@ class Relay : public BasicFBType {
     }
   }
 };
-const char* Relay::FB_TYPE_NAME = "Relay";
-const char* Relay::IV_ONOFF = "OnOff";
-const char* Relay::IE_CONTROL = "Control";
+const char* RelayFBType::FB_TYPE_NAME = "RelayFBType";
+const char* RelayFBType::IV_ONOFF = "OnOff";
+const char* RelayFBType::IE_CONTROL = "Control";
 
 FBNetwork fbNetwork;
 
@@ -223,22 +223,22 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  fbNetwork.attachFBInstance(FBInstance::create<Relay>("Relay"));
-  fbNetwork.attachFBInstance(FBInstance::create<OccupySensor>("OccupySensor"));
-  fbNetwork.attachFBInstance(FBInstance::create<WebPortal>("WebPortal"));
+  fbNetwork.attachFBInstance(FBInstance::create<RelayFBType>("Relay"));
+  fbNetwork.attachFBInstance(FBInstance::create<OccupySensorFBType>("OccupySensor"));
+  fbNetwork.attachFBInstance(FBInstance::create<WebPortalFBType>("WebPortal"));
   {
-    const char* outVariableNames[] = {OccupySensor::OV_STATUS};
-    const char* inVariableNames[] = {WebPortal::IV_STATUS};
-    fbNetwork.connect("OccupySensor", OccupySensor::OE_OCCUPY, outVariableNames,
+    const char* outVariableNames[] = {OccupySensorFBType::OV_STATUS};
+    const char* inVariableNames[] = {WebPortalFBType::IV_STATUS};
+    fbNetwork.connect("OccupySensor", OccupySensorFBType::OE_OCCUPY, outVariableNames,
                       ARRAY_SIZE(outVariableNames), "WebPortal",
-                      WebPortal::IE_OCCUPY, inVariableNames,
+                      WebPortalFBType::IE_OCCUPY, inVariableNames,
                       ARRAY_SIZE(inVariableNames));
   }
   {
-    const char* outVariableNames[] = {WebPortal::OV_ONOFF};
-    const char* inVariableNames[] = {Relay::IV_ONOFF};
-    fbNetwork.connect("WebPortal", WebPortal::OE_CONTROL, outVariableNames,
-                      ARRAY_SIZE(outVariableNames), "Relay", Relay::IE_CONTROL,
+    const char* outVariableNames[] = {WebPortalFBType::OV_ONOFF};
+    const char* inVariableNames[] = {RelayFBType::IV_ONOFF};
+    fbNetwork.connect("WebPortal", WebPortalFBType::OE_CONTROL, outVariableNames,
+                      ARRAY_SIZE(outVariableNames), "Relay", RelayFBType::IE_CONTROL,
                       inVariableNames, ARRAY_SIZE(inVariableNames));
   }
 }
