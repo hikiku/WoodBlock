@@ -18,9 +18,9 @@ WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 class FBInstance : public NamedObject {
   // TODO:
  public:
-  template <class FBTYPE>
-  static FBInstance* create(const char* name) {
-    FBTYPE* fbType = new FBTYPE();
+  template <typename FBTYPE, typename... Args>
+  static FBInstance* create(const char* name, const Args&... args) {
+    FBTYPE* fbType = new FBTYPE(args...);
     if (fbType) {
       return new FBInstance(name, *fbType);
     }
