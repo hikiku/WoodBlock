@@ -74,6 +74,8 @@ class FBNetwork {
     return false;
   }
 
+  // TODO: used initializer_list. reference
+  // https://songlee24.github.io/2014/07/22/cpp-changeable-parameter/
   bool connect(const char* srcFBInstanceName, const char* outEventName,
                const char* outVariableNames[], int sizeofOutVariables,
                const char* destFBInstanceName, const char* inEventName,
@@ -179,8 +181,10 @@ class FBNetwork {
                     const char* inEventName, const char* inVariableNames[],
                     int sizeofVariables) {
     bool result = true;
-    EventOutput* outEvent = sourceFBInstance.getFBType().findEventOutputByName(outEventName);
-    EventInput* inEvent = destFBInstance.getFBType().findEventInputByName(inEventName);
+    EventOutput* outEvent =
+        sourceFBInstance.getFBType().findEventOutputByName(outEventName);
+    EventInput* inEvent =
+        destFBInstance.getFBType().findEventInputByName(inEventName);
     if (!outEvent) {
       //// printf(ERROR, "It Can't find EventOutput by name %s!\n",
       /// outEventName)
