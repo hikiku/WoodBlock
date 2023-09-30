@@ -15,3 +15,4 @@
 #include <WoodBlock/Core/FBType.h>
 #include <WoodBlock/Core/FBNetwork.h >
 #include <WoodBlock/Core/Variable.h>
+#include <WoodBlock/Core/ECCBasicFBType.h>

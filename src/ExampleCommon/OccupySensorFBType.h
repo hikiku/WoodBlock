@@ -29,7 +29,7 @@ class OccupySensorFBType : public SIFBType {
   }
   ~OccupySensorFBType() {}
 
-  void executeEventInput(EventInput& inEvent) {
+  void executeEventInput(const EventInput& inEvent) {
     Serial.printf("TODO: Don't deal event(%s), line:%d\n",
                   inEvent.getName().c_str(), __LINE__);
   }
@@ -62,7 +62,7 @@ class OccupySensorFBType : public SIFBType {
             "\tline:%d *)\n",
             getName().c_str(), oeOccupy->getName().c_str(),
             status ? "true" : "false", __LINE__);
-        generateOutEvent(*oeOccupy);
+        generateEventOutput(*oeOccupy);
       }
       lasttime = time;
       return true;

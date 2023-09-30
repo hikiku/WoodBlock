@@ -147,7 +147,8 @@ class FBType : public NamedObject {
   template <class TDataBox>
   Vo<TDataBox>* addOutputVariable(const char* nameOfOutputVariable) {
     // push a outVariable to std::list<OutputVariable*> outputVariables!
-    Vo<TDataBox>* outVariable = new Vo<TDataBox>(nameOfOutputVariable);  // OutputVariable
+    Vo<TDataBox>* outVariable =
+        new Vo<TDataBox>(nameOfOutputVariable);  // OutputVariable
     if (outVariable) {
       outputVariables.push_back(outVariable);
       return outVariable;
@@ -157,8 +158,9 @@ class FBType : public NamedObject {
 
   // eg: EVENT_ANY, ...
   // template <class TEventType>
-  EventInput* addEventInput(const char* nameOfEventInput, const char* inputVariableNames[],
-                         int sizeofInVariables) {
+  EventInput* addEventInput(const char* nameOfEventInput,
+                            const char* inputVariableNames[] = nullptr,
+                            int sizeofInVariables = 0) {
     EventInput* inEvent = new EventInput(*this, nameOfEventInput);
     if (inEvent) {
       bool result =
@@ -174,14 +176,16 @@ class FBType : public NamedObject {
         return nullptr;
       }
     } else {
-      // TODO: printf (ERROR, "It fail for adding EventInput[%s]!", nameOfEventInput);
+      // TODO: printf (ERROR, "It fail for adding EventInput[%s]!",
+      // nameOfEventInput);
       return nullptr;
     }
   }
   // eg: EVENT_ANY, ...
   // template <class TEventType>
-  EventOutput* addEventOutput(const char* nameOfEventOutput, const char* outputVariableNames[],
-                           int sizeofOutVariables) {
+  EventOutput* addEventOutput(const char* nameOfEventOutput,
+                              const char* outputVariableNames[],
+                              int sizeofOutVariables) {
     // TODO: ...
     EventOutput* outEvent = new EventOutput(*this, nameOfEventOutput);
     if (outEvent) {
@@ -198,7 +202,8 @@ class FBType : public NamedObject {
         return nullptr;
       }
     } else {
-      // TODO: printf (ERROR, "It fail for adding addEventOutput[%s]!", nameOfEventOutput);
+      // TODO: printf (ERROR, "It fail for adding addEventOutput[%s]!",
+      // nameOfEventOutput);
       return nullptr;
     }
   }
@@ -226,16 +231,16 @@ class FBType : public NamedObject {
   // Some private functions in ~FBType()
 
  protected:
-  virtual void executeEventInput(EventInput& inEvent) = 0;
+  virtual void executeEventInput(const EventInput& inEvent) = 0;
   //{
   // TODO: ......
   // if inEvent.is("INIT") { ... }
   // else if inEvent.is("RESET") { ... }
   // ...... OutData.set(xyz)......
-  // ...... generateOutEvent(EventOutput &outEvent)......
+  // ...... generateEventOutput(EventOutput &outEvent)......
   //}
 
-  void generateOutEvent(EventOutput& outEvent) {
+  void generateEventOutput(EventOutput& outEvent) {
     outEvent.generate();
     triggeredEventOutputs.push_back(&outEvent);
   }
@@ -309,8 +314,6 @@ class BasicFBType : public FBType {
 
  private:
   std::list<InternalVariable*> internalVariables;  // 0..*
-  // TODO: ECC ecc; // 0..1
-  // TODO: Algorithm algorithm; // 0..*
 };
 
 class CompositeFBType : public FBType {
@@ -375,7 +378,7 @@ class SIFBType : public BasicFBType {  // FBType
   //     //   if siiEvent.is("AAA") { ... }
   //     //   else if siiEvent.is("BBB") { ... }
   //     //   ...... OutData.set(xyz)......
-  //     //   ...... generateOutEvent(EventOutput &outEvent)......
+  //     //   ...... generateEventOutput(EventOutput &outEvent)......
   //     //  }
   //     return true;
   // }

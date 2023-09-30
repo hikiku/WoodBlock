@@ -3,15 +3,18 @@
 // MIT License
 
 #pragma once
+
 #include <Arduino.h>  // Arduino
 // #include <WString.h>  // Arduino
 // #include <iterator>   //
 // #include <list>
 
-#include <WoodBlock/Core/FBType.h>
-#include <WoodBlock/Core/NamedObject.h>
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
+
+#include <WoodBlock/Core/FBType.h>
+#include <WoodBlock/Core/NamedObject.h>
+
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 

@@ -24,10 +24,10 @@ class RelayFBType : public BasicFBType {
   }
   ~RelayFBType() {}
 
-  void executeEventInput(EventInput& inEvent) {
+  void executeEventInput(const EventInput& inEvent) {
     if (inEvent.getName().equals(RelayFBType::IE_CONTROL)) {
       Vi<Bool>* ivOnOff = (Vi<Bool>*)findInputVariableByName(RelayFBType::IV_ONOFF);
-      EventInput* ieControl = &inEvent;
+      const EventInput* ieControl = &inEvent;
       if (ivOnOff) {
         BOOL* onOff = ivOnOff->getDataBox().getData();
         if (onOff) {

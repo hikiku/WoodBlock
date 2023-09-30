@@ -5,7 +5,8 @@
 #pragma once
 
 #include <WString.h>  // Arduino
-#include <iterator>   //
+#include <exception>
+#include <iterator>  //
 #include <list>
 
 #include <WoodBlock/Macro.h>
@@ -105,5 +106,21 @@ using Vi = InputVariableImpl<TDataBox>;
 
 template <class TDataBox>
 using Vt = InternalVariableImpl<TDataBox>;
+
+class InputVariableException : public std::exception {
+  virtual const char* what() const throw() {
+    return "Input Variable does not exist!";
+  }
+};
+class OutputVariableException : public std::exception {
+  virtual const char* what() const throw() {
+    return "Output Variable does not exist!";
+  }
+};
+class InternalVariableException : public std::exception {
+  virtual const char* what() const throw() {
+    return "Internal Variable does not exist!";
+  }
+};
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

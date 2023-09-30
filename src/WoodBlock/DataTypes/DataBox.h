@@ -105,6 +105,9 @@ class DataBoxImpl : public DataBox {
   T* getData() {
     return (T*)getDataPoint();
   }
+  T& getDataRef() {
+    return *(getData());
+  }
   void setData(const T& value) {
     T* data = getData();
     if (data) {

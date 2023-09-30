@@ -49,10 +49,10 @@ class WebPortalFBType : public SIFBType {
   }
   ~WebPortalFBType() {}
 
-  void executeEventInput(EventInput& inEvent) {
+  void executeEventInput(const EventInput& inEvent) {
     if (hasEventInput) {
       if (inEvent.getName().equals(WebPortalFBType::IE_OCCUPY)) {
-        EventInput* ieOccupy = &inEvent;
+        const EventInput* ieOccupy = &inEvent;
         Vi<Bool>* ivStatus =
             (Vi<Bool>*)findInputVariableByName(WebPortalFBType::IV_STATUS);
         if (ivStatus) {
@@ -101,7 +101,7 @@ class WebPortalFBType : public SIFBType {
               "\tline:%d *)\n",
               getName().c_str(), oeControl->getName().c_str(),
               onOff ? "true" : "false", __LINE__);
-          generateOutEvent(*oeControl);
+          generateEventOutput(*oeControl);
         }
         lasttime = time;
         return true;

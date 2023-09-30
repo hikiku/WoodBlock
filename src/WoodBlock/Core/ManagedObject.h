@@ -14,7 +14,9 @@
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
 class ManagedObject {
+ public:
   // TODO:
+  virtual ~ManagedObject() {}
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

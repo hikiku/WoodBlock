@@ -10,18 +10,22 @@
 
 #include <WoodBlock/Macro.h>
 #include <WoodBlock/Namespace.hpp>
+
 #include <WoodBlock/Core/ManagedObject.h>
 
 WOODBLOCK_BEGIN_PUBLIC_NAMESPACE
 
-class NamedObject :public ManagedObject {
-public:
-  NamedObject(const String& name): name(name) {}
+class NamedObject : public ManagedObject {
+ public:
+  NamedObject(const String& name) : ManagedObject(), name(name) {}
 
   const String& getName() const {
     return name;
   }
+
  private:
+  NamedObject() {}
+
   String name;
 };
 
