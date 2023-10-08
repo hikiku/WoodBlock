@@ -83,7 +83,7 @@ class DataBox {
  private:
   const char* name;
   size_t size;  // bytes
-  void* dp;  // data point
+  void* dp;     // data point
 };
 
 // eg: DataBoxImpl<SINT, "SINT">
@@ -108,6 +108,10 @@ class DataBoxImpl : public DataBox {
   T& getDataRef() {
     return *(getData());
   }
+
+  // const T& getDataRef() const {
+  //   return *(getData());
+  // }
   void setData(const T& value) {
     T* data = getData();
     if (data) {

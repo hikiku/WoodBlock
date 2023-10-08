@@ -11,15 +11,15 @@ class VoterECCBasicFBType : public ECCBasicFBType {
  public:
   static const char* FB_TYPE_NAME;
 
-  static const char* IE_Vote;
-  static const char* IE_Reset;
+  static const char* IE_VOTE;
+  static const char* IE_RESET;
   static const char* IV_A;
   static const char* IV_B;
   static const char* IV_C;
 
-  static const char* OE_Voted;
-  static const char* OE_Ready;
-  static const char* OV_State;
+  static const char* OE_VOTED;
+  static const char* OE_READY;
+  static const char* OV_STATE;
 
   static const char* A_VoteAlg;
   static const char* A_ResetAlg;
@@ -39,58 +39,67 @@ class VoterECCBasicFBType : public ECCBasicFBType {
         const char* inVariableNames[] = {VoterECCBasicFBType::IV_A,
                                          VoterECCBasicFBType::IV_B,
                                          VoterECCBasicFBType::IV_C};
-        addEventInput(VoterECCBasicFBType::IE_Vote, inVariableNames,
+        addEventInput(VoterECCBasicFBType::IE_VOTE, inVariableNames,
                       ARRAY_SIZE(inVariableNames));
-        addEventInput(VoterECCBasicFBType::IE_Reset);
+        addEventInput(VoterECCBasicFBType::IE_RESET);  // TODO:!!!!!
       }
     }
 
     // Output
     {
-      addOutputVariable<Bool>(VoterECCBasicFBType::OV_State);
+      addOutputVariable<Bool>(VoterECCBasicFBType::OV_STATE);
       {
-        const char* outVariableNames[] = {VoterECCBasicFBType::OV_State};
-        addEventOutput(VoterECCBasicFBType::OE_Voted, outVariableNames,
+        const char* outVariableNames[] = {VoterECCBasicFBType::OV_STATE};
+        addEventOutput(VoterECCBasicFBType::OE_VOTED, outVariableNames,
                        ARRAY_SIZE(outVariableNames));
-        addEventOutput(VoterECCBasicFBType::OE_Ready, outVariableNames,
+        addEventOutput(VoterECCBasicFBType::OE_READY, outVariableNames,
                        ARRAY_SIZE(outVariableNames));
       }
     }
 
     // ECC
     {
-      addAlgorithm(VoterECCBasicFBType::A_VoteAlg, VoteAlg);
-      addAlgorithm(VoterECCBasicFBType::A_ResetAlg, ResetAlg);
+      addAlgorithm(VoterECCBasicFBType::A_VoteAlg,
+                   std::bind(&VoterECCBasicFBType::VoteAlg, this));
+      addAlgorithm(VoterECCBasicFBType::A_ResetAlg,
+                   std::bind(&VoterECCBasicFBType::ResetAlg, this));
 
       addECState(VoterECCBasicFBType::ES_Ready);
-      addECState(VoterECCBasicFBType::ES_Vote, {VoterECCBasicFBType::A_VoteAlg,
-                                                VoterECCBasicFBType::OE_Voted});
+      addECState(VoterECCBasicFBType::ES_Vote);
       addECState(VoterECCBasicFBType::ES_VotedPos);
-      addECState(
-          VoterECCBasicFBType::ES_Reset,
-          {VoterECCBasicFBType::A_ResetAlg, VoterECCBasicFBType::OE_Ready});
+      addECState(VoterECCBasicFBType::ES_Reset);
 
+      addECAction(VoterECCBasicFBType::ES_Vote, VoterECCBasicFBType::A_VoteAlg,
+                  VoterECCBasicFBType::OE_VOTED);
+      addECAction(VoterECCBasicFBType::ES_Reset,
+                  VoterECCBasicFBType::A_ResetAlg,
+                  VoterECCBasicFBType::OE_READY);
+
+      // addECTransitionWithEvent()
       addECTransition(VoterECCBasicFBType::ES_Ready,
                       VoterECCBasicFBType::ES_Vote,
-                      VoterECCBasicFBType::IE_Vote);
-      addECTransition(
-          VoterECCBasicFBType::ES_Vote, VoterECCBasicFBType::ES_VotedPos,
-          nullptr, () {
-            Vo<Bool>* State = (Vo<Bool>*)findOutputVariableByName(
-                VoterECCBasicFBType::OV_State);
-            if (State) {
-              BOOL* state = State->getDataBox().getData();
-              if (state) {
-                return *state
-              }
-            }
-            return false;
-          });
+                      VoterECCBasicFBType::IE_VOTE);
+      // addECTransitionWithBoolExpression()
+      addECTransition(VoterECCBasicFBType::ES_Vote,
+                      VoterECCBasicFBType::ES_VotedPos, [this]() {
+                        Vo<Bool>* State = (Vo<Bool>*)findOutputVariableByName(
+                            VoterECCBasicFBType::OV_STATE);
+                        if (State) {
+                          BOOL* state = State->getDataBox().getData();
+                          if (state) {
+                            return *state;
+                          }
+                        }
+                        return false;
+                      });
+      // addECTransitionWithUnconditional();
       addECTransition(VoterECCBasicFBType::ES_Vote,
                       VoterECCBasicFBType::ES_Ready);
+      // addECTransitionWithEvent()
       addECTransition(VoterECCBasicFBType::ES_VotedPos,
                       VoterECCBasicFBType::ES_Reset,
-                      VoterECCBasicFBType::IE_Reset);
+                      VoterECCBasicFBType::IE_RESET);
+      // addECTransitionWithUnconditional()
       addECTransition(VoterECCBasicFBType::ES_Reset,
                       VoterECCBasicFBType::ES_Ready);
     }
@@ -98,17 +107,17 @@ class VoterECCBasicFBType : public ECCBasicFBType {
   ~VoterECCBasicFBType() {}
 
   //   void executeEventInput(const EventInput& inEvent) {
-  //     if (inEvent.getName().equals(VoterECCBasicFBType::IE_Vote)) {
+  //     if (inEvent.getName().equals(VoterECCBasicFBType::IE_VOTE)) {
   //       EventInput* ieOccupy = &inEvent;
   //       Vi<Bool>* ivStatus =
   //           (Vi<Bool>*)findInputVariableByName(VoterECCBasicFBType::IV_A);
   //       if (ivStatus) {
   //         BOOL* status = ivStatus->getDataBox().getData();
   //         if (status) {
-  //           Serial.printf(
+  //           WB_OUT(
   //               "%s \tProcess: \tEVENT_INPUT \t%s \t\tWITH \tStatus \t(* %s,
   //               "
-  //               "\tline:%d *) \n",
+  //               "\tline:%d *) \r\n",
   //               getName().c_str(), ieOccupy->getName().c_str(),
   //               (*status) ? "true" : "false", __LINE__);
   //         }
@@ -116,7 +125,7 @@ class VoterECCBasicFBType : public ECCBasicFBType {
   //       return;
   //     }
 
-  //     Serial.printf("TODO: Don't deal event(%s), line:%d !!!!!!!!\n",
+  //     WB_OUT("TODO: Don't deal event(%s), line:%d !!!!!!!! \r\n",
   //                   inEvent.getName().c_str(), __LINE__);
   //   }
   //   bool captureAndExecuteServiceInterfaceInEvent() {
@@ -133,16 +142,16 @@ class VoterECCBasicFBType : public ECCBasicFBType {
 
   //     if (time - lasttime > 10 * 1000) {
   //       EventOutput* oeControl =
-  //           (EventOutput*)findEventOutputByName(VoterECCBasicFBType::OE_Voted);
+  //           (EventOutput*)findEventOutputByName(VoterECCBasicFBType::OE_VOTED);
   //       Vo<Bool>* ovOnOff =
-  //           (Vo<Bool>*)findOutputVariableByName(VoterECCBasicFBType::OV_State);
+  //           (Vo<Bool>*)findOutputVariableByName(VoterECCBasicFBType::OV_STATE);
   //       Vt<Bool>* tvOnOff =
   //           (Vt<Bool>*)findInternalVariableByName(VoterECCBasicFBType::TV_ONOFF);
   //       if (tvOnOff && ovOnOff && oeControl) {
   //         BOOL onOff = *(tvOnOff->getDataBox().getData());
   //         tvOnOff->getDataBox().setData(!onOff);
   //         ovOnOff->getDataBox().setData(onOff);
-  //         Serial.printf(
+  //         WB_OUT(
   //             "%s \tGenerate: \tEVENT_OUTPUT \t%s \tWITH \tOnOff \t(* %s, "
   //             "\tline:%d *)\n",
   //             getName().c_str(), oeControl->getName().c_str(),
@@ -159,12 +168,12 @@ class VoterECCBasicFBType : public ECCBasicFBType {
  private:
   // TODO: Merge to class Aogorithm!
   void VoteAlg() {
-     // TODO: vi<T>() is Aogorithm's member function !
-    const Bool& A = vi<Bool>(VoterECCBasicFBType::IV_A);
-    const Bool& B = vi<Bool>(VoterECCBasicFBType::IV_B);
-    const Bool& C = vi<Bool>(VoterECCBasicFBType::IV_C);
+    // TODO: vi<T>() is Aogorithm's member function !
+    /*const*/ Bool& A = vi<Bool>(VoterECCBasicFBType::IV_A);
+    /*const*/ Bool& B = vi<Bool>(VoterECCBasicFBType::IV_B);
+    /*const*/ Bool& C = vi<Bool>(VoterECCBasicFBType::IV_C);
 
-    Bool& state = vo<Bool>(VoterECCBasicFBType::OV_State);
+    Bool& state = vo<Bool>(VoterECCBasicFBType::OV_STATE);
 
     // TODO: return const reference !
     const BOOL& a = A.getDataRef();
@@ -185,7 +194,7 @@ class VoterECCBasicFBType : public ECCBasicFBType {
     // (Vi<Bool>*)findInputVariableByName(VoterECCBasicFBType::IV_C);
 
     // Vo<Bool>* State =
-    //     (Vo<Bool>*)findOutputVariableByName(VoterECCBasicFBType::OV_State);
+    //     (Vo<Bool>*)findOutputVariableByName(VoterECCBasicFBType::OV_STATE);
 
     // if (A && B && C && State) {
     //   BOOL* a = A->getDataBox().getData();
@@ -203,25 +212,28 @@ class VoterECCBasicFBType : public ECCBasicFBType {
     // }
   }
   void ResetAlg() {
+    // WB_LOGD("ResetAlg()");
+
     Vo<Bool>* State =
-        (Vo<Bool>*)findOutputVariableByName(VoterECCBasicFBType::OV_State);
+        (Vo<Bool>*)findOutputVariableByName(VoterECCBasicFBType::OV_STATE);
 
     if (State) {
       State->getDataBox().setData(false);
     }
   }
 };
+
 const char* VoterECCBasicFBType::FB_TYPE_NAME = "VoterECCBasicFBType";
 
-const char* VoterECCBasicFBType::IE_Vote = "Vote";
-const char* VoterECCBasicFBType::IE_Reset = "Reset";
+const char* VoterECCBasicFBType::IE_VOTE = "Vote";
+const char* VoterECCBasicFBType::IE_RESET = "Reset";
 const char* VoterECCBasicFBType::IV_A = "A";
 const char* VoterECCBasicFBType::IV_B = "B";
 const char* VoterECCBasicFBType::IV_C = "C";
 
-const char* VoterECCBasicFBType::OE_Voted = "Voted";
-const char* VoterECCBasicFBType::OE_Ready = "Ready";
-const char* VoterECCBasicFBType::OV_State = "State";
+const char* VoterECCBasicFBType::OE_VOTED = "Voted";
+const char* VoterECCBasicFBType::OE_READY = "Ready";
+const char* VoterECCBasicFBType::OV_STATE = "State";
 
 const char* VoterECCBasicFBType::A_VoteAlg = "VoteAlg";
 const char* VoterECCBasicFBType::A_ResetAlg = "ResetAlg";

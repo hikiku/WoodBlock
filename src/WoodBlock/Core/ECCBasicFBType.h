@@ -24,8 +24,11 @@ class ECAction;
 class Algorithm;
 class ECTransition;
 
-typedef EventInput ECTransitionEvent;
-typedef bool (*GuardCondition)(const ECCBasicFBType& eccBasicFBType);
+#define ECTransitionEvent EventInput
+
+typedef std::function<bool()>
+    GuardCondition; /*const ECCBasicFBType& eccBasicFBType*/
+// typedef bool (*GuardCondition)(const ECCBasicFBType& eccBasicFBType);
 
 class ECState : public NamedObject {
  public:
@@ -62,7 +65,8 @@ class ECAction {
   EventOutput* eventOutput;  // can be NULL
 };
 
-typedef void (*AlgorithmCallback)(); /*BasicFBType& basicFBType*/
+typedef std::function<void()> AlgorithmCallback; /*BasicFBType& basicFBType*/
+// typedef void (*AlgorithmCallback)(); /*BasicFBType& basicFBType*/
 
 class Algorithm : public NamedObject {
  public:
@@ -75,16 +79,6 @@ class Algorithm : public NamedObject {
   void execute() {
     algorithmCallback();  // eccBasicFBType->algorithmCallback()???
   }
-
- protected:
-  template <typename T>
-  const T& vi(const String& nameOfInputVariable);
-
-  template <typename T>
-  T& vo(const String& nameOfOutputVariable);
-
-  template <typename T>
-  T& vt(const String& nameOfInternalVariable);
 
  private:
   // Algorithm() {}
@@ -112,17 +106,20 @@ class ECTransitionCondition {
   bool checkECTransitionEvent(
       const ECTransitionEvent& ecTransitionEvent_) const {
     if (this->ecTransitionEvent == nullptr) {
+      // WB_LOGV("this->ecTransitionEvent == nullptr");
       return false;
     }
     if (&ecTransitionEvent_ != this->ecTransitionEvent) {
+      // WB_LOGV("&ecTransitionEvent_ != this->ecTransitionEvent");
       return false;
     }
 
     if (guardCondition) {
-      return guardCondition(eccBasicFBType);
+      return guardCondition();  // eccBasicFBType
     }
 
-    return alwaysTrue;
+    // return alwaysTrue;
+    return true;
   }
   bool checkECTransitionEvent() const {
     if (this->ecTransitionEvent != nullptr) {
@@ -130,7 +127,7 @@ class ECTransitionCondition {
     }
 
     if (guardCondition) {
-      return guardCondition(eccBasicFBType);
+      return guardCondition();  // eccBasicFBType
     }
 
     return alwaysTrue;
@@ -161,9 +158,21 @@ class ECTransition {
   bool evaluateTransitionWithEventInput(const ECState& currentECState,
                                         const EventInput& eventInput) const {
     if (&currentECState != &sourceECState) {
+      // WB_LOGV(
+      //     "ECTransition::evaluateTransitionWithEventInput(currentECState=%s, "
+      //     "eventInput=%s, sourceECState=%s, ), result= %s",
+      //     currentECState.getName().c_str(), eventInput.getName().c_str(),
+      //     sourceECState.getName().c_str(), "false");
       return false;
     }
-    return ecTransitionCondition.checkECTransitionEvent(eventInput);
+
+    bool result = ecTransitionCondition.checkECTransitionEvent(eventInput);
+    // WB_LOGV(
+    //     "ECTransition::evaluateTransitionWithEventInput(currentECState=%s, "
+    //     "eventInput=%s, sourceECState=%s, ), result= %s",
+    //     currentECState.getName().c_str(), eventInput.getName().c_str(),
+    //     sourceECState.getName().c_str(), result ? "true" : "false");
+    return result;
   }
   bool evaluateTransitionWithoutEventInput(
       const ECState& currentECState) const {
@@ -225,34 +234,106 @@ class ECCBasicFBType : public BasicFBType {
 
   ECState* addECState(const String& nameOfECState) {
     ECState* ecState = new ECState(nameOfECState, *this);
+    if (ecState == nullptr) {
+      WB_LOGE("new ECState(%s) is failed!", nameOfECState.c_str());
+      return nullptr;
+    }
+
     if (currentECState == nullptr) {
       currentECState = ecState;
     }
+
+    ecStates.push_back(ecState);
     return ecState;
   }
 
-  static void addECAction(ECState& ecState, Algorithm* algorithm,
-                          EventOutput* eventOutput) {
-    ecState.addECAction(algorithm, eventOutput);
+  void addECAction(const String& nameOfECState, const String& nameOfAlgorithm,
+                   const String& nameOfEventOutput) {
+    ECState* ecState = findECStateByName(nameOfECState);
+    Algorithm* algorithm = findAlgorithmByName(nameOfAlgorithm);
+    EventOutput* eventOutput = findEventOutputByName(nameOfEventOutput);
+    if (ecState && (algorithm || eventOutput)) {
+      ecState->addECAction(algorithm, eventOutput);
+    }
   }
 
-  void addECTransition(ECState& sourceECState, ECState& destinationECState,
-                       const ECTransitionEvent* ecTransitionEvent = nullptr,
-                       const GuardCondition guardCondition = nullptr,
-                       bool alwaysTrue = false) {
-    if (ecTransitionEvent == nullptr && guardCondition == nullptr &&
-        alwaysTrue == false) {
-      // TODO: print(ERROR, "only one is nullptr");
+  // static void addECAction(ECState& ecState, Algorithm* algorithm,
+  //                         EventOutput* eventOutput) {
+  //   ecState.addECAction(algorithm, eventOutput);
+  // }
+
+  // addECTransitionWithEvent()
+  void addECTransition(const String& nameOfSourceECState,
+                       const String& nameOfDestinationECState,
+                       const String& nameOfECTransitionEvent,
+                       const GuardCondition guardCondition = nullptr) {
+    ECState* sourceECState = findECStateByName(nameOfSourceECState);
+    if (sourceECState == nullptr) {
+      WB_LOGE("sourceECState(%s) is NULL!", nameOfSourceECState.c_str());
       return;
     }
 
-    ECTransition* ecTransition =
-        new ECTransition(*this, sourceECState, destinationECState,
-                         ecTransitionEvent, guardCondition, alwaysTrue);
-    ecTransitions.push_back(ecTransition);
+    ECState* destinationECState = findECStateByName(nameOfDestinationECState);
+    if (destinationECState == nullptr) {
+      WB_LOGE("ecTransitionEvent(%s) is required!",
+              nameOfDestinationECState.c_str());
+      return;
+    }
+
+    const ECTransitionEvent* ecTransitionEvent =
+        findEventInputByName(nameOfECTransitionEvent);
+    if (ecTransitionEvent == nullptr) {
+      WB_LOGE("ecTransitionEvent(%s) is required!",
+              nameOfECTransitionEvent.c_str());
+      return;
+    }
+
+    _addECTransition(*sourceECState, *destinationECState, ecTransitionEvent,
+                     guardCondition, false);
+  }
+  // addECTransitionWithBoolExpression()
+  void addECTransition(const String& nameOfSourceECState,
+                       const String& nameOfDestinationECState,
+                       const GuardCondition guardCondition) {
+    ECState* sourceECState = findECStateByName(nameOfSourceECState);
+    ECState* destinationECState = findECStateByName(nameOfDestinationECState);
+
+    if (sourceECState == nullptr || destinationECState == nullptr ||
+        guardCondition == nullptr) {
+      // TODO: print(ERROR, "guardCondition is required!");
+      return;
+    }
+    _addECTransition(*sourceECState, *destinationECState, nullptr,
+                     guardCondition, false);
+  }
+  // addECTransitionWithUnconditional()
+  void addECTransition(const String& nameOfSourceECState,
+                       const String& nameOfDestinationECState) {
+    ECState* sourceECState = findECStateByName(nameOfSourceECState);
+    ECState* destinationECState = findECStateByName(nameOfDestinationECState);
+
+    if (sourceECState == nullptr || destinationECState == nullptr) {
+      // TODO: print(ERROR, "guardCondition is required!");
+      return;
+    }
+    _addECTransition(*sourceECState, *destinationECState, nullptr, nullptr,
+                     true);
   }
 
   void executeEventInput(const EventInput& eventInput) {
+    WB_OUT(
+        "%s \tProcess: \tEVENT_INPUT \t%s \t\tWITH \t... \t(* ..., "
+        "\t\tline:%d *) \r\n",
+        getName().c_str(), eventInput.getName().c_str(),
+        // (*state) ? "true" : "false",
+        __LINE__);
+
+    // WB_LOGD(
+    //     "ECCBasicFBType::executeEventInput(FBType:%s, "
+    //     "currentECState=%s, eventInput=%s)",
+    //     getName().c_str(), currentECState->getName().c_str(),
+    //     eventInput.getName().c_str());
+
     // s1
     ECTransition* ecTransition = evaluateTransitionWithEventInput(eventInput);
     while (ecTransition) {  // && ecTransition->getDestinationECState()
@@ -284,14 +365,64 @@ class ECCBasicFBType : public BasicFBType {
     return nullptr;
   }
 
+ protected:
+  template <typename T>
+  /*const*/ T& vi(const String& nameOfInputVariable) {
+    Vi<T>* inputVariable = (Vi<T>*)findInputVariableByName(nameOfInputVariable);
+    if (inputVariable) {
+      return inputVariable->getDataBox();
+    } else {
+      throw InputVariableException();
+    }
+  }
+
+  template <typename T>
+  T& vo(const String& nameOfOutputVariable) {
+    Vo<T>* outputVariable =
+        (Vo<T>*)findOutputVariableByName(nameOfOutputVariable);
+    if (outputVariable) {
+      return outputVariable->getDataBox();
+    } else {
+      throw OutputVariableException();
+    }
+  }
+
+  template <typename T>
+  T& vt(const String& nameOfInternalVariable) {
+    Vt<T>* internalVariable =
+        (Vt<T>*)findInternalVariableByName(nameOfInternalVariable);
+    if (internalVariable) {
+      return internalVariable->getDataBox();
+    } else {
+      throw InputVariableException();
+    }
+  }
+
  private:
   // ECCBasicFBType(const char *) {}
 
-  void generateEventOutput(EventOutput& outEvent) {
-    FBType::generateEventOutput(outEvent);
+  void _addECTransition(ECState& sourceECState, ECState& destinationECState,
+                        const ECTransitionEvent* ecTransitionEvent = nullptr,
+                        const GuardCondition guardCondition = nullptr,
+                        bool alwaysTrue = false) {
+    if (ecTransitionEvent == nullptr && guardCondition == nullptr &&
+        alwaysTrue == false) {
+      // TODO: print(ERROR, "only one is nullptr");
+      return;
+    }
+
+    ECTransition* ecTransition =
+        new ECTransition(*this, sourceECState, destinationECState,
+                         ecTransitionEvent, guardCondition, alwaysTrue);
+    ecTransitions.push_back(ecTransition);
   }
 
   ECTransition* evaluateTransitionWithEventInput(const EventInput& eventInput) {
+    // WB_LOGD(
+    //     "ECCBasicFBType::evaluateTransitionWithEventInput(eventInput=%s, "
+    //     "ecTransitions.size()=%u)",
+    //     eventInput.getName().c_str(), ecTransitions.size());
+
     for (std::list<ECTransition*>::iterator it = ecTransitions.begin();
          it != ecTransitions.end(); it++) {
       if ((*it)->evaluateTransitionWithEventInput(*currentECState,
@@ -311,6 +442,10 @@ class ECCBasicFBType : public BasicFBType {
     return nullptr;
   }
 
+  void generateEventOutput(EventOutput& outEvent) {
+    FBType::generateEventOutput(outEvent);
+  }
+
   // ECC： Execuion Control Chart
   ECState* currentECState;
   std::list<ECState*> ecStates;            // length greater than 1
@@ -318,7 +453,7 @@ class ECCBasicFBType : public BasicFBType {
 
   std::list<Algorithm*> algorithms;  // 0..*
 
-  friend class ECAction; // ECCBasicFBType::generateEventOutput()
+  friend class ECAction;  // ECCBasicFBType::generateEventOutput()
 };
 
 WOODBLOCK_END_PUBLIC_NAMESPACE

@@ -30,7 +30,7 @@ class OccupySensorFBType : public SIFBType {
   ~OccupySensorFBType() {}
 
   void executeEventInput(const EventInput& inEvent) {
-    Serial.printf("TODO: Don't deal event(%s), line:%d\n",
+    WB_LOGW("TODO: Don't deal event(%s), line:%d\n",
                   inEvent.getName().c_str(), __LINE__);
   }
   bool captureAndExecuteServiceInterfaceInEvent() {
@@ -57,9 +57,9 @@ class OccupySensorFBType : public SIFBType {
         tvStatus->getDataBox().setData(!status);
         ovStatus->getDataBox().setData(status);
 
-        Serial.printf(
+        WB_OUT(
             "%s \tGenerate: \tEVENT_OUTPUT \t%s \t\tWITH \tStatus \t(* %s, "
-            "\tline:%d *)\n",
+            "\tline:%d *) \r\n",
             getName().c_str(), oeOccupy->getName().c_str(),
             status ? "true" : "false", __LINE__);
         generateEventOutput(*oeOccupy);

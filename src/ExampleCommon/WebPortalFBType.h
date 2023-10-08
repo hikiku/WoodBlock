@@ -58,9 +58,9 @@ class WebPortalFBType : public SIFBType {
         if (ivStatus) {
           BOOL* status = ivStatus->getDataBox().getData();
           if (status) {
-            Serial.printf(
+            WB_OUT(
                 "%s \tProcess: \tEVENT_INPUT \t%s \t\tWITH \tStatus \t(* %s, "
-                "\tline:%d *) \n",
+                "\tline:%d *) \r\n",
                 getName().c_str(), ieOccupy->getName().c_str(),
                 (*status) ? "true" : "false", __LINE__);
           }
@@ -69,7 +69,7 @@ class WebPortalFBType : public SIFBType {
       }
     }
 
-    Serial.printf("TODO: Don't deal event(%s), line:%d !!!!!!!!\n",
+    WB_OUT("TODO: Don't deal event(%s), line:%d !!!!!!!! \r\n",
                   inEvent.getName().c_str(), __LINE__);
   }
   bool captureAndExecuteServiceInterfaceInEvent() {
@@ -96,9 +96,9 @@ class WebPortalFBType : public SIFBType {
           BOOL onOff = *(tvOnOff->getDataBox().getData());
           tvOnOff->getDataBox().setData(!onOff);
           ovOnOff->getDataBox().setData(onOff);
-          Serial.printf(
+          WB_OUT(
               "%s \tGenerate: \tEVENT_OUTPUT \t%s \tWITH \tOnOff \t(* %s, "
-              "\tline:%d *)\n",
+              "\tline:%d *) \r\n",
               getName().c_str(), oeControl->getName().c_str(),
               onOff ? "true" : "false", __LINE__);
           generateEventOutput(*oeControl);

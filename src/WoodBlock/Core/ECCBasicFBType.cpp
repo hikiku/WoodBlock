@@ -47,37 +47,4 @@ void ECAction::execute() {
   }
 }
 
-template <typename T>
-const T& Algorithm::vi(const String& nameOfInputVariable) {
-  Vi<T>* inputVariable =
-      (Vi<T>*)eccBasicFBType.findInputVariableByName(nameOfInputVariable);
-  if (inputVariable) {
-    return inputVariable->getDataBox();
-  } else {
-    throw InputVariableException();
-  }
-}
-
-template <typename T>
-T& Algorithm::vo(const String& nameOfOutputVariable) {
-  Vo<T>* outputVariable =
-      (Vo<T>*)eccBasicFBType.findOutputVariableByName(nameOfOutputVariable);
-  if (outputVariable) {
-    return outputVariable->getDataBox();
-  } else {
-    throw OutputVariableException();
-  }
-}
-
-template <typename T>
-T& Algorithm::vt(const String& nameOfInternalVariable) {
-  Vt<T>* internalVariable =
-      (Vt<T>*)eccBasicFBType.findInternalVariableByName(nameOfInternalVariable);
-  if (internalVariable) {
-    return internalVariable->getDataBox();
-  } else {
-    throw InputVariableException();
-  }
-}
-
 WOODBLOCK_END_PUBLIC_NAMESPACE

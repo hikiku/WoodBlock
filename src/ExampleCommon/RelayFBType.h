@@ -31,15 +31,15 @@ class RelayFBType : public BasicFBType {
       if (ivOnOff) {
         BOOL* onOff = ivOnOff->getDataBox().getData();
         if (onOff) {
-          Serial.printf(
+          WB_OUT(
               "%s \t\tProcess: \tEVENT_INPUT \t%s \tWITH \tOnOff \t(* %s, "
-              "\tline:%d *) \n",
+              "\tline:%d *) \r\n",
               getName().c_str(), ieControl->getName().c_str(),
               (*onOff) ? "true" : "false", __LINE__);
         }
       }
     } else {
-      Serial.printf("TODO: Don't deal event(%s), line:%d !!!!!!!!\n",
+      WB_OUT("TODO: Don't deal event(%s), line:%d !!!!!!!! \r\n",
                     inEvent.getName().c_str(), __LINE__);
     }
   }

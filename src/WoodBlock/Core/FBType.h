@@ -163,17 +163,22 @@ class FBType : public NamedObject {
                             int sizeofInVariables = 0) {
     EventInput* inEvent = new EventInput(*this, nameOfEventInput);
     if (inEvent) {
-      bool result =
-          inEvent->addInVariablesByNames(inputVariableNames, sizeofInVariables);
-      // add eventInputs ot std::list<EventInput*> eventInputs;
-      if (result) {
+      if (inputVariableNames == nullptr || sizeofInVariables == 0) {
         eventInputs.push_back(inEvent);
         return inEvent;
       } else {
-        // TODO: printf (ERROR, "It fail for calling
-        // addInVariablesByNames(EventInput[%s])!", nameOfEventInput);
-        delete inEvent;
-        return nullptr;
+        bool result = inEvent->addInVariablesByNames(inputVariableNames,
+                                                     sizeofInVariables);
+        // add eventInputs ot std::list<EventInput*> eventInputs;
+        if (result) {
+          eventInputs.push_back(inEvent);
+          return inEvent;
+        } else {
+          // TODO: printf (ERROR, "It fail for calling
+          // addInVariablesByNames(EventInput[%s])!", nameOfEventInput);
+          delete inEvent;
+          return nullptr;
+        }
       }
     } else {
       // TODO: printf (ERROR, "It fail for adding EventInput[%s]!",
@@ -186,20 +191,24 @@ class FBType : public NamedObject {
   EventOutput* addEventOutput(const char* nameOfEventOutput,
                               const char* outputVariableNames[],
                               int sizeofOutVariables) {
-    // TODO: ...
     EventOutput* outEvent = new EventOutput(*this, nameOfEventOutput);
     if (outEvent) {
-      bool result = outEvent->addOutVariablesByNames(outputVariableNames,
-                                                     sizeofOutVariables);
-      // add outEvent to std::list<EventOutput*> eventOutputs;
-      if (result) {
+      if (outputVariableNames == nullptr || sizeofOutVariables == 0) {
         eventOutputs.push_back(outEvent);
         return outEvent;
       } else {
-        // TODO: printf (ERROR, "It fail for calling
-        // addOutVariablesByNames(EventInput[%s])!", nameOfEventOutput);
-        delete outEvent;
-        return nullptr;
+        bool result = outEvent->addOutVariablesByNames(outputVariableNames,
+                                                       sizeofOutVariables);
+        // add outEvent to std::list<EventOutput*> eventOutputs;
+        if (result) {
+          eventOutputs.push_back(outEvent);
+          return outEvent;
+        } else {
+          // TODO: printf (ERROR, "It fail for calling
+          // addOutVariablesByNames(EventInput[%s])!", nameOfEventOutput);
+          delete outEvent;
+          return nullptr;
+        }
       }
     } else {
       // TODO: printf (ERROR, "It fail for adding addEventOutput[%s]!",
@@ -248,6 +257,10 @@ class FBType : public NamedObject {
   void handleAllOfEventOutputs(
       FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
+    // WB_LOGD(
+    //     "FBType::handleAllOfEventOutputs(%s), triggeredEventOutputs.size()=%u",
+    //     getName().c_str(), triggeredEventOutputs.size());
+
     for (std::list<EventOutput*>::iterator it = triggeredEventOutputs.begin();
          it != triggeredEventOutputs.end();) {
       handleEventOutputCallback(fbNetwork, fbInstance, **it);
@@ -309,6 +322,8 @@ class BasicFBType : public FBType {
   bool fetchExternalEvents(
       FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
+    // WB_LOGD("BasicFBType::fetchExternalEvents()");
+    // TODO: ...
     return true;
   }
 
@@ -325,6 +340,8 @@ class CompositeFBType : public FBType {
   bool fetchExternalEvents(
       FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
+    // WB_LOGD("CompositeFBType::fetchExternalEvents()");
+    // TODO: ...
     return true;
   }
 
@@ -350,6 +367,7 @@ class SIFBType : public BasicFBType {  // FBType
   bool fetchExternalEvents(
       FBNetwork& fbNetwork, FBInstance& fbInstance,
       HandleEventOutputCallback handleEventOutputCallback) {
+    // WB_LOGD("SIFBType::fetchExternalEvents(%s)", getName().c_str());
     bool result = captureAndExecuteServiceInterfaceInEvent();  // execution ecc
     if (result) {
       handleAllOfEventOutputs(fbNetwork, fbInstance, handleEventOutputCallback);

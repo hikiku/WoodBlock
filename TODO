@@ -27,3 +27,19 @@
 // TODO: check data type of connection
 
 // TODO: Lookup Event / Feedback Event!
+
+// TODO: genenral template function block
+// TODO: Auto generate some Graphs: Application Top / FB Sequence
+// TODO: (Local / Remote) Test Functon Block: Driver & Discarder
+
+// Test Case:
+// FunctionBlock interface: 
+//      1. A event input/output with 0 input/output variables;
+//      2. A event input/output with 1 input/output variable;
+//      3. A event input/output with 2 input/output variables;
+//      4. A event input/output with 3 input/output variables;
+
+//      5. A input/output variable related to 0 event input/output;
+//      6. A input/output variable related to 1 event input/output;
+//      7. A input/output variable related to 2 event2 input/output;
+//      8. A input/output variable related to 3 event3 input/output;

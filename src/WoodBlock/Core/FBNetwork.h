@@ -82,29 +82,30 @@ class FBNetwork {
                const char* inVariableNames[], int sizeofInVariables) {
     WB_CHECK_PTR_RETURN_VALUE(srcFBInstanceName, false);
     WB_CHECK_PTR_RETURN_VALUE(outEventName, false);
-    WB_CHECK_PTR_RETURN_VALUE(outVariableNames, false);
-    WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables <= 0), false);
+    // WB_CHECK_PTR_RETURN_VALUE(outVariableNames, false);
+    // WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables <= 0), false);
     WB_CHECK_PTR_RETURN_VALUE(destFBInstanceName, false);
     WB_CHECK_PTR_RETURN_VALUE(inEventName, false);
-    WB_CHECK_PTR_RETURN_VALUE(inVariableNames, false);
-    WB_CHECK_EXP_RETURN_VALUE((sizeofInVariables <= 0), false);
+    // WB_CHECK_PTR_RETURN_VALUE(inVariableNames, false);
+    // WB_CHECK_EXP_RETURN_VALUE((sizeofInVariables <= 0), false);
     WB_CHECK_EXP_RETURN_VALUE((sizeofOutVariables != sizeofInVariables), false);
 
     FBInstance* sourceFBInstance = findFBInstanceByName(srcFBInstanceName);
     FBInstance* destFBInstance = findFBInstanceByName(destFBInstanceName);
     if (sourceFBInstance == nullptr) {
-      // TODO: printf(WARNING, "sourceFBInstance is nullptr!");
+      WB_LOGE("sourceFBInstance(%s) not found!", srcFBInstanceName);
       return false;
     }
     if (destFBInstance == nullptr) {
-      // TODO: printf(WARNING, "destFBInstance is nullptr!");
+      WB_LOGE("destFBInstance(%s) not found!", destFBInstanceName);
       return false;
     }
     bool result = connectEvent(*sourceFBInstance, outEventName,
                                outVariableNames, *destFBInstance, inEventName,
                                inVariableNames, sizeofInVariables);
     if (!result) {
-      // TODO: printf(HINT, "connectTo() is false!");
+      WB_LOGE("Error connecting [%s(%s)] to [%s(%s)]!", srcFBInstanceName,
+              outEventName, destFBInstanceName, inEventName);
       return false;
     }
     return true;
@@ -122,6 +123,8 @@ class FBNetwork {
                                         FBInstance& fbInstance,
                                         EventOutput& eventOutput) {
     // FBNetwork* _fbNetwork = (FBNetwork*)fbNetwork;
+    // WB_LOGD("FBNetwork::handleEventOutputCallback(eventOutput:%s)",
+    //         eventOutput.getName().c_str());
     fbNetwork._handleEventOutputCallback(fbInstance, eventOutput);
   }
   static OutputVariable* searchOutDataCallback(FBNetwork& fbNetwork,
@@ -137,6 +140,7 @@ class FBNetwork {
 
   bool fetchExternalEvents() {
     bool result = false;
+    // WB_LOGD("FBNetwork::fbInstances.size()=%d", fbInstances.size());
     for (std::list<FBInstance*>::iterator it = fbInstances.begin();
          it != fbInstances.end(); ++it) {
       result |= (*it)->getFBType().fetchExternalEvents(
@@ -152,6 +156,10 @@ class FBNetwork {
          it != eventConnections.end(); ++it) {
       if (((*it)->getSourceFBInstance() == &fbInstance) &&
           ((*it)->getSourceEvent() == &eventOutput)) {
+        // WB_LOGD(
+        //     "FBNetwork::_handleEventOutputCallback(FBType:%s)",
+        //     (*it)->getDestinationFBInstance()->getFBType().getName().c_str());
+
         (*it)->getDestinationFBInstance()->getFBType().processEventInput(
             *this, **it, *((*it)->getDestinationFBInstance()),
             *((*it)->getDestinationEvent()), FBNetwork::searchOutDataCallback,
@@ -164,8 +172,15 @@ class FBNetwork {
                                          FBInstance& fbInstance,
                                          EventInput& eventInput,
                                          InputVariable& inputVariable) {
+    // WB_LOGD(
+    //     "_searchOutDataCallback(): dataConnections.size()=%u, eventConnect:%p"
+    //     "[EventInput:%s,%p(InputVariable:%s,%p)]",
+    //     dataConnections.size(), &eventConnect, eventInput.getName().c_str(),
+    //     &eventInput, inputVariable.getName().c_str(), &inputVariable);
+
     for (std::list<DataConnection*>::iterator it = dataConnections.begin();
          it != dataConnections.end(); ++it) {
+      // (*it)->print();
       if (((*it)->eventConnection() == &eventConnect) &&
           ((*it)->destination() == &inputVariable)) {
         return (*it)->source();
@@ -186,13 +201,11 @@ class FBNetwork {
     EventInput* inEvent =
         destFBInstance.getFBType().findEventInputByName(inEventName);
     if (!outEvent) {
-      //// printf(ERROR, "It Can't find EventOutput by name %s!\n",
-      /// outEventName)
+      WB_LOGE("[outEvent:%s] not found!", outEventName);
       result = false;
     }
     if (!inEvent) {
-      //// printf(ERROR, "It Can't find EventInput by name %s!\n",
-      /// inEventName)
+      WB_LOGE("[inEvent:%s] not found!", inEventName);
       result = false;
     }
     if (!result) {
@@ -203,16 +216,17 @@ class FBNetwork {
     unsigned int srcEventType = outEvent->getEventType();
     unsigned int dstEventType = inEvent->getEventType();
     if ((dstEventType != EVENT_ANY) && (dstEventType != srcEventType)) {
-      // TODO: printf(WARNING, "EventType of srcEventType(%u) and
-      // dstEventType(%u) do not match!\n", srcEventType, dstEventType)
+      WB_LOGW(
+          "EventType of srcEventType(%u) and dstEventType(%u) do not match!",
+          srcEventType, dstEventType);
       result = false;
     }
     if (eventOutputIsAlreadyConnected(outEvent)) {
-      // TODO: printf(WARNING, "outEvent is already connected!\n")
+      WB_LOGW("[outEvent:%s] is already connected!", outEventName);
       result = false;
     }
     if (eventInputIsAlreadyConnected(inEvent)) {
-      // TODO: printf(WARNING, "inEvent is already connected!\n")
+      WB_LOGW("[inEvent:%s] is already connected!", inEventName);
       result = false;
     }
 
@@ -225,23 +239,19 @@ class FBNetwork {
           inEvent->findInputVariableByName(inVariableNames[i]);
 
       if (!outVariable) {
-        Serial.printf(
-            "ERROR: Check: It Can't find OutputVariable by name %s!\n",
-            outVariableNames[i]);
+        WB_LOGE("(outVariable:%s) cannot be found!", outVariableNames[i]);
         result = false;
       }
       if (!inVariable) {
-        Serial.printf("ERROR: Check: It Can't find InputVariable by name %s!\n",
-                      inVariableNames[i]);
+        WB_LOGE("(inVariable:%s) cannot be found!", inVariableNames[i]);
         result = false;
       }
       // check that outVariable and inVariable are match
       if (result) {
-        checkForConnectVariable(*outVariable, *inVariable);
-        if (!result) {
-          //// printf(HINT, "outVariable(%s) & inVariable(%s) are not
-          /// match!\n",
-          /// outVariable.getName(), inVariable.getName());
+        bool resultCheck = checkForConnectVariable(*outVariable, *inVariable);
+        if (!resultCheck) {
+          WB_LOGE("(outVariable:%s) & (inVariable:%s) are not match!",
+                  outVariable->getName().c_str(), inVariable->getName().c_str());
           result = false;
         }
       }
@@ -263,26 +273,31 @@ class FBNetwork {
           inEvent->findInputVariableByName(inVariableNames[i]);
 
       if (!outVariable) {
-        //// printf(ERROR, "Connect: It Can't find OutputVariable by name
-        ///%s!\n", outVariableNames[i])
+        WB_LOGE("(outVariable:%s) cannot be found!", outVariableNames[i]);
         continue;  // result = false;
       }
       if (!inVariable) {
-        //// printf(ERROR, "Connect: It Can't find InputVariable by name
-        ///%s!\n",
-        /// inVariableNames[i])
+        WB_LOGE("(inVariable:%s) cannot be found!", inVariableNames[i]);
         continue;  // result = false;
       }
-      connectVariable(*eventConnection, *outVariable, *inVariable);
+      bool resultConn =
+          connectVariable(*eventConnection, *outVariable, *inVariable);
+      if (!resultConn) {
+        WB_LOGE("connect variable((outVariable:%s) => (inVariable:%s)) error!",
+                outVariable->getName().c_str(), inVariable->getName().c_str());
+        result = false;
+      }
     }
 
-    return true;
+    return result;
   }
 
   // connect InputVariable from OutputVariable
   bool connectVariable(EventConnection& eventConnection,
                        OutputVariable& outData, InputVariable& inData) {
     if (!checkForConnectVariable(outData, inData)) {
+      WB_LOGE("checkForConnectVariable((outData:%s) & (inData:%s)) failed!",
+              outData.getName().c_str(), inData.getName().c_str());
       return false;
     }
 
@@ -318,11 +333,15 @@ class FBNetwork {
     }
     return false;
   }
-  bool inputVariableIsAlreadyConnected(InputVariable& inputVariable) const {
+  bool _inputVariableIsAlreadyConnected(OutputVariable& outputVariable,
+                                        InputVariable& inputVariable) const {
     for (std::list<DataConnection*>::const_iterator it =
              dataConnections.begin();
          it != dataConnections.end(); ++it) {
-      if ((*it)->destination() == &inputVariable) {
+      if (((*it)->source() !=
+           &outputVariable) &&  // Fixed bug: N>1 input events with a same input
+                                // variable!
+          ((*it)->destination() == &inputVariable)) {
         return true;
       }
     }
@@ -332,19 +351,20 @@ class FBNetwork {
   // check that outVariable and inVariable are match
   bool checkForConnectVariable(OutputVariable& outData,
                                InputVariable& inData) const {
-    if (inputVariableIsAlreadyConnected(inData)) {
-      // TODO: printf(WARN, "inData is alreay connected!\n");
+    if (_inputVariableIsAlreadyConnected(outData, inData)) {
+      WB_LOGE("(inData:%s) may alreay be connected!", inData.getName().c_str());
       return false;
     }
+
     // check data type
     unsigned int outNumberOfDataType = outData.getNumberOfDataType();
     unsigned int inNumberOfDataType = inData.getNumberOfDataType();
     bool result =
         DataBox::check4ConnectDataType(outNumberOfDataType, inNumberOfDataType);
     if (!result) {
-      // TODO: printf(WARNING, "outNumberOfDataType(%u) and
-      // inNumberOfDataType(%u) are not matched!\n", outNumberOfDataType,
-      // inNumberOfDataType)
+      WB_LOGE(
+          "outNumberOfDataType(%u) and inNumberOfDataType(%u) are not matched!",
+          outNumberOfDataType, inNumberOfDataType);
       return false;
     } else {
       return true;

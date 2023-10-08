@@ -114,10 +114,14 @@ class EventInput : public Event {
   void _sample(FBNetwork& fbNetwork, EventConnection& eventConnect,
                FBInstance& fbInstance,
                SearchOutDataCallback searchOutDataCallback) {
+    // WB_LOGD("EventInput:%s, inputVariables.size()=%d", getName().c_str(),
+    //         inputVariables.size());
     for (std::list<InputVariable*>::iterator it = inputVariables.begin();
          it != inputVariables.end(); ++it) {
-      OutputVariable* outputVariable =
-          searchOutDataCallback(fbNetwork, eventConnect, fbInstance, *this, **it);
+      OutputVariable* outputVariable = searchOutDataCallback(
+          fbNetwork, eventConnect, fbInstance, *this, **it);
+      // WB_LOGD("[EventInput:%s(InputVariable:%s)], outputVariable=%p",
+      //         getName().c_str(), (*it)->getName().c_str(), outputVariable);
       // (*it)->sample(*outputVariable);  //**it = outputVariable
       (*it)->getDataBox() = outputVariable->getDataBox();
     }

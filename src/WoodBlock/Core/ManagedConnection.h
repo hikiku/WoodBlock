@@ -72,6 +72,12 @@ class DataConnection : public ManagedConnection {
     return this->inputVariable;
   };
 
+  void print() {
+    WB_LOGD("connection=%p, outputVariable(%s, %p) -> inputVariable(%s, %p)",
+            connection, outputVariable->getName().c_str(), outputVariable,
+            inputVariable->getName().c_str(), inputVariable);
+  }
+
  private:
   EventConnection* connection;
   OutputVariable* outputVariable;  // from / source // //outData
